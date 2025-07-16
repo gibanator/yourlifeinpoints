@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             LifeInPointsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "JOJO",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -42,6 +42,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     LifeInPointsTheme {
-        Greeting("Android")
+        Greeting("Jojo")
     }
 }
