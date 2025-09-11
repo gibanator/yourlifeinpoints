@@ -12,7 +12,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lifeinpoints.ui.components.common.AppBottomBar
 import com.example.lifeinpoints.ui.components.common.AppNavHost
-import com.example.lifeinpoints.ui.components.common.BottomNavItem
+import com.example.lifeinpoints.ui.components.common.Destination
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +35,7 @@ fun AppWithBottomBar() {
     ) { padding ->
         AppNavHost(
             navController = navController,
-            startDestination = BottomNavItem.MAIN,
+            startDestination = Destination.MAIN,
             modifier = Modifier.padding(padding)
         )
     }

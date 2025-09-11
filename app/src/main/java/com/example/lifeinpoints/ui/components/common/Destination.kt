@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 
-enum class BottomNavItem(
+enum class Destination(
     val route: String,
     val label: String,
     val icon: ImageVector

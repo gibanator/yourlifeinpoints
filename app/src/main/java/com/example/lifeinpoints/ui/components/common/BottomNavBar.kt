@@ -15,19 +15,19 @@ import com.example.lifeinpoints.ui.screens.MainScreen
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    startDestination: BottomNavItem,
+    startDestination: Destination,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController,
         startDestination = startDestination.route
     ) {
-        BottomNavItem.entries.forEach { destination ->
+        Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    BottomNavItem.MAIN -> MainScreen()
-                    BottomNavItem.CALENDAR -> CalendarScreen()
-                    BottomNavItem.GRAPHS -> TODO()
+                    Destination.MAIN -> MainScreen()
+                    Destination.CALENDAR -> CalendarScreen()
+                    Destination.GRAPHS -> TODO()
                 }
             }
         }
@@ -40,7 +40,7 @@ fun AppBottomBar(
     currentRoute: String?
 ) {
     NavigationBar {
-        BottomNavItem.entries.forEach { item ->
+        Destination.entries.forEach { item ->
             NavigationBarItem(
                 selected = currentRoute == item.route,
                 onClick = {
