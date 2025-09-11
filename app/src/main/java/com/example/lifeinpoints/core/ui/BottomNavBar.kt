@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.ui.components.common
+package com.example.lifeinpoints.core.ui
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -6,7 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.lifeinpoints.ui.navigation.Destination
+import com.example.lifeinpoints.core.util.Destination
 
 @Composable
 fun AppBottomBar(

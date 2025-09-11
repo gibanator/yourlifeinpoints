@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.ui.theme
+package com.example.lifeinpoints.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

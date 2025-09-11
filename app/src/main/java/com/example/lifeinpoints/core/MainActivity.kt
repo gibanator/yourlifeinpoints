@@ -1,4 +1,4 @@
-package com.example.lifeinpoints
+package com.example.lifeinpoints.core
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,9 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.lifeinpoints.ui.components.common.AppBottomBar
-import com.example.lifeinpoints.ui.navigation.AppNavHost
-import com.example.lifeinpoints.ui.navigation.Destination
+import com.example.lifeinpoints.core.ui.AppBottomBar
+import com.example.lifeinpoints.core.util.AppNavHost
+import com.example.lifeinpoints.core.util.Destination
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

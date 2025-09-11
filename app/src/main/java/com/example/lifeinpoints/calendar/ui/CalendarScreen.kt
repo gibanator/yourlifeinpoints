@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.ui.screens
+package com.example.lifeinpoints.calendar.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

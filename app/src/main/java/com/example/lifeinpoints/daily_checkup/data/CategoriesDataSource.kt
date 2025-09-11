@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.ui.components
+package com.example.lifeinpoints.daily_checkup.data
 
 import com.example.lifeinpoints.R
 

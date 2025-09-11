@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.ui.navigation
+package com.example.lifeinpoints.core.util
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
