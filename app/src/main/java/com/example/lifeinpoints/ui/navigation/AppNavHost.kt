@@ -6,7 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.lifeinpoints.ui.screens.CalendarScreen
-import com.example.lifeinpoints.ui.screens.MainScreen
+import com.example.lifeinpoints.ui.screens.CategoriesListPreview
+
 
 @Composable
 fun AppNavHost(
@@ -21,7 +22,7 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.MAIN -> MainScreen()
+                    Destination.MAIN -> CategoriesListPreview()
                     Destination.CALENDAR -> CalendarScreen()
                     Destination.GRAPHS -> TODO()
                 }
