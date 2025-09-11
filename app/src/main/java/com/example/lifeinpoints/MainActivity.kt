@@ -11,15 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lifeinpoints.ui.components.common.AppBottomBar
-import com.example.lifeinpoints.ui.components.common.AppNavHost
-import com.example.lifeinpoints.ui.components.common.Destination
+import com.example.lifeinpoints.ui.navigation.AppNavHost
+import com.example.lifeinpoints.ui.navigation.Destination
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // AppWithBottomBar()
+            AppWithBottomBar()
         }
     }
 }
