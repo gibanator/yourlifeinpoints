@@ -32,7 +32,6 @@ fun CalendarScreen(
 ) {
     val calendarUiState by vm.uiState.collectAsStateWithLifecycle()
 
-
     LaunchedEffect(calendarUiState.mode, calendarUiState.month) {
         val title = if (calendarUiState.mode == CalendarUiState.Mode.MONTH)
             calendarUiState.month.format(java.time.format.DateTimeFormatter.ofPattern("LLLL yyyy"))

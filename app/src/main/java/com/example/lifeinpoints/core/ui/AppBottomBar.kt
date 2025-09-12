@@ -6,7 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.lifeinpoints.core.util.Destination
+import com.example.lifeinpoints.core.navigation.Destination
 
 @Composable
 fun AppBottomBar(
