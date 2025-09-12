@@ -123,7 +123,7 @@ fun CategoryListItemPreview() {
     )
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun CategoriesListPreview() {
     // Создаем тестовые данные для превью
