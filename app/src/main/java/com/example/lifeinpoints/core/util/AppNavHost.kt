@@ -18,13 +18,14 @@ fun AppNavHost(
 ) {
     NavHost(
         navController,
-        startDestination = startDestination.route
+        startDestination = startDestination.route,
+        modifier = modifier
     ) {
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
                     Destination.MAIN -> CategoriesListPreview()
-                    Destination.CALENDAR -> CalendarScreen(topBar)
+                    Destination.CALENDAR -> CalendarScreen(topBar = topBar)
                     Destination.GRAPHS -> TODO()
                 }
             }
