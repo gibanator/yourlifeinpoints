@@ -6,13 +6,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
+import com.example.lifeinpoints.core.ui.TopBarController
 import com.example.lifeinpoints.daily_checkup.ui.CategoriesListPreview
-
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     startDestination: Destination,
+    topBar: TopBarController,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -23,7 +24,7 @@ fun AppNavHost(
             composable(destination.route) {
                 when (destination) {
                     Destination.MAIN -> CategoriesListPreview()
-                    Destination.CALENDAR -> CalendarScreen()
+                    Destination.CALENDAR -> CalendarScreen(topBar)
                     Destination.GRAPHS -> TODO()
                 }
             }
