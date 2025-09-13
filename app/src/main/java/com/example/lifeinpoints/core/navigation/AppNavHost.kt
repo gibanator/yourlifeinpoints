@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
-import com.example.lifeinpoints.core.ui.TopBarController
 import com.example.lifeinpoints.daily_checkup.data.CategoryRepository
 import com.example.lifeinpoints.daily_checkup.ui.CategoriesList
 
@@ -14,7 +13,6 @@ import com.example.lifeinpoints.daily_checkup.ui.CategoriesList
 fun AppNavHost(
     navController: NavHostController,
     startDestination: Destination,
-    topBar: TopBarController,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -25,9 +23,9 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.MAIN -> CategoriesList(CategoryRepository.categories, topBar = topBar,
+                    Destination.MAIN -> CategoriesList(CategoryRepository.categories,
                         onCategoryClick = { category -> },)
-                    Destination.CALENDAR -> CalendarScreen(topBar = topBar)
+                    Destination.CALENDAR -> CalendarScreen()
                     Destination.GRAPHS -> TODO()
                 }
             }

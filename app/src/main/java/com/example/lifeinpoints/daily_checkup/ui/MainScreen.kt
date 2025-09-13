@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,8 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lifeinpoints.R
-import com.example.lifeinpoints.core.ui.TopBarController
-import com.example.lifeinpoints.core.ui.TopBarState
 import com.example.lifeinpoints.daily_checkup.data.Category
 
 @Composable
@@ -368,8 +368,9 @@ fun CalendarPlaceholder(
 @Composable
 fun CategoryListItem(
     category: Category,
-    isSelected: Boolean = false,
     modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
+
 ) {
     val cardColor = if (isSelected) {
         Color(0xFF7E6DF8)
@@ -435,7 +436,6 @@ fun CategoriesListPreview() {
             onCategoryClick = { category ->
                 // Обработка клика по категории
             },
-            topBar = TopBarController()
         )
     }
 }
