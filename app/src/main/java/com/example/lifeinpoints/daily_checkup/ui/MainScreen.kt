@@ -11,19 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,69 +36,72 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.daily_checkup.data.Category
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesList(
     categories: List<Category>,
     modifier: Modifier = Modifier,
     onCategoryClick: (Category) -> Unit,
-    topBar: TopBarController,
     viewModel: DailyCheckupViewModel = viewModel()
 ) {
-    LaunchedEffect(Unit) {
-        topBar.set(
-            TopBarState(
-                title = "Point Distribution",
-                actions = {}
-            )
-        )
-    }
 
     // Collect state from ViewModel
     val selectedCategories by viewModel.selectedCategories.collectAsState()
     val isDayEnded by viewModel.isDayEnded.collectAsState()
     val isMultiplierMode by viewModel.isMultiplierMode.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .padding(12.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Место для будущего календаря (уменьшенное)
-            CalendarPlaceholder(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-            )
-
-            // Карточка с категориями
-            CategoryListCard(
-                categories = categories,
-                selectedCategories = selectedCategories,
-                isDayEnded = isDayEnded,
-                isMultiplierMode = isMultiplierMode,
-                onCategoryClick = { index, category ->
-                    viewModel.toggleCategory(index)
-                    onCategoryClick(category)
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Daily Checkup")
                 },
-                onToggleMultiplierMode = { viewModel.toggleMultiplierMode() },
-                modifier = Modifier.weight(1f)
             )
         }
-
-        // Карточка блокировки выбора
-        DayCompletionCard(
-            isDayEnded = isDayEnded,
-            onToggleDayEnded = { viewModel.toggleDayEnded() },
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        )
+                .padding(12.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Место для будущего календаря (уменьшенное)
+                CalendarPlaceholder(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                )
+
+                // Карточка с категориями
+                CategoryListCard(
+                    categories = categories,
+                    selectedCategories = selectedCategories,
+                    isDayEnded = isDayEnded,
+                    isMultiplierMode = isMultiplierMode,
+                    onCategoryClick = { index, category ->
+                        viewModel.toggleCategory(index)
+                        onCategoryClick(category)
+                    },
+                    onToggleMultiplierMode = { viewModel.toggleMultiplierMode() },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // Карточка блокировки выбора
+            DayCompletionCard(
+                isDayEnded = isDayEnded,
+                onToggleDayEnded = { viewModel.toggleDayEnded() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            )
+        }
     }
+
 }
 
 @Composable
