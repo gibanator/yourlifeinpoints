@@ -18,7 +18,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lifeinpoints.core.navigation.AppNavHost
 import com.example.lifeinpoints.core.navigation.Destination
 import com.example.lifeinpoints.core.ui.AppBottomBar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

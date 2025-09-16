@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lifeinpoints.calendar.CalendarUiState
 import com.example.lifeinpoints.calendar.CalendarViewModel
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 @Preview
@@ -36,14 +38,19 @@ fun CalendarScreen(
 ) {
     val calendarUiState by vm.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        vm.initMonthlyView(YearMonth.of(2025, 6))
+    }
+
     Scaffold (
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         if (calendarUiState.mode == CalendarUiState.Mode.MONTH)
-                            calendarUiState.month.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
-                        else calendarUiState.month.year.toString()
+                            calendarUiState.currentMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
+                        + ", " + "${calendarUiState.weeksCount.toString()} weeks"
+                        else calendarUiState.currentMonth.year.toString()
                     )
                 },
                 actions = {

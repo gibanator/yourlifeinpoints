@@ -1,109 +1,180 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.lifeinpoints.R
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.daily_checkup.data.Category
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesList(
-    categories: List<Category>,
+fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
-    onCategoryClick: (Category) -> Unit,
-    viewModel: DailyCheckupViewModel = viewModel()
-) {
+    vm: NewDailyCheckupViewModel = hiltViewModel()
+)
+{
+    val uiState by vm.uiState.collectAsState()
+    val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }
 
-    // Collect state from ViewModel
-    val selectedCategories by viewModel.selectedCategories.collectAsState()
-    val isDayEnded by viewModel.isDayEnded.collectAsState()
-    val isMultiplierMode by viewModel.isMultiplierMode.collectAsState()
-
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text("Daily Checkup")
-                },
+                title = { Text(uiState.selectedDate.format(formatter)) }
             )
         }
-    ) { padding ->
+    ) {paddingValues ->
         Column(
             modifier = Modifier
-                .padding(12.dp)
-                .fillMaxSize(),
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(12.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Место для будущего календаря (уменьшенное)
-                CalendarPlaceholder(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                )
-
-                // Карточка с категориями
-                CategoryListCard(
-                    categories = categories,
-                    selectedCategories = selectedCategories,
-                    isDayEnded = isDayEnded,
-                    isMultiplierMode = isMultiplierMode,
-                    onCategoryClick = { index, category ->
-                        viewModel.toggleCategory(index)
-                        onCategoryClick(category)
-                    },
-                    onToggleMultiplierMode = { viewModel.toggleMultiplierMode() },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
+            WeekBarWithButtons(
+                days = uiState.currentWeek,
+                onDaySelected = vm::onDaySelected,
+                toPrevWeek = vm::toPrevWeek,
+                toNextWeek = vm::toNextWeek,
+            )
+            CategoryListCard(
+                categories = uiState.allCategories,
+                selectedCategories = uiState.selectedCategories,
+                isDayEnded = uiState.isDayEnded,
+                isMultiplierMode = uiState.isMultiplierMode,
+                onCategoryClick = { index, category ->
+                    vm.toggleCategory(index)
+                },
+                onToggleMultiplierMode = { vm.toggleMultiplierMode() },
+                modifier = Modifier
+            )
             // Карточка блокировки выбора
             DayCompletionCard(
-                isDayEnded = isDayEnded,
-                onToggleDayEnded = { viewModel.toggleDayEnded() },
+                isDayEnded = uiState.isDayEnded,
+                onToggleDayEnded = { vm.toggleDayEnded() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             )
         }
-    }
 
+
+    }
 }
 
+@Composable
+fun WeekBarWithButtons(
+    modifier: Modifier = Modifier,
+    days: List<DayForWeekBar>,
+    onDaySelected: (LocalDate) -> Unit,
+    toPrevWeek: () -> Unit,
+    toNextWeek: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Left button
+        IconButton(
+            onClick = toPrevWeek) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous week")
+        }
+
+        // Center week row
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            days.forEach { day ->
+                val selected = day.isSelected
+                Box(
+                    modifier = Modifier
+                        .weight(1f) // fixed circle size (safe for portrait/landscape)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+                        .background(
+                            if (selected) MaterialTheme.colorScheme.primary
+                            else Color.Transparent
+                        )
+                        .clickable { onDaySelected(day.date) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = day.dayOfWeek,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (selected)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = day.dayOfMonth.toString(),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (selected)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+
+        // Right button
+        IconButton(onClick = toNextWeek) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next week")
+        }
+    }
+}
+
+
+/**
+ *
+ *
+ */
 @Composable
 fun CategoryListCard(
     categories: List<Category>,
@@ -153,6 +224,15 @@ fun CategoryListCard(
     }
 }
 
+/**
+ * Composable which holds the bottom buttons of the Daily Checkup Screen (lock and month/day representation)
+ *
+ * @param selectedCount Count of selected categories
+ * @param totalCount Count of all categories
+ * @param isDayEnded Is day ended (locks all categories)
+ * @param isMultiplierMode If true, multiplies by 31
+ * @param onToggleMultiplierMode
+ */
 @Composable
 fun ActionButtonsRow(
     selectedCount: Int,
@@ -238,9 +318,14 @@ fun ActionButtonsRow(
     }
 }
 
-// Остальные компоненты остаются без изменений
-// CalendarPlaceholder, CategoryRow, NumberCard, DayCompletionCard, CategoryListItem
-
+/**
+ * Row which represents the state of a category
+ *
+ * @param category Category
+ * @param isSelected Is Category selected for the day
+ * @param isDayEnded Is day ended; if true, blocks the row
+ * @param onCategoryClick Function to call when the category is clicked
+ */
 @Composable
 fun CategoryRow(
     category: Category,
@@ -279,31 +364,6 @@ fun CategoryRow(
 }
 
 @Composable
-fun NumberCard(
-    number: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = number,
-                fontSize = 18.sp,  // Уменьшили размер шрифта
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-
-
-@Composable
 fun DayCompletionCard(
     isDayEnded: Boolean,
     onToggleDayEnded: () -> Unit,
@@ -337,40 +397,11 @@ fun DayCompletionCard(
     }
 }
 
-// Заглушка для будущего календаря
-@Composable
-fun CalendarPlaceholder(
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-        )
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = "Calendar will be here",
-                fontSize = 14.sp,  // Уменьшили размер шрифта
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
 @Composable
 fun CategoryListItem(
     category: Category,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
-
 ) {
     val cardColor = if (isSelected) {
         Color(0xFF7E6DF8)
@@ -403,39 +434,25 @@ fun CategoryListItem(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun CategoryListItemPreview() {
-    val testCategory = Category(descriptionRes = R.string.category1)
-
-    CategoryListItem(
-        category = testCategory,
-        modifier = Modifier.padding(8.dp)
-    )
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun CategoriesListPreview() {
-    val testCategories = listOf(
-        Category(descriptionRes = R.string.category1),
-        Category(descriptionRes = R.string.category2),
-        Category(descriptionRes = R.string.category3),
-        Category(descriptionRes = R.string.category4),
-        Category(descriptionRes = R.string.category5),
-
-    )
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+fun NumberCard(
+    number: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        CategoriesList(
-            categories = testCategories,
-            modifier = Modifier.fillMaxSize(),
-            onCategoryClick = { category ->
-                // Обработка клика по категории
-            },
-        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                text = number,
+                fontSize = 18.sp,  // Уменьшили размер шрифта
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }

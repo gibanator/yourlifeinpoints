@@ -43,7 +43,7 @@ fun CalendarDayCell(
 
     Box(
         modifier = modifier
-            .aspectRatio(1f) // square
+            .aspectRatio(1f)
             .clip(shape)
             .border(
                 width = if (isToday) 2.dp else 1.dp,
@@ -63,18 +63,16 @@ fun CalendarDayCell(
             )
         }
 
-        // Status fill (kept below the number using another Box)
         if (date != null && fillColor != null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp) // leave space for the number
+                    .padding(top = 16.dp)
                     .clip(shape)
                     .background(fillColor.copy(alpha = 0.35f), shape)
             )
         }
 
-        // Optional streak/marker area bottom-center (placeholder)
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -88,6 +86,16 @@ fun CalendarDayCell(
         )
     }
 }
+
+
+
+
+
+
+
+
+
+
 @Composable
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true, widthDp = 360)
 fun Preview_CalendarDayCell_Row() {
