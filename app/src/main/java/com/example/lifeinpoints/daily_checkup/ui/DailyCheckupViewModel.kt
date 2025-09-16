@@ -13,7 +13,7 @@ import com.example.lifeinpoints.util.weekDatesOf
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class NewDailyCheckupViewModel @Inject constructor() : ViewModel()  {
+class DailyCheckupViewModel @Inject constructor() : ViewModel()  {
 
     val today: LocalDate = LocalDate.now(ZoneId.systemDefault())
 

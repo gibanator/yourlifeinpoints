@@ -50,7 +50,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
-    vm: NewDailyCheckupViewModel = hiltViewModel()
+    vm: DailyCheckupViewModel = hiltViewModel()
 )
 {
     val uiState by vm.uiState.collectAsState()
