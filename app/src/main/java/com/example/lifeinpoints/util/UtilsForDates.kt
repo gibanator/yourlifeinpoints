@@ -5,12 +5,24 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.WeekFields
 
+/**
+ * Gets Week (where the given day is) in form of list consisting of 7 dates in LocalDate format
+ *
+ * @param date Date of the week we need to get
+ * @param firstDay Optional parameter which sets the first weekday (for example, somewhere it is Sunday)
+ */
 fun weekDatesOf(date: LocalDate, firstDay: DayOfWeek = DayOfWeek.MONDAY): List<LocalDate> {
     val wf = WeekFields.of(firstDay, 1)
     val start = date.with(wf.dayOfWeek(), 1)
     return (0..6).map { start.plusDays(it.toLong()) }
 }
 
+/**
+ * Gets week count in calendar representation of the month, can be 4-5-6
+ *
+ * @param month Month for which to get it
+ * @param firstDayOfWeek Optional parameter which sets the first weekday (for example, somewhere it is Sunday)
+ */
 fun calculateWeekCount(month: YearMonth, firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY): Int {
     val first = month.atDay(1)
     val last = month.atEndOfMonth()
@@ -20,6 +32,12 @@ fun calculateWeekCount(month: YearMonth, firstDayOfWeek: DayOfWeek = DayOfWeek.M
     return (totalCells + 6) / 7
 }
 
+/**
+ * Extension function to check if a month contains a date
+ *
+ * @param date Date to check
+ * @return True, if the month contains the date; false, if not
+ */
 fun YearMonth.contains(date: LocalDate): Boolean =
     this == YearMonth.from(date)
 
