@@ -28,6 +28,7 @@ class DailyCheckupViewModel @Inject constructor() : ViewModel()  {
                 dates = week,
                 selectedDay = selected
             ),
+
         )
     }
 
@@ -127,4 +128,6 @@ class DailyCheckupViewModel @Inject constructor() : ViewModel()  {
             )
         }
     }
+
+
 }

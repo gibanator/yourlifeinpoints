@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,24 +46,24 @@ import com.example.lifeinpoints.daily_checkup.data.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
-    vm: DailyCheckupViewModel = hiltViewModel()
-)
-{
+    vm: DailyCheckupViewModel = hiltViewModel(),
+    onNavigateToComments: () -> Unit,
+    onNavigateToMain: () -> Unit
+) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.selectedDate.format(formatter)) }
+                title = { Text(uiState.selectedDate.format(formatter)) },
             )
         }
-    ) {paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -85,6 +86,7 @@ fun DailyCheckupScreen(
                     vm.toggleCategory(index)
                 },
                 onToggleMultiplierMode = { vm.toggleMultiplierMode() },
+                onAddComment = onNavigateToComments,
                 modifier = Modifier
             )
             // Карточка блокировки выбора
@@ -96,8 +98,6 @@ fun DailyCheckupScreen(
                     .padding(top = 8.dp)
             )
         }
-
-
     }
 }
 
@@ -170,11 +170,6 @@ fun WeekBarWithButtons(
     }
 }
 
-
-/**
- *
- *
- */
 @Composable
 fun CategoryListCard(
     categories: List<Category>,
@@ -183,6 +178,7 @@ fun CategoryListCard(
     isMultiplierMode: Boolean,
     onCategoryClick: (Int, Category) -> Unit,
     onToggleMultiplierMode: () -> Unit,
+    onAddComment: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -216,6 +212,7 @@ fun CategoryListCard(
                 isDayEnded = isDayEnded,
                 isMultiplierMode = isMultiplierMode,
                 onToggleMultiplierMode = onToggleMultiplierMode,
+                onAddComment = onAddComment,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
@@ -224,15 +221,6 @@ fun CategoryListCard(
     }
 }
 
-/**
- * Composable which holds the bottom buttons of the Daily Checkup Screen (lock and month/day representation)
- *
- * @param selectedCount Count of selected categories
- * @param totalCount Count of all categories
- * @param isDayEnded Is day ended (locks all categories)
- * @param isMultiplierMode If true, multiplies by 31
- * @param onToggleMultiplierMode
- */
 @Composable
 fun ActionButtonsRow(
     selectedCount: Int,
@@ -240,6 +228,7 @@ fun ActionButtonsRow(
     isDayEnded: Boolean,
     isMultiplierMode: Boolean,
     onToggleMultiplierMode: () -> Unit,
+    onAddComment: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -251,9 +240,8 @@ fun ActionButtonsRow(
             modifier = Modifier
                 .weight(1f)
                 .clickable(
-                    onClick = {
-                        // Пока ничего не делает
-                    }
+                    //enabled = !isDayEnded,
+                    onClick = onAddComment
                 ),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(12.dp),
@@ -288,7 +276,7 @@ fun ActionButtonsRow(
             colors = CardDefaults.cardColors(
                 containerColor = if (selectedCount > 0) {
                     if (isMultiplierMode) {
-                        Color(0xFF5A4FCF) // Более темный фиолетовый для режима умножения
+                        Color(0xFF7E6DF8) // Более темный фиолетовый для режима умножения
                     } else {
                         Color(0xFF7E6DF8) // Обычный фиолетовый
                     }
@@ -318,14 +306,6 @@ fun ActionButtonsRow(
     }
 }
 
-/**
- * Row which represents the state of a category
- *
- * @param category Category
- * @param isSelected Is Category selected for the day
- * @param isDayEnded Is day ended; if true, blocks the row
- * @param onCategoryClick Function to call when the category is clicked
- */
 @Composable
 fun CategoryRow(
     category: Category,
