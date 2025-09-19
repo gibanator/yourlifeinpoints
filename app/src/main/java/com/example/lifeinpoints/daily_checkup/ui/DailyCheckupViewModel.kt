@@ -1,34 +1,41 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
-import com.example.lifeinpoints.util.weekDatesOf
-import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class DailyCheckupViewModel @Inject constructor() : ViewModel()  {
+class DailyCheckupViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) : ViewModel()  {
 
     val today: LocalDate = LocalDate.now(ZoneId.systemDefault())
 
-    val _uiState = MutableStateFlow(initState(today))
+    val _uiState = MutableStateFlow(DailyCheckupUiState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+        val today = savedStateHandle.get<String>("selectedDay")
+            ?.let(LocalDate::parse) ?: LocalDate.now()
+        initStateForDay(today)
+    }
 
-    private fun initState(selected: LocalDate): DailyCheckupUiState {
+    fun initStateForDay(selected: LocalDate) {
         val week = weekDatesOf(selected)
-        return DailyCheckupUiState(
-            mapToUi(
-                dates = week,
-                selectedDay = selected
-            ),
-        )
+        update {
+            it.copy(
+                selectedDate = selected,
+                currentWeek = mapToUi(week, selected)
+            )
+        }
+        savedStateHandle["selectedDay"] = selected
     }
 
     /**
@@ -46,21 +53,6 @@ class DailyCheckupViewModel @Inject constructor() : ViewModel()  {
                 date = day
             )
         }
-
-    /**
-     * Function to move current day to the day selected on grid
-     *
-     * @param date The target date
-     */
-    fun onDaySelected(date: LocalDate) {
-        _uiState.update {
-            it.copy(
-                selectedDate = date,
-                currentWeek = mapToUi(weekDatesOf(date), date)
-                )
-        }
-        resetCategories()
-    }
 
 
     fun toPrevWeek() {
@@ -126,5 +118,10 @@ class DailyCheckupViewModel @Inject constructor() : ViewModel()  {
                 isDayEnded = false
             )
         }
+    }
+
+
+    private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
+        _uiState.update(x)
     }
 }

@@ -5,7 +5,7 @@ import java.time.LocalDate
 object Routes {
     const val DailyCheckup = "daily_checkup"
 
-    const val DailyCheckupWithArgs = "${DailyCheckup}?date={date}"
+    const val DailyCheckupWithArgs = "daily_checkup?date={date}"
     const val Calendar = "calendar"
 
 

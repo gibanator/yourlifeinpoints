@@ -12,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.lifeinpoints.calendar.CalendarViewModel
 import com.example.lifeinpoints.core.navigation.AppNavHost
 import com.example.lifeinpoints.core.ui.AppBottomBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,8 +34,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppWithTopAndBottomBar() {
     val navController = rememberNavController()
+    val calendarVm: CalendarViewModel = hiltViewModel()
     Scaffold(
-        bottomBar = { AppBottomBar(navController) }
+        bottomBar = {
+            AppBottomBar(
+                navController = navController,
+            )
+        }
     ) { padding ->
         AppNavHost(
             navController = navController,

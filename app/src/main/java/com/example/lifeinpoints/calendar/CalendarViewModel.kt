@@ -62,7 +62,7 @@ class CalendarViewModel @Inject constructor(private val savedStateHandle: SavedS
         }
     }
 
-    fun nextMonth() = initMonthlyView(_uiState.value.currentMonth.minusMonths(1))
+    fun nextMonth() = initMonthlyView(_uiState.value.currentMonth.plusMonths(1))
     fun prevMonth() = initMonthlyView(_uiState.value.currentMonth.minusMonths(1))
     fun switchMode() = update {
         val newMode = if (it.mode == CalendarUiState.Mode.MONTH)

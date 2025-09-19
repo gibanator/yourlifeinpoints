@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -44,7 +45,7 @@ fun AppNavHost(
             val date = dateStr?.let { LocalDate.parse(it) }
             val vm: DailyCheckupViewModel = hiltViewModel()
             LaunchedEffect(date) {
-                if (date != null) vm.onDaySelected(date)
+                if (date != null) vm.initStateForDay(date)
             }
             DailyCheckupScreen(vm = vm)
         }
@@ -53,8 +54,10 @@ fun AppNavHost(
                 toCertainDate = { date ->
                     navController.navigate(Routes.checkupForDay(date)) {
                         launchSingleTop = true
-                        restoreState = true
-                        popUpTo(Routes.Calendar) { saveState = true }
+                        restoreState = false
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
                     }
                 }
             )
