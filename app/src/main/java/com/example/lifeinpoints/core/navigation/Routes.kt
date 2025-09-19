@@ -1,0 +1,13 @@
+package com.example.lifeinpoints.core.navigation
+
+import java.time.LocalDate
+
+object Routes {
+    const val DailyCheckup = "daily_checkup"
+
+    const val DailyCheckupWithArgs = "${DailyCheckup}?date={date}"
+    const val Calendar = "calendar"
+
+
+    fun checkupForDay(date: LocalDate?) = "daily_checkup?date=$date"
+}

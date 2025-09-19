@@ -17,7 +17,8 @@ data class DayInMonth(
     enum class CompletionCategory{
         NONE,
         COMPLETED,
-        PARTIAL
+        PARTIAL,
+        FUTURE
     }
 }
 data class CalendarUiState(
