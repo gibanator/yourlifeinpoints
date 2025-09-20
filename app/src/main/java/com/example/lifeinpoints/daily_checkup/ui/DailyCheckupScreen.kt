@@ -73,7 +73,7 @@ fun DailyCheckupScreen(
         ) {
             WeekBarWithButtons(
                 days = uiState.currentWeek,
-                onDaySelected = vm::onDaySelected,
+                onDaySelected = vm::initStateForDay,
                 toPrevWeek = vm::toPrevWeek,
                 toNextWeek = vm::toNextWeek,
             )

@@ -41,7 +41,17 @@ fun calculateWeekCount(month: YearMonth, firstDayOfWeek: DayOfWeek = DayOfWeek.M
 fun YearMonth.contains(date: LocalDate): Boolean =
     this == YearMonth.from(date)
 
-fun allDatesOfMonth(month: YearMonth): List<LocalDate> {
-    return (1..month.lengthOfMonth())
-        .map { day -> month.atDay(day) }
+fun allDatesOfMonthView(month: YearMonth, firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY): List<LocalDate> {
+    val first = month.atDay(1)
+    val last = month.atEndOfMonth()
+
+    val leadingDays = (first.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
+    val trailingDays = (7 - (last.dayOfWeek.value - firstDayOfWeek.value + 1) % 7) % 7
+
+    val startDate = first.minusDays(leadingDays.toLong())
+    val endDate = last.plusDays(trailingDays.toLong())
+
+    return generateSequence(startDate) { it.plusDays(1) }
+        .takeWhile { !it.isAfter(endDate) }
+        .toList()
 }
