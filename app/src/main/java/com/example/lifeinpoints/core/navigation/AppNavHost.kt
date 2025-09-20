@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
+import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupScreen
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 import java.time.LocalDate
@@ -28,7 +29,9 @@ fun AppNavHost(
         composable(
             route = Routes.DailyCheckup,
         ) {
-            DailyCheckupScreen()
+            DailyCheckupNavHost(
+              onNavigateToMain = { /* Обработка возврата если нужно */ }
+            )
         }
 
         composable(

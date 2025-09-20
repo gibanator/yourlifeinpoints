@@ -26,6 +26,7 @@ class DailyCheckupViewModel @Inject constructor(private val savedStateHandle: Sa
 
     fun initStateForDay(selected: LocalDate) {
         val week = weekDatesOf(selected)
+
         update {
             it.copy(
                 selectedDate = selected,
@@ -118,7 +119,9 @@ class DailyCheckupViewModel @Inject constructor(private val savedStateHandle: Sa
     }
 
 
+
     private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
         _uiState.update(x)
     }
+
 }
