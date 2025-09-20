@@ -15,10 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DailyCheckupViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) : ViewModel()  {
-
-    val today: LocalDate = LocalDate.now(ZoneId.systemDefault())
-
-    val _uiState = MutableStateFlow(DailyCheckupUiState())
+    val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
     init {
