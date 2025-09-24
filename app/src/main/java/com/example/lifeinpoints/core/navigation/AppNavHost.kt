@@ -50,7 +50,9 @@ fun AppNavHost(
             LaunchedEffect(date) {
                 if (date != null) vm.initStateForDay(date)
             }
-            DailyCheckupScreen(vm = vm)
+            DailyCheckupNavHost(
+                onNavigateToMain = {}
+            )
         }
         composable(Routes.Calendar) {
             CalendarScreen(
