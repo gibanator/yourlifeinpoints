@@ -51,8 +51,7 @@ import java.time.format.DateTimeFormatter
 fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
     vm: DailyCheckupViewModel = hiltViewModel(),
-    onNavigateToComments: () -> Unit,
-    onNavigateToMain: () -> Unit
+    onNavigateToComments: () -> Unit
 ) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }

@@ -16,7 +16,6 @@ fun DailyCheckupNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     // Передаем необходимые параметры из родительского компонента
-    onNavigateToMain: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -27,8 +26,7 @@ fun DailyCheckupNavHost(
             DailyCheckupScreen(
                 onNavigateToComments = {
                     navController.navigate(ScreenDest.CommentScreen.route)
-                },
-                onNavigateToMain = onNavigateToMain
+                }
             )
         }
 
