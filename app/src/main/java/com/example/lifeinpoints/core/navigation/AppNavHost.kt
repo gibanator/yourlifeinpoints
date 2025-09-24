@@ -30,7 +30,6 @@ fun AppNavHost(
             route = Routes.DailyCheckup,
         ) {
             DailyCheckupNavHost(
-              onNavigateToMain = { /* Обработка возврата если нужно */ }
             )
         }
 
@@ -51,7 +50,6 @@ fun AppNavHost(
                 if (date != null) vm.initStateForDay(date)
             }
             DailyCheckupNavHost(
-                onNavigateToMain = {}
             )
         }
         composable(Routes.Calendar) {
