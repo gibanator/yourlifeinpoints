@@ -2,19 +2,22 @@ package com.example.lifeinpoints.daily_checkup.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.example.lifeinpoints.data.CategoryRepository
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class DailyCheckupViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) : ViewModel()  {
+class DailyCheckupViewModel @Inject constructor(
+    private val repo: CategoryRepository,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel()  {
     val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
