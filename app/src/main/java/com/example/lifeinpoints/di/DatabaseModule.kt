@@ -2,8 +2,10 @@ package com.example.lifeinpoints.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.lifeinpoints.data.CategoryDao
-import com.example.lifeinpoints.data.CategoryDatabase
+import com.example.lifeinpoints.data.category.CategoryDao
+import com.example.lifeinpoints.data.category.CategoryDatabase
+import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressDao
+import com.example.lifeinpoints.data.user.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,5 +24,11 @@ object DatabaseModule {
             .build()
 
     @Provides
+    fun provideUserDao(db: CategoryDatabase): UserDao = db.userDao()
+
+    @Provides
     fun provideCategory(db: CategoryDatabase): CategoryDao = db.categoryDao()
+
+    @Provides
+    fun provideDailyProgressDao(db: CategoryDatabase): DailyCategoryProgressDao = db.dailyProgressDao()
 }

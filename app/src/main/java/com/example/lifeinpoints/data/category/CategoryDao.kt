@@ -1,12 +1,12 @@
-package com.example.lifeinpoints.data
+package com.example.lifeinpoints.data.category
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import androidx.room.Query
 
 @Dao
 interface CategoryDao {
@@ -33,4 +33,13 @@ interface CategoryDao {
 
     @Query("DELETE FROM categories")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM categories WHERE userId = :userId")
+    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>
+
+    @Query("SELECT * FROM categories WHERE userId = :userId")
+    suspend fun getByUserId(userId: Int): List<CategoryEntity>
+
+    @Query("DELETE FROM categories WHERE userId = :userId")
+    suspend fun deleteByUserId(userId: Int)
 }

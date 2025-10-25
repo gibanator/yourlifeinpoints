@@ -10,6 +10,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.lifeinpoints.Settings.SettingsScreen
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupScreen
@@ -63,6 +64,12 @@ fun AppNavHost(
                         }
                     }
                 }
+            )
+        }
+        composable(Routes.Settings) {
+            SettingsScreen(
+                onBack = { navController.navigateUp() }
+
             )
         }
     }

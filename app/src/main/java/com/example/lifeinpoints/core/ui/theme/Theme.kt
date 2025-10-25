@@ -32,20 +32,27 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+// Theme.kt
+// LifeInPointsTheme.kt
 @Composable
 fun LifeInPointsTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
+    themeType: ThemeType = ThemeType.SYSTEM,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val systemDarkTheme = isSystemInDarkTheme()
+    val useDarkTheme = when (themeType) {
+        ThemeType.SYSTEM -> systemDarkTheme
+        ThemeType.LIGHT -> false
+        ThemeType.DARK -> true
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
-        darkTheme -> DarkColorScheme
+        useDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
