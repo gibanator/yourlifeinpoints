@@ -42,8 +42,7 @@ android {
 }
 
 dependencies {
-
-
+    ksp(libs.room.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -58,8 +57,9 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.contentpager)
-    implementation(libs.androidx.room.common.jvm)
-    implementation(libs.androidx.room.runtime.android)
+    implementation(libs.room.runtime)
+    //implementation(libs.androidx.room.common.jvm)
+    //implementation(libs.androidx.room.runtime.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
