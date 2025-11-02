@@ -3,6 +3,7 @@ package com.example.lifeinpoints.core.ui
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -49,5 +50,6 @@ data class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem(Routes.DailyCheckup, Icons.Default.Home, "Main"),
-    BottomNavItem(Routes.Calendar, Icons.Default.DateRange, "Calendar")
+    BottomNavItem(Routes.Calendar, Icons.Default.DateRange, "Calendar"),
+    BottomNavItem(Routes.Settings, Icons.Default.Settings, "Settings")
 )

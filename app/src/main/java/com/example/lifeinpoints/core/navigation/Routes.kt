@@ -8,6 +8,7 @@ object Routes {
     const val DailyCheckupWithArgs = "daily_checkup?date={date}"
     const val Calendar = "calendar"
 
+    const val Settings = "settings"
 
     fun checkupForDay(date: LocalDate?) = "daily_checkup?date=$date"
 }

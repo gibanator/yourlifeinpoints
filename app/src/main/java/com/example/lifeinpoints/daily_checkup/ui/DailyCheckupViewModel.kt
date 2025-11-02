@@ -2,7 +2,7 @@ package com.example.lifeinpoints.daily_checkup.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.lifeinpoints.data.CategoryRepository
+import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
