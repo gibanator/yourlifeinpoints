@@ -1,53 +1,129 @@
+// com.example.lifeinpoints.data.category/CategoryRepository.kt
 package com.example.lifeinpoints.data.category
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(
-    private val dao: CategoryDao,
+    private val dao: CategoryDao
 ) {
-    // Получение всех категорий (для администрирования или всех пользователей)
-    fun observeAll(): Flow<List<CategoryEntity>> = dao.observeAll()
 
-    suspend fun getAll(): List<CategoryEntity> = dao.observeAll().first()
+    private val defaultCategories = listOf(
+        "Networking",
+        "Education",
+        "Work",
+        "Health",
+        "Personal life",
+        "Finance",
+        "Hobbies",
+        "Family",
+        "Travel",
+        "Self-development"
+    )
 
-    // Работа с категориями конкретного пользователя
-    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>> = dao.observeByUserId(userId)
+    suspend fun initializeDefaultCategories(userId: Int) {
+        println("DEBUG: initializeDefaultCategories for user $userId")
+        try {
+            // Получаем существующие категории пользователя
+            val existingCategories = getByUserId(userId)
+            println("DEBUG: Existing categories count: ${existingCategories.size}")
 
-    suspend fun getByUserId(userId: Int): List<CategoryEntity> = dao.getByUserId(userId)
+            // Добавляем только отсутствующие категории
+            val categoriesToAdd = defaultCategories.filter { categoryName ->
+                !existingCategories.any { it.name.equals(categoryName, ignoreCase = true) }
+            }
+            println("DEBUG: Categories to add: ${categoriesToAdd.size}")
 
-    // Добавление категории с указанием пользователя
-    suspend fun add(category: CategoryEntity) = dao.insert(category)
+            if (categoriesToAdd.isNotEmpty()) {
+                val entities = categoriesToAdd.mapIndexed { index, name ->
+                    CategoryEntity(
+                        name = name,
+                        userId = userId,
+                        color = getDefaultColor(index),
+                        sortOrder = index
+                    )
+                }
+                println("DEBUG: Inserting ${entities.size} categories")
+                dao.insertAll(entities)
+                println("DEBUG: Categories inserted successfully")
+            }
+        } catch (e: Exception) {
+            println("DEBUG: Error in initializeDefaultCategories: ${e.message}")
+            throw e
+        }
+    }
 
-    suspend fun addCategory(userId: Int, name: String) {
-        val category = CategoryEntity(name = name, userId = userId)
-        dao.insert(category)
+    // Получение всех категорий пользователя
+    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>> {
+        println("DEBUG: observeByUserId called for user $userId")
+        return dao.observeByUserId(userId)
+    }
+
+    suspend fun getByUserId(userId: Int): List<CategoryEntity> {
+        println("DEBUG: getByUserId called for user $userId")
+        return dao.getByUserId(userId)
+    }
+
+    // Добавление новой категории
+    suspend fun addCategory(userId: Int, name: String, color: String = "#6200EE"): Result<Unit> {
+        return try {
+            // Проверяем, нет ли уже категории с таким именем
+            val existingCount = dao.countByUserIdAndName(userId, name)
+            if (existingCount > 0) {
+                Result.failure(Exception("Category '$name' already exists"))
+            } else {
+                // Получаем максимальный sortOrder для установки новой категории в конец
+                val userCategories = getByUserId(userId)
+                val maxSortOrder = userCategories.maxByOrNull { it.sortOrder }?.sortOrder ?: -1
+
+                val newCategory = CategoryEntity(
+                    name = name.trim(),
+                    userId = userId,
+                    color = color,
+                    sortOrder = maxSortOrder + 1
+                )
+                dao.insert(newCategory)
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     // Обновление категории
-    suspend fun update(category: CategoryEntity) = dao.update(category)
+    suspend fun updateCategory(category: CategoryEntity): Result<Unit> {
+        return try {
+            dao.update(category)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     // Удаление категории
-    suspend fun delete(category: CategoryEntity) = dao.delete(category)
-
-    // Удаление всех категорий пользователя
-    suspend fun deleteByUserId(userId: Int) = dao.deleteByUserId(userId)
+    suspend fun deleteCategory(category: CategoryEntity): Result<Unit> {
+        return try {
+            dao.delete(category)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     // Получение категории по ID
     suspend fun getById(id: Int): CategoryEntity? = dao.getById(id)
 
-    // Дополнительные методы для удобства
-    suspend fun addCategories(userId: Int, categoryNames: List<String>) {
-        val categories = categoryNames.map { name ->
-            CategoryEntity(name = name, userId = userId)
-        }
-        dao.insertAll(categories)
+    // Вспомогательная функция для цветов по умолчанию
+    private fun getDefaultColor(index: Int): String {
+        val colors = listOf(
+            "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
+            "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9"
+        )
+        return colors[index % colors.size]
     }
 
-    // Проверка существования категории у пользователя
-    suspend fun categoryExistsForUser(userId: Int, categoryName: String): Boolean {
-        val userCategories = getByUserId(userId)
-        return userCategories.any { it.name.equals(categoryName, ignoreCase = true) }
+    // Проверка существования категории
+    suspend fun categoryExists(userId: Int, categoryName: String): Boolean {
+        return dao.countByUserIdAndName(userId, categoryName) > 0
     }
 }

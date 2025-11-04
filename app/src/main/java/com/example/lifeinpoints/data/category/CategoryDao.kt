@@ -42,4 +42,10 @@ interface CategoryDao {
 
     @Query("DELETE FROM categories WHERE userId = :userId")
     suspend fun deleteByUserId(userId: Int)
+
+    @Query("SELECT COUNT(*) FROM categories WHERE userId = :userId AND LOWER(name) = LOWER(:categoryName)")
+    suspend fun countByUserIdAndName(userId: Int, categoryName: String): Int
+
+    @Query("SELECT * FROM categories WHERE userId = :userId ORDER BY sortOrder ASC, name ASC")
+    fun observeByUserIdSorted(userId: Int): Flow<List<CategoryEntity>>
 }

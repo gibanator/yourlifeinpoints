@@ -17,7 +17,8 @@ import com.example.lifeinpoints.data.user.UserEntity
         )
     ],
     indices = [
-        Index(value = ["userId"])
+        Index(value = ["userId"]),
+        Index(value = ["userId", "name"], unique = true) // Уникальность имени в рамках пользователя
     ]
 )
 data class CategoryEntity(
@@ -26,5 +27,15 @@ data class CategoryEntity(
 
     val name: String,
 
-    val userId: Int // связь с пользователем
+    val userId: Int, // связь с пользователем
+
+    val color: String = "#6200EE", // цвет категории
+
+    val icon: String = "", // иконка категории
+
+    val sortOrder: Int = 0, // порядок сортировки
+
+    val isActive: Boolean = true, // активна ли категория
+
+    val createdAt: Long = System.currentTimeMillis() // дата создания
 )

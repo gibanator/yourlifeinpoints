@@ -12,6 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.lifeinpoints.Settings.SettingsScreen
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
+import com.example.lifeinpoints.categories.AddCategoryScreen
+import com.example.lifeinpoints.categories.CategoriesScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupScreen
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
@@ -66,11 +68,46 @@ fun AppNavHost(
                 }
             )
         }
-        composable(Routes.Settings) {
-            SettingsScreen(
-                onBack = { navController.navigateUp() }
 
+        composable("categories") {
+            CategoriesScreen(
+                onBack = { navController.popBackStack() },
+                onAddCategory = {
+                    navController.navigate("add_category")
+                }
             )
         }
+
+        composable(Routes.Settings) {
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onCategoriesClick = {
+                    navController.navigate("categories")
+                }
+            )
+        }
+
+        // Добавим новый composable:
+
+        composable(Routes.ADD_CATEGORY) {
+            AddCategoryScreen(
+                onBack = { navController.popBackStack() },
+                onCategoryAdded = {
+                    navController.popBackStack()
+                    // Можно показать snackbar сообщение об успехе
+                }
+            )
+        }
+
+        composable("add_category") {
+            AddCategoryScreen(
+                onBack = { navController.popBackStack() },
+                onCategoryAdded = {
+                    navController.popBackStack()
+                    // Можно добавить snackbar сообщение об успехе
+                }
+            )
+        }
+
     }
 }
