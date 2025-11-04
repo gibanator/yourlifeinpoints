@@ -14,6 +14,7 @@ import com.example.lifeinpoints.Settings.SettingsScreen
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
 import com.example.lifeinpoints.categories.AddCategoryScreen
 import com.example.lifeinpoints.categories.CategoriesScreen
+import com.example.lifeinpoints.categories.EditCategoryScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupScreen
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
@@ -74,6 +75,9 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onAddCategory = {
                     navController.navigate("add_category")
+                },
+                onEditCategory = { categoryId ->
+                    navController.navigate("edit_category/$categoryId")
                 }
             )
         }
@@ -105,6 +109,23 @@ fun AppNavHost(
                 onCategoryAdded = {
                     navController.popBackStack()
                     // Можно добавить snackbar сообщение об успехе
+                }
+            )
+        }
+
+        // AppNavHost.kt - добавим новый маршрут
+        composable("edit_category/{categoryId}") { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getString("categoryId")?.toIntOrNull() ?: 0
+            EditCategoryScreen(
+                categoryId = categoryId,
+                onBack = { navController.popBackStack() },
+                onCategoryUpdated = {
+                    navController.popBackStack()
+                    // Можно показать snackbar сообщение об успехе
+                },
+                onCategoryDeleted = {
+                    navController.popBackStack()
+                    // Можно показать snackbar сообщение об успехе
                 }
             )
         }

@@ -9,5 +9,5 @@ data class CategoriesUiState(
 
 data class CategoryUiItem(
     val id: Int,
-    val name: String
+    var name: String
 )

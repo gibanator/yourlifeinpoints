@@ -1,4 +1,3 @@
-// com.example.lifeinpoints.categories/AddCategoryScreen.kt
 package com.example.lifeinpoints.categories
 
 import androidx.compose.foundation.layout.*
@@ -80,7 +79,6 @@ fun AddCategoryScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Поле ввода названия категории
             OutlinedTextField(
                 value = categoryName,
                 onValueChange = {
@@ -95,7 +93,6 @@ fun AddCategoryScreen(
                 isError = errorMessage != null
             )
 
-            // Сообщение об ошибке
             errorMessage?.let { message ->
                 Text(
                     text = message,
@@ -104,7 +101,6 @@ fun AddCategoryScreen(
                 )
             }
 
-            // Подсказка
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
