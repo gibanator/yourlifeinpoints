@@ -9,11 +9,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
@@ -42,6 +45,9 @@ fun EditCategoryScreen(
         }
     }
 
+    // Проверяем, является ли категория системной
+    val isStaticCategory = viewModel.isStaticCategory(categoryId)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -52,39 +58,43 @@ fun EditCategoryScreen(
                     }
                 },
                 actions = {
-                    // Кнопка удаления
-                    IconButton(
-                        onClick = { showDeleteDialog = true },
-                        enabled = !isLoading
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    // Кнопка удаления (только для нестатических категорий)
+                    if (!isStaticCategory) {
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            enabled = !isLoading
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
                     }
 
-                    // Кнопка сохранения
-                    IconButton(
-                        onClick = {
-                            if (categoryName.isNotBlank()) {
-                                isLoading = true
-                                errorMessage = null
+                    // Кнопка сохранения (только для нестатических категорий)
+                    if (!isStaticCategory) {
+                        IconButton(
+                            onClick = {
+                                if (categoryName.isNotBlank()) {
+                                    isLoading = true
+                                    errorMessage = null
 
-                                coroutineScope.launch {
-                                    val result = viewModel.updateCategory(categoryId, categoryName.trim())
-                                    isLoading = false
+                                    coroutineScope.launch {
+                                        val result = viewModel.updateCategory(categoryId, categoryName.trim())
+                                        isLoading = false
 
-                                    if (result.isSuccess) {
-                                        onCategoryUpdated()
-                                    } else {
-                                        errorMessage = result.exceptionOrNull()?.message
+                                        if (result.isSuccess) {
+                                            onCategoryUpdated()
+                                        } else {
+                                            errorMessage = result.exceptionOrNull()?.message
+                                        }
                                     }
                                 }
+                            },
+                            enabled = categoryName.isNotBlank() && !isLoading
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            } else {
+                                Icon(Icons.Default.Check, contentDescription = "Save")
                             }
-                        },
-                        enabled = categoryName.isNotBlank() && !isLoading
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                        } else {
-                            Icon(Icons.Default.Check, contentDescription = "Save")
                         }
                     }
                 }
@@ -100,31 +110,65 @@ fun EditCategoryScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                OutlinedTextField(
-                    value = categoryName,
-                    onValueChange = {
-                        categoryName = it
-                        errorMessage = null
-                    },
-                    label = { Text("Category Name") },
-                    placeholder = { Text("Enter category name...") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    isError = errorMessage != null
-                )
-
-                errorMessage?.let { message ->
-                    Text(
-                        text = message,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                // Если категория системная, показываем сообщение вместо поля ввода
+                if (isStaticCategory) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = "Locked",
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "System Category",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "This is a system category and cannot be edited or deleted. System categories ensure consistent tracking across the app.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                } else {
+                    // Поле ввода для пользовательских категорий
+                    OutlinedTextField(
+                        value = categoryName,
+                        onValueChange = {
+                            categoryName = it
+                            errorMessage = null
+                        },
+                        label = { Text("Category Name") },
+                        placeholder = { Text("Enter category name...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        isError = errorMessage != null
                     )
+
+                    errorMessage?.let { message ->
+                        Text(
+                            text = message,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
 
-            // Диалог подтверждения удаления
-            if (showDeleteDialog) {
+            // Диалог подтверждения удаления (только для нестатических категорий)
+            if (showDeleteDialog && !isStaticCategory) {
                 AlertDialog(
                     onDismissRequest = { showDeleteDialog = false },
                     title = { Text("Delete Category") },
@@ -137,6 +181,9 @@ fun EditCategoryScreen(
                                     val result = viewModel.deleteCategory(categoryId)
                                     if (result.isSuccess) {
                                         onCategoryDeleted()
+                                    } else {
+                                        // Можно показать ошибку
+                                        errorMessage = result.exceptionOrNull()?.message
                                     }
                                 }
                             },

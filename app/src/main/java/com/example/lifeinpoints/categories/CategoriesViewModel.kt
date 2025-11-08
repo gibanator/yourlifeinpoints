@@ -31,7 +31,8 @@ class CategoriesViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             categories = categories,
-                            isLoading = false
+                            isLoading = false,
+                            error = null
                         )
                     }
                 }
@@ -39,7 +40,7 @@ class CategoriesViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message
+                        error = e.message ?: "Failed to load categories"
                     )
                 }
             }
@@ -50,25 +51,20 @@ class CategoriesViewModel @Inject constructor(
         return categoriesRepository.addCategory(name)
     }
 
-    // CategoriesViewModel.kt - добавим новые методы
     suspend fun updateCategory(categoryId: Int, newName: String): Result<Unit> {
-        return try {
-            categoriesRepository.updateCategory(categoryId, newName)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return categoriesRepository.updateCategory(categoryId, newName)
     }
 
     suspend fun deleteCategory(categoryId: Int): Result<Unit> {
-        return try {
-            categoriesRepository.deleteCategory(categoryId)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return categoriesRepository.deleteCategory(categoryId)
     }
 
     fun getCategoryById(categoryId: Int): CategoryUiItem? {
         val currentState = _uiState.value
         return currentState.categories.find { it.id == categoryId }
+    }
+
+    fun isStaticCategory(categoryId: Int): Boolean {
+        return categoriesRepository.isStaticCategory(categoryId)
     }
 }

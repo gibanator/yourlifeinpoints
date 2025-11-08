@@ -9,5 +9,6 @@ data class CategoriesUiState(
 
 data class CategoryUiItem(
     val id: Int,
-    var name: String
+    var name: String,
+    val isStatic: Boolean = false
 )
