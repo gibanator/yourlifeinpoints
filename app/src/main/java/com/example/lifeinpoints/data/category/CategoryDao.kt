@@ -34,12 +34,24 @@ interface CategoryDao {
     @Query("DELETE FROM categories")
     suspend fun clearAll()
 
-    @Query("SELECT * FROM categories WHERE userId = :userId")
-    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>
+    @Query("SELECT * FROM categories")
+    suspend fun getAll(): List<CategoryEntity>
 
-    @Query("SELECT * FROM categories WHERE userId = :userId")
-    suspend fun getByUserId(userId: Int): List<CategoryEntity>
+    @Query("SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(:categoryName)")
+    suspend fun countByName(categoryName: String): Int
 
-    @Query("DELETE FROM categories WHERE userId = :userId")
-    suspend fun deleteByUserId(userId: Int)
+//    @Query("SELECT * FROM categories WHERE userId = :userId")
+//    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>
+//
+//    @Query("SELECT * FROM categories WHERE userId = :userId")
+//    suspend fun getByUserId(userId: Int): List<CategoryEntity>
+//
+//    @Query("DELETE FROM categories WHERE userId = :userId")
+//    suspend fun deleteByUserId(userId: Int)
+//
+//    @Query("SELECT COUNT(*) FROM categories WHERE userId = :userId AND LOWER(name) = LOWER(:categoryName)")
+//    suspend fun countByUserIdAndName(userId: Int, categoryName: String): Int
+//
+//    @Query("SELECT * FROM categories WHERE userId = :userId ORDER BY sortOrder ASC, name ASC")
+//    fun observeByUserIdSorted(userId: Int): Flow<List<CategoryEntity>>
 }

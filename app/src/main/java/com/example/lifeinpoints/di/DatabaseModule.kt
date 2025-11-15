@@ -23,8 +23,8 @@ object DatabaseModule {
             .fallbackToDestructiveMigration(true)
             .build()
 
-    @Provides
-    fun provideUserDao(db: CategoryDatabase): UserDao = db.userDao()
+//    @Provides
+//    fun provideUserDao(db: CategoryDatabase): UserDao = db.userDao()
 
     @Provides
     fun provideCategory(db: CategoryDatabase): CategoryDao = db.categoryDao()
