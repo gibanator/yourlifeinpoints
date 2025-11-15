@@ -10,5 +10,7 @@ object Routes {
 
     const val Settings = "settings"
 
+    const val ADD_CATEGORY = "add_category"
+
     fun checkupForDay(date: LocalDate?) = "daily_checkup?date=$date"
 }

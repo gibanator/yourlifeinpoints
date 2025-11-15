@@ -16,7 +16,7 @@ class DailyCategoryProgressRepository @Inject constructor(
 
     suspend fun update(progress: DailyCategoryProgressEntity) = dao.update(progress)
 
-    suspend fun getByDate(date: String): DailyCategoryProgressEntity? = dao.getByDate(date)
+    suspend fun getByDate(date: String): List<DailyCategoryProgressEntity> = dao.getByDate(date)
 
     suspend fun getByCategoryAndDate(categoryId: Int, date: String): DailyCategoryProgressEntity? =
         dao.getByCategoryAndDate(categoryId, date)

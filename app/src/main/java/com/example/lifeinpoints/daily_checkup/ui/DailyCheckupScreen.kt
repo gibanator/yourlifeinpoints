@@ -36,13 +36,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.lifeinpoints.daily_checkup.data.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -72,12 +70,12 @@ fun DailyCheckupScreen(
         ) {
             WeekBarWithButtons(
                 days = uiState.currentWeek,
-                onDaySelected = vm::initStateForDay,
+                onDaySelected = vm::onDaySelected,
                 toPrevWeek = vm::toPrevWeek,
                 toNextWeek = vm::toNextWeek,
             )
             CategoryListCard(
-                categories = uiState.allCategories,
+                categories = uiState.allCategories.toList(),
                 selectedCategories = uiState.selectedCategories,
                 isDayEnded = uiState.isDayEnded,
                 isMultiplierMode = uiState.isMultiplierMode,
@@ -171,11 +169,11 @@ fun WeekBarWithButtons(
 
 @Composable
 fun CategoryListCard(
-    categories: List<Category>,
+    categories: List<String>,
     selectedCategories: Set<Int>,
     isDayEnded: Boolean,
     isMultiplierMode: Boolean,
-    onCategoryClick: (Int, Category) -> Unit,
+    onCategoryClick: (Int, String) -> Unit,
     onToggleMultiplierMode: () -> Unit,
     onAddComment: () -> Unit,
     modifier: Modifier = Modifier
@@ -307,7 +305,7 @@ fun ActionButtonsRow(
 
 @Composable
 fun CategoryRow(
-    category: Category,
+    category: String,
     isSelected: Boolean,
     isDayEnded: Boolean,
     onCategoryClick: () -> Unit,
@@ -378,7 +376,7 @@ fun DayCompletionCard(
 
 @Composable
 fun CategoryListItem(
-    category: Category,
+    category: String,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
 ) {
@@ -403,7 +401,7 @@ fun CategoryListItem(
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(category.descriptionRes),
+                text = category,
                 fontSize = 18.sp,  // Уменьшили размер шрифта
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,

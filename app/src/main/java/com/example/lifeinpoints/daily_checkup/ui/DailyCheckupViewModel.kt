@@ -2,12 +2,15 @@ package com.example.lifeinpoints.daily_checkup.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
+import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -15,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DailyCheckupViewModel @Inject constructor(
-    private val repo: CategoryRepository,
+    private val categoryRepo: CategoryRepository,
+    private val dailyProgressRepo: DailyCategoryProgressRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel()  {
     val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
@@ -24,19 +28,32 @@ class DailyCheckupViewModel @Inject constructor(
     init {
         val today = savedStateHandle.get<String>("selectedDay")
             ?.let(LocalDate::parse) ?: LocalDate.now()
-        initStateForDay(today)
+        viewModelScope.launch {
+            initStateForDay(today)
+        }
     }
 
-    fun initStateForDay(selected: LocalDate) {
+    private suspend fun initStateForDay(selected: LocalDate) {
+        val categoriesForDay = dailyProgressRepo
+            .getByDate(selected.toString())
+        val completedCategories = categoriesForDay
+            .filter { it.value }
+            .map { it.categoryId }
+            .toSet()
+        val allCategories = categoryRepo.getAll()
+            .map { it.name }
+            .toSet()
         val week = weekDatesOf(selected)
 
         update {
             it.copy(
                 selectedDate = selected,
-                currentWeek = mapToUi(week, selected)
+                currentWeek = mapToUi(week, selected),
+                selectedCategories = completedCategories,
+                allCategories = allCategories
             )
         }
-        savedStateHandle["selectedDay"] = selected
+        savedStateHandle["selectedDay"] = selected.toString()
     }
 
     /**
@@ -121,6 +138,14 @@ class DailyCheckupViewModel @Inject constructor(
         }
     }
 
+    /**
+     * A function for UI
+     */
+    fun onDaySelected(day: LocalDate) {
+        viewModelScope.launch {
+            initStateForDay(day)
+        }
+    }
 
 
     private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
