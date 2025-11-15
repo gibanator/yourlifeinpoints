@@ -1,7 +1,7 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
-import com.example.lifeinpoints.daily_checkup.data.Category
-import com.example.lifeinpoints.daily_checkup.data.CategoryRepository
+
+import com.example.lifeinpoints.data.category.CategoryRepository
 import java.time.LocalDate
 
 
@@ -25,6 +25,6 @@ data class DailyCheckupUiState (
 
     val isDayEnded: Boolean = false,
     val selectedCategories: Set<Int> = emptySet(),
-    val allCategories: List<Category> = CategoryRepository.categories,
+    val allCategories: Set<String> = emptySet(),
     val isMultiplierMode: Boolean = false
 )

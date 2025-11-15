@@ -12,6 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
+    private val trueCategoriesRepository: com.example.lifeinpoints.data.category.CategoryRepository,
     private val categoriesRepository: CategoriesRepository
 ) : ViewModel() {
 
@@ -26,29 +27,40 @@ class CategoriesViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            try {
-                categoriesRepository.observeCategories().collect { categories ->
-                    _uiState.update {
-                        it.copy(
-                            categories = categories,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
-            } catch (e: Exception) {
+            trueCategoriesRepository.observeAll().collect { categories ->
                 _uiState.update {
                     it.copy(
+                        categories = categories.map { category ->
+                            CategoryUiItem(category.id,category.name, false) },
                         isLoading = false,
-                        error = e.message ?: "Failed to load categories"
+                        error = null
                     )
                 }
             }
+//            try {
+//                categoriesRepository.observeCategories().collect { categories ->
+//                    _uiState.update {
+//                        it.copy(
+//                            categories = categories,
+//                            isLoading = false,
+//                            error = null
+//                        )
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                _uiState.update {
+//                    it.copy(
+//                        isLoading = false,
+//                        error = e.message ?: "Failed to load categories"
+//                    )
+//                }
+//            }
         }
     }
 
+
     suspend fun addCategory(name: String): Result<Unit> {
-        return categoriesRepository.addCategory(name)
+        return trueCategoriesRepository.addCategory(0, name)
     }
 
     suspend fun updateCategory(categoryId: Int, newName: String): Result<Unit> {

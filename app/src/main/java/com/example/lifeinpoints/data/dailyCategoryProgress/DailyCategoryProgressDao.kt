@@ -33,7 +33,7 @@ interface DailyCategoryProgressDao {
     fun observeByCategoryId(categoryId: Int): Flow<List<DailyCategoryProgressEntity>>
 
     @Query("SELECT * FROM daily_category_progress WHERE date = :date")
-    suspend fun getByDate(date: String): DailyCategoryProgressEntity?
+    suspend fun getByDate(date: String): List<DailyCategoryProgressEntity>
 
     @Query("SELECT * FROM daily_category_progress WHERE categoryId = :categoryId AND date = :date")
     suspend fun getByCategoryAndDate(categoryId: Int, date: String): DailyCategoryProgressEntity?

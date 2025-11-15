@@ -30,12 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.lifeinpoints.daily_checkup.data.Category
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +89,7 @@ fun CommentScreen(
 
 @Composable
 fun OneComment(
-    category: Category,
+    category: String,
     isSelected: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -122,7 +120,7 @@ fun OneComment(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = stringResource(category.descriptionRes),
+                text = category,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 modifier = Modifier.fillMaxWidth(),

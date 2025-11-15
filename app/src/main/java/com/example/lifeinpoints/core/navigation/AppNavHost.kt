@@ -51,7 +51,7 @@ fun AppNavHost(
             val date = dateStr?.let { LocalDate.parse(it) }
             val vm: DailyCheckupViewModel = hiltViewModel()
             LaunchedEffect(date) {
-                if (date != null) vm.initStateForDay(date)
+                if (date != null) vm.onDaySelected(date)
             }
             DailyCheckupNavHost(
             )

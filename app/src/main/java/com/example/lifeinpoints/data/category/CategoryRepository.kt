@@ -25,7 +25,7 @@ class CategoryRepository @Inject constructor(
         println("DEBUG: initializeDefaultCategories for user $userId")
         try {
             // Получаем существующие категории пользователя
-            val existingCategories = getByUserId(userId)
+            val existingCategories = dao.getAll()
             println("DEBUG: Existing categories count: ${existingCategories.size}")
 
             // Добавляем только отсутствующие категории
@@ -38,7 +38,7 @@ class CategoryRepository @Inject constructor(
                 val entities = categoriesToAdd.mapIndexed { index, name ->
                     CategoryEntity(
                         name = name,
-                        userId = userId,
+                        //userId = userId,
                         color = getDefaultColor(index),
                         sortOrder = index
                     )
@@ -53,32 +53,21 @@ class CategoryRepository @Inject constructor(
         }
     }
 
-    // Получение всех категорий пользователя
-    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>> {
-        println("DEBUG: observeByUserId called for user $userId")
-        return dao.observeByUserId(userId)
-    }
-
-    suspend fun getByUserId(userId: Int): List<CategoryEntity> {
-        println("DEBUG: getByUserId called for user $userId")
-        return dao.getByUserId(userId)
-    }
-
     // Добавление новой категории
     suspend fun addCategory(userId: Int, name: String, color: String = "#6200EE"): Result<Unit> {
         return try {
             // Проверяем, нет ли уже категории с таким именем
-            val existingCount = dao.countByUserIdAndName(userId, name)
+            val existingCount = dao.countByName(name)
             if (existingCount > 0) {
                 Result.failure(Exception("Category '$name' already exists"))
             } else {
                 // Получаем максимальный sortOrder для установки новой категории в конец
-                val userCategories = getByUserId(userId)
+                val userCategories = dao.getAll()
                 val maxSortOrder = userCategories.maxByOrNull { it.sortOrder }?.sortOrder ?: -1
 
                 val newCategory = CategoryEntity(
                     name = name.trim(),
-                    userId = userId,
+                    //userId = userId,
                     color = color,
                     sortOrder = maxSortOrder + 1
                 )
@@ -122,8 +111,20 @@ class CategoryRepository @Inject constructor(
         return colors[index % colors.size]
     }
 
+    fun observeAll() = dao.observeAll()
+
+    suspend fun getAll() = dao.getAll()
     // Проверка существования категории
     suspend fun categoryExists(userId: Int, categoryName: String): Boolean {
-        return dao.countByUserIdAndName(userId, categoryName) > 0
+        return dao.countByName(categoryName) > 0
     }
 }
+
+fun defaultCategories() = listOf(
+    CategoryEntity(name = "Networking"),
+    CategoryEntity(name = "Education"),
+    CategoryEntity(name = "Family"),
+    CategoryEntity(name = "Work"),
+    CategoryEntity(name = "Health"),
+    CategoryEntity(name = "Personal life")
+)

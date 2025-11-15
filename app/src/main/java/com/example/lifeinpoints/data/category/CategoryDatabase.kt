@@ -9,15 +9,15 @@ import com.example.lifeinpoints.data.user.UserEntity
 
 @Database(
     entities = [
-        UserEntity::class,                    // новая таблица
+        //UserEntity::class,                    // новая таблица
         CategoryEntity::class,                // обновленная (добавлен user_id)
         DailyCategoryProgressEntity::class    // существующая
     ],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
+    //abstract fun userDao(): UserDao
     abstract fun categoryDao(): CategoryDao
     abstract fun dailyProgressDao(): DailyCategoryProgressDao // новый DAO
 }

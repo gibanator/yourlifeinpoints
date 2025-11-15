@@ -8,18 +8,18 @@ import com.example.lifeinpoints.data.user.UserEntity
 
 @Entity(
     tableName = "categories",
-    foreignKeys = [
-        ForeignKey(
-            entity = UserEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["userId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [
-        Index(value = ["userId"]),
-        Index(value = ["userId", "name"], unique = true) // Уникальность имени в рамках пользователя
-    ]
+//    foreignKeys = [
+//        ForeignKey(
+//            entity = UserEntity::class,
+//            parentColumns = ["id"],
+//            childColumns = ["userId"],
+//            onDelete = ForeignKey.CASCADE
+//        )
+//    ],
+//    indices = [
+//        Index(value = ["userId"]),
+//        Index(value = ["userId", "name"], unique = true) // Уникальность имени в рамках пользователя
+//    ]
 )
 data class CategoryEntity(
     @PrimaryKey(autoGenerate = true)
@@ -27,7 +27,7 @@ data class CategoryEntity(
 
     val name: String,
 
-    val userId: Int, // связь с пользователем
+    //val userId: Int, // связь с пользователем
 
     val color: String = "#6200EE", // цвет категории
 
