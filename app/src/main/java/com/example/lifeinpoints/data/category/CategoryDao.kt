@@ -38,6 +38,15 @@ interface CategoryDao {
     @Query("DELETE FROM categories WHERE isSystem = 0") // Удаляем только пользовательские
     suspend fun clearUserCategories()
 
+    @Query("UPDATE categories SET isVisible = :isVisible WHERE id = :categoryId")
+    suspend fun setVisibility(categoryId: Int, isVisible: Boolean)
+
+    @Query("SELECT * FROM categories WHERE isVisible = 1 ORDER BY isSystem ASC, sortOrder DESC")
+    fun observeVisibleCategories(): Flow<List<CategoryEntity>>
+
+    @Query("SELECT * FROM categories WHERE isVisible = 1 ORDER BY isSystem ASC, sortOrder DESC")
+    suspend fun getVisibleCategories(): List<CategoryEntity>
+
 //    @Query("SELECT * FROM categories")
 //    suspend fun getAll(): List<CategoryEntity>
 

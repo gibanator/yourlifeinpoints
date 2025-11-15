@@ -75,7 +75,7 @@ fun DailyCheckupScreen(
                 toNextWeek = vm::toNextWeek,
             )
             CategoryListCard(
-                categories = uiState.allCategories.toList(),
+                categories = uiState.orderedCategories,
                 selectedCategories = uiState.selectedCategories,
                 isDayEnded = uiState.isDayEnded,
                 isMultiplierMode = uiState.isMultiplierMode,

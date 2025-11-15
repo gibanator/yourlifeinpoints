@@ -3,6 +3,7 @@ package com.example.lifeinpoints.categories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lifeinpoints.data.category.CategoryEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,11 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.data.category.CategoryRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+// com.example.lifeinpoints.categories/CategoriesViewModel.kt
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
-    private val categoryRepository: CategoryRepository // Используем репозиторий из data.category
+    private val categoryRepository: CategoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CategoriesUiState())
@@ -24,7 +27,6 @@ class CategoriesViewModel @Inject constructor(
         loadCategories()
     }
 
-    // com.example.lifeinpoints.categories/CategoriesViewModel.kt
     fun loadCategories() {
         _uiState.update { it.copy(isLoading = true) }
 
@@ -39,7 +41,8 @@ class CategoriesViewModel @Inject constructor(
                                 CategoryUiItem(
                                     id = category.id,
                                     name = category.name,
-                                    isStatic = category.isSystem
+                                    isStatic = category.isSystem,
+                                    isVisible = category.isVisible // Добавляем состояние видимости
                                 )
                             },
                             isLoading = false,
@@ -58,6 +61,7 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
+    // Остальные методы без изменений...
     suspend fun addCategory(name: String): Result<Unit> {
         return categoryRepository.addCategory(name)
     }
@@ -65,7 +69,6 @@ class CategoriesViewModel @Inject constructor(
     suspend fun updateCategory(categoryId: Int, newName: String): Result<Unit> {
         val category = categoryRepository.getById(categoryId)
         return if (category != null) {
-            // Проверяем, не системная ли это категория
             if (category.isSystem) {
                 Result.failure(Exception("Cannot edit system category"))
             } else {
@@ -86,6 +89,24 @@ class CategoriesViewModel @Inject constructor(
             }
         } else {
             Result.failure(Exception("Category not found"))
+        }
+    }
+
+    // Метод для изменения видимости - теперь работает для всех категорий
+    // Метод для изменения видимости
+    suspend fun setCategoryVisibility(categoryId: Int, isVisible: Boolean): Result<Unit> {
+        return try {
+            // Получаем текущую категорию из базы
+            val category = categoryRepository.getById(categoryId)
+            if (category != null) {
+                // Обновляем только поле видимости
+                val updatedCategory = category.copy(isVisible = isVisible)
+                categoryRepository.updateCategory(updatedCategory)
+            } else {
+                Result.failure(Exception("Category not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

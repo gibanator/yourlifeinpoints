@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.core.ui.theme.ThemeType
@@ -37,6 +38,7 @@ import com.example.lifeinpoints.core.ui.theme.ThemeType
 fun SettingsScreen(
     onBack: () -> Unit = {},
     onCategoriesClick: () -> Unit = {}, // Новый параметр для навигации
+    onVisibilityClick: () -> Unit = {},
     vm: SettingsViewModel = hiltViewModel()
 ) {
     val currentTheme by vm.currentTheme.collectAsState()
@@ -78,38 +80,38 @@ fun SettingsScreen(
             )
 
             CategoriesCard(
-                onCategoriesClick = onCategoriesClick
+                onCategoriesClick = onCategoriesClick,
+                onVisibilityClick = onVisibilityClick
             )
         }
     }
 }
 
+// com.example.lifeinpoints.Settings/SettingsScreen.kt
 @Composable
 fun CategoriesCard(
-    onCategoriesClick: () -> Unit
+    onCategoriesClick: () -> Unit,
+    onVisibilityClick: () -> Unit // Новый параметр
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onCategoriesClick() }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column {
+            // Основная строка категорий
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onCategoriesClick() }
+                    .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 Column {
                     Text(
                         text = "Categories",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = "Manage your activity categories",
@@ -119,6 +121,31 @@ fun CategoriesCard(
                 }
             }
 
+            // Разделитель
+            Divider()
+
+            // Строка управления видимостью
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onVisibilityClick() }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Visible Categories",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Choose which categories appear on main screen",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }

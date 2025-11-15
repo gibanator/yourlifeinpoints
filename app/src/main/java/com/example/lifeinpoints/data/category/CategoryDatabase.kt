@@ -13,7 +13,7 @@ import com.example.lifeinpoints.data.user.UserEntity
         CategoryEntity::class,                // обновленная (добавлен user_id)
         DailyCategoryProgressEntity::class    // существующая
     ],
-    version = 6,
+    version = 8,
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {

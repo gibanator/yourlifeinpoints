@@ -18,35 +18,40 @@ class CategoryRepository @Inject constructor(
             name = "Networking",
             color = "#FF6B6B",
             sortOrder = 0,
-            isSystem = true
+            isSystem = true,
+            isVisible = true
         ),
         CategoryEntity(
             id = 2,
             name = "Education",
             color = "#4ECDC4",
             sortOrder = 1,
-            isSystem = true
+            isSystem = true,
+            isVisible = true
         ),
         CategoryEntity(
             id = 3,
             name = "Work",
             color = "#45B7D1",
             sortOrder = 2,
-            isSystem = true
+            isSystem = true,
+            isVisible = true
         ),
         CategoryEntity(
             id = 4,
             name = "Health",
             color = "#96CEB4",
             sortOrder = 3,
-            isSystem = true
+            isSystem = true,
+            isVisible = true
         ),
         CategoryEntity(
             id = 5,
             name = "Personal Life",
             color = "#FFEAA7",
             sortOrder = 4,
-            isSystem = true
+            isSystem = true,
+            isVisible = true
         )
     )
 
@@ -100,9 +105,17 @@ class CategoryRepository @Inject constructor(
     suspend fun updateCategory(category: CategoryEntity): Result<Unit> {
         return try {
             if (category.isSystem) {
-                Result.failure(Exception("Cannot edit system category"))
+                // Для системных категорий разрешаем только изменение видимости
+                // Проверяем, не пытаемся ли изменить имя системной категории
+                val existingCategory = dao.getById(category.id)
+                if (existingCategory != null && existingCategory.name != category.name) {
+                    Result.failure(Exception("Cannot edit name of system category"))
+                } else {
+                    dao.update(category)
+                    Result.success(Unit)
+                }
             } else {
-                // Проверяем, нет ли дубликатов имени (исключая текущую категорию)
+                // Для пользовательских категорий проверяем дубликаты имени
                 val existingCategories = dao.getAll()
                 val duplicate = existingCategories.any {
                     it.id != category.id && it.name.equals(category.name, ignoreCase = true)
@@ -176,4 +189,34 @@ class CategoryRepository @Inject constructor(
         val colors = listOf("#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9")
         return colors[index % colors.size]
     }
+
+    suspend fun setCategoryVisibility(categoryId: Int, isVisible: Boolean): Result<Unit> {
+        return try {
+            dao.setVisibility(categoryId, isVisible)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Убедимся, что observeVisibleCategories() возвращает только видимые
+    fun observeVisibleCategories(): Flow<List<CategoryEntity>> {
+        return dao.observeVisibleCategories().map { categories ->
+            // Та же логика сортировки
+            val userCategories = categories
+                .filter { !it.isSystem }
+                .sortedByDescending { it.sortOrder }
+
+            val systemCategories = categories
+                .filter { it.isSystem }
+                .sortedBy { it.sortOrder }
+
+            userCategories + systemCategories
+        }
+    }
+
+    suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()
+
+    // Обновим системные категории - по умолчанию все видимые
+
 }

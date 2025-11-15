@@ -20,7 +20,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): CategoryDatabase =
         Room.databaseBuilder(context, CategoryDatabase::class.java, "category_db")
-            .fallbackToDestructiveMigration() // Используем для тестирования
+            .fallbackToDestructiveMigration() // Для тестирования - пересоздаем БД
             .build()
 
     @Provides

@@ -37,9 +37,19 @@ class DailyCheckupViewModel @Inject constructor(
         viewModelScope.launch {
             initStateForDay(today)
         }
+
+        // Подписываемся на изменения видимых категорий
+        viewModelScope.launch {
+            categoryRepository.observeVisibleCategories().collect { visibleCategories ->
+                // Обновляем состояние, когда меняются видимые категории
+                val currentState = _uiState.value
+                if (currentState.selectedDate != null) {
+                    initStateForDay(currentState.selectedDate)
+                }
+            }
+        }
     }
 
-    // com.example.lifeinpoints.daily_checkup/ui/DailyCheckupViewModel.kt
     private suspend fun initStateForDay(selected: LocalDate) {
         val categoriesForDay = dailyProgressRepo
             .getByDate(selected.toString())
@@ -48,10 +58,10 @@ class DailyCheckupViewModel @Inject constructor(
             .map { it.categoryId }
             .toSet()
 
-        // Теперь категории будут отсортированы правильно
-        val allCategories = categoryRepository.getAll()
+        // Используем только видимые категории для главного экрана
+        val visibleCategories = categoryRepository.getVisibleCategories()
             .map { it.name }
-            .toList() // Используем List чтобы сохранить порядок
+            .toList()
 
         val week = weekDatesOf(selected)
 
@@ -60,7 +70,8 @@ class DailyCheckupViewModel @Inject constructor(
                 selectedDate = selected,
                 currentWeek = mapToUi(week, selected),
                 selectedCategories = completedCategories,
-                allCategories = allCategories.toSet() // Сохраняем как Set для совместимости
+                allCategories = visibleCategories.toSet(),
+                orderedCategories = visibleCategories // Сохраняем упорядоченный список видимых категорий
             )
         }
         savedStateHandle["selectedDay"] = selected.toString()

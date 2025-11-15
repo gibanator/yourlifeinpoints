@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
+// com.example.lifeinpoints.categories/EditCategoryScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditCategoryScreen(
@@ -45,7 +46,6 @@ fun EditCategoryScreen(
         }
     }
 
-    // Проверяем, является ли категория системной
     val isStaticCategory = viewModel.isStaticCategory(categoryId)
 
     Scaffold(
@@ -110,7 +110,6 @@ fun EditCategoryScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Если категория системная, показываем сообщение вместо поля ввода
                 if (isStaticCategory) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -135,7 +134,7 @@ fun EditCategoryScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "This is a system category and cannot be edited or deleted. System categories ensure consistent tracking across the app.",
+                                text = "This is a system category. You can hide it from the main screen in the visibility settings, but you cannot edit its name or delete it.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center
                             )
@@ -182,7 +181,6 @@ fun EditCategoryScreen(
                                     if (result.isSuccess) {
                                         onCategoryDeleted()
                                     } else {
-                                        // Можно показать ошибку
                                         errorMessage = result.exceptionOrNull()?.message
                                     }
                                 }
