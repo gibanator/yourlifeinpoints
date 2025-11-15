@@ -18,14 +18,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DailyCheckupViewModel @Inject constructor(
-    private val categoryRepo: CategoryRepository,
+    private val categoryRepository: CategoryRepository,
     private val dailyProgressRepo: DailyCategoryProgressRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel()  {
-    val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
+
+    private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
     init {
+        // Инициализируем системные категории при создании ViewModel
+        viewModelScope.launch {
+            categoryRepository.initializeSystemCategories()
+        }
+
         val today = savedStateHandle.get<String>("selectedDay")
             ?.let(LocalDate::parse) ?: LocalDate.now()
         viewModelScope.launch {
@@ -33,6 +39,7 @@ class DailyCheckupViewModel @Inject constructor(
         }
     }
 
+    // com.example.lifeinpoints.daily_checkup/ui/DailyCheckupViewModel.kt
     private suspend fun initStateForDay(selected: LocalDate) {
         val categoriesForDay = dailyProgressRepo
             .getByDate(selected.toString())
@@ -40,9 +47,12 @@ class DailyCheckupViewModel @Inject constructor(
             .filter { it.value }
             .map { it.categoryId }
             .toSet()
-        val allCategories = categoryRepo.getAll()
+
+        // Теперь категории будут отсортированы правильно
+        val allCategories = categoryRepository.getAll()
             .map { it.name }
-            .toSet()
+            .toList() // Используем List чтобы сохранить порядок
+
         val week = weekDatesOf(selected)
 
         update {
@@ -50,7 +60,7 @@ class DailyCheckupViewModel @Inject constructor(
                 selectedDate = selected,
                 currentWeek = mapToUi(week, selected),
                 selectedCategories = completedCategories,
-                allCategories = allCategories
+                allCategories = allCategories.toSet() // Сохраняем как Set для совместимости
             )
         }
         savedStateHandle["selectedDay"] = selected.toString()
@@ -71,7 +81,6 @@ class DailyCheckupViewModel @Inject constructor(
                 date = day
             )
         }
-
 
     fun toPrevWeek() {
         val old = _uiState.value.selectedDate
@@ -147,9 +156,7 @@ class DailyCheckupViewModel @Inject constructor(
         }
     }
 
-
     private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
         _uiState.update(x)
     }
-
 }

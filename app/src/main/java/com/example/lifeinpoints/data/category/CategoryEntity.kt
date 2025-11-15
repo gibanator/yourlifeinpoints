@@ -37,5 +37,8 @@ data class CategoryEntity(
 
     val isActive: Boolean = true, // активна ли категория
 
-    val createdAt: Long = System.currentTimeMillis() // дата создания
+    val createdAt: Long = System.currentTimeMillis(), // дата создания
+
+    // Новое поле: является ли категория системной
+    val isSystem: Boolean = false
 )

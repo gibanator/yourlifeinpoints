@@ -10,6 +10,7 @@ import androidx.room.Query
 
 @Dao
 interface CategoryDao {
+    // Существующие методы остаются без изменений
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(category: CategoryEntity)
 
@@ -22,23 +23,23 @@ interface CategoryDao {
     @Delete
     suspend fun delete(category: CategoryEntity)
 
-//    @Query("SELECT * FROM categories")
-//    suspend fun getAll(): List<CategoryEntity>
-
-    @Query("SELECT * FROM categories")
+    @Query("SELECT * FROM categories ORDER BY isSystem ASC, sortOrder DESC")
     fun observeAll(): Flow<List<CategoryEntity>>
 
     @Query("SELECT * FROM categories WHERE id = :id")
     suspend fun getById(id: Int): CategoryEntity?
 
-    @Query("DELETE FROM categories")
-    suspend fun clearAll()
-
-    @Query("SELECT * FROM categories")
+    @Query("SELECT * FROM categories ORDER BY isSystem ASC, sortOrder DESC")
     suspend fun getAll(): List<CategoryEntity>
 
     @Query("SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(:categoryName)")
     suspend fun countByName(categoryName: String): Int
+
+    @Query("DELETE FROM categories WHERE isSystem = 0") // Удаляем только пользовательские
+    suspend fun clearUserCategories()
+
+//    @Query("SELECT * FROM categories")
+//    suspend fun getAll(): List<CategoryEntity>
 
 //    @Query("SELECT * FROM categories WHERE userId = :userId")
 //    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>

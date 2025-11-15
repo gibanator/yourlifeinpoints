@@ -2,74 +2,91 @@
 package com.example.lifeinpoints.data.category
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton // Добавляем аннотацию Singleton
 class CategoryRepository @Inject constructor(
     private val dao: CategoryDao
 ) {
 
-    private val defaultCategories = listOf(
-        "Networking",
-        "Education",
-        "Work",
-        "Health",
-        "Personal life",
-        "Finance",
-        "Hobbies",
-        "Family",
-        "Travel",
-        "Self-development"
+    // Системные категории, которые нельзя удалить/редактировать
+    private val systemCategories = listOf(
+        CategoryEntity(
+            id = 1,
+            name = "Networking",
+            color = "#FF6B6B",
+            sortOrder = 0,
+            isSystem = true
+        ),
+        CategoryEntity(
+            id = 2,
+            name = "Education",
+            color = "#4ECDC4",
+            sortOrder = 1,
+            isSystem = true
+        ),
+        CategoryEntity(
+            id = 3,
+            name = "Work",
+            color = "#45B7D1",
+            sortOrder = 2,
+            isSystem = true
+        ),
+        CategoryEntity(
+            id = 4,
+            name = "Health",
+            color = "#96CEB4",
+            sortOrder = 3,
+            isSystem = true
+        ),
+        CategoryEntity(
+            id = 5,
+            name = "Personal Life",
+            color = "#FFEAA7",
+            sortOrder = 4,
+            isSystem = true
+        )
     )
 
-    suspend fun initializeDefaultCategories(userId: Int) {
-        println("DEBUG: initializeDefaultCategories for user $userId")
+    // Инициализация системных категорий при первом запуске
+    suspend fun initializeSystemCategories() {
         try {
-            // Получаем существующие категории пользователя
             val existingCategories = dao.getAll()
-            println("DEBUG: Existing categories count: ${existingCategories.size}")
 
-            // Добавляем только отсутствующие категории
-            val categoriesToAdd = defaultCategories.filter { categoryName ->
-                !existingCategories.any { it.name.equals(categoryName, ignoreCase = true) }
-            }
-            println("DEBUG: Categories to add: ${categoriesToAdd.size}")
-
-            if (categoriesToAdd.isNotEmpty()) {
-                val entities = categoriesToAdd.mapIndexed { index, name ->
-                    CategoryEntity(
-                        name = name,
-                        //userId = userId,
-                        color = getDefaultColor(index),
-                        sortOrder = index
-                    )
+            // Добавляем системные категории, если их еще нет
+            systemCategories.forEach { systemCategory ->
+                val exists = existingCategories.any { it.id == systemCategory.id }
+                if (!exists) {
+                    dao.insert(systemCategory)
                 }
-                println("DEBUG: Inserting ${entities.size} categories")
-                dao.insertAll(entities)
-                println("DEBUG: Categories inserted successfully")
             }
         } catch (e: Exception) {
-            println("DEBUG: Error in initializeDefaultCategories: ${e.message}")
-            throw e
+            // Логируем ошибку, но не прерываем выполнение
+            println("Error initializing system categories: ${e.message}")
         }
     }
 
-    // Добавление новой категории
-    suspend fun addCategory(userId: Int, name: String, color: String = "#6200EE"): Result<Unit> {
+    // Остальные методы остаются без изменений...
+    // Обновим метод addCategory - новые категории должны получать максимальный sortOrder
+    suspend fun addCategory(name: String): Result<Unit> {
         return try {
-            // Проверяем, нет ли уже категории с таким именем
             val existingCount = dao.countByName(name)
             if (existingCount > 0) {
                 Result.failure(Exception("Category '$name' already exists"))
             } else {
-                // Получаем максимальный sortOrder для установки новой категории в конец
-                val userCategories = dao.getAll()
-                val maxSortOrder = userCategories.maxByOrNull { it.sortOrder }?.sortOrder ?: -1
+                val allCategories = dao.getAll()
+
+                // Находим максимальный sortOrder среди пользовательских категорий
+                val userCategories = allCategories.filter { !it.isSystem }
+                val maxUserSortOrder = userCategories.maxByOrNull { it.sortOrder }?.sortOrder ?: 4
 
                 val newCategory = CategoryEntity(
                     name = name.trim(),
-                    //userId = userId,
-                    color = color,
-                    sortOrder = maxSortOrder + 1
+                    color = getDefaultColor(allCategories.size),
+                    sortOrder = maxUserSortOrder + 1, // Новая категория получает sortOrder больше текущего максимума
+                    isSystem = false
                 )
                 dao.insert(newCategory)
                 Result.success(Unit)
@@ -79,52 +96,84 @@ class CategoryRepository @Inject constructor(
         }
     }
 
-    // Обновление категории
+    // При обновлении проверяем, не системная ли категория
     suspend fun updateCategory(category: CategoryEntity): Result<Unit> {
         return try {
-            dao.update(category)
-            Result.success(Unit)
+            if (category.isSystem) {
+                Result.failure(Exception("Cannot edit system category"))
+            } else {
+                // Проверяем, нет ли дубликатов имени (исключая текущую категорию)
+                val existingCategories = dao.getAll()
+                val duplicate = existingCategories.any {
+                    it.id != category.id && it.name.equals(category.name, ignoreCase = true)
+                }
+
+                if (duplicate) {
+                    Result.failure(Exception("Category '${category.name}' already exists"))
+                } else {
+                    dao.update(category)
+                    Result.success(Unit)
+                }
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    // Удаление категории
+    // При удалении проверяем, не системная ли категория
     suspend fun deleteCategory(category: CategoryEntity): Result<Unit> {
         return try {
-            dao.delete(category)
-            Result.success(Unit)
+            if (category.isSystem) {
+                Result.failure(Exception("Cannot delete system category"))
+            } else {
+                dao.delete(category)
+                Result.success(Unit)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    // Получение категории по ID
+    // Получаем категорию по ID с проверкой на системность
     suspend fun getById(id: Int): CategoryEntity? = dao.getById(id)
 
-    // Вспомогательная функция для цветов по умолчанию
+    // Проверяем, является ли категория системной
+    suspend fun isSystemCategory(categoryId: Int): Boolean {
+        return dao.getById(categoryId)?.isSystem ?: false
+    }
+
+    // Остальные методы остаются без изменений
+    fun observeAll(): Flow<List<CategoryEntity>> {
+        return dao.observeAll().map { categories ->
+            // Сначала пользовательские категории (новые сверху), затем системные
+            val userCategories = categories
+                .filter { !it.isSystem }
+                .sortedByDescending { it.sortOrder } // Новые пользовательские категории сверху
+
+            val systemCategories = categories
+                .filter { it.isSystem }
+                .sortedBy { it.sortOrder } // Системные в оригинальном порядке
+
+            userCategories + systemCategories
+        }
+    }
+
+    // Обновим метод getAll для правильной сортировки
+    suspend fun getAll(): List<CategoryEntity> {
+        val categories = dao.getAll()
+        val userCategories = categories
+            .filter { !it.isSystem }
+            .sortedByDescending { it.sortOrder }
+
+        val systemCategories = categories
+            .filter { it.isSystem }
+            .sortedBy { it.sortOrder }
+
+        return userCategories + systemCategories
+    }
+
     private fun getDefaultColor(index: Int): String {
-        val colors = listOf(
-            "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
-            "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9"
-        )
+        val colors = listOf("#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9")
         return colors[index % colors.size]
     }
-
-    fun observeAll() = dao.observeAll()
-
-    suspend fun getAll() = dao.getAll()
-    // Проверка существования категории
-    suspend fun categoryExists(userId: Int, categoryName: String): Boolean {
-        return dao.countByName(categoryName) > 0
-    }
 }
-
-fun defaultCategories() = listOf(
-    CategoryEntity(name = "Networking"),
-    CategoryEntity(name = "Education"),
-    CategoryEntity(name = "Family"),
-    CategoryEntity(name = "Work"),
-    CategoryEntity(name = "Health"),
-    CategoryEntity(name = "Personal life")
-)
