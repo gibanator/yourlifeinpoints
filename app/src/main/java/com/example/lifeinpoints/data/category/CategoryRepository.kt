@@ -218,5 +218,6 @@ class CategoryRepository @Inject constructor(
     suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()
 
     // Обновим системные категории - по умолчанию все видимые
+    suspend fun getAllIds() = dao.getAllIds()
 
 }

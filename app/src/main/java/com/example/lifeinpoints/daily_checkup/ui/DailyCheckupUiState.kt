@@ -4,7 +4,11 @@ package com.example.lifeinpoints.daily_checkup.ui
 import com.example.lifeinpoints.data.category.CategoryRepository
 import java.time.LocalDate
 
-
+data class CategoryUi(
+    val id: Int,
+    val name: String,
+    // color etc
+)
 /**
  * Represents a day in the week bar.
  *
@@ -25,7 +29,7 @@ data class DailyCheckupUiState (
 
     val isDayEnded: Boolean = false,
     val selectedCategories: Set<Int> = emptySet(),
-    val allCategories: Set<String> = emptySet(),
+    val allCategories: List<CategoryUi> = emptyList(),
     val isMultiplierMode: Boolean = false,
-    val orderedCategories: List<String> = emptyList()
+    val orderedCategories: List<CategoryUI> = emptyList()
 )

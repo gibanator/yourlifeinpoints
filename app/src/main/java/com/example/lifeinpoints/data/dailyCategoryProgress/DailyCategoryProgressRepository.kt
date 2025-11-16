@@ -1,25 +1,38 @@
 package com.example.lifeinpoints.data.dailyCategoryProgress
 
+import com.example.lifeinpoints.data.category.CategoryDao
 import kotlinx.coroutines.flow.Flow
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.first
 
 class DailyCategoryProgressRepository @Inject constructor(
-    private val dao: DailyCategoryProgressDao
+    private val progressDao: DailyCategoryProgressDao,
+    private val categoryDao: CategoryDao
 ) {
-    fun observeAll(): Flow<List<DailyCategoryProgressEntity>> = dao.observeAll()
+    fun observeAll(): Flow<List<DailyCategoryProgressEntity>> = progressDao.observeAll()
 
     fun observeByCategoryId(categoryId: Int): Flow<List<DailyCategoryProgressEntity>> =
-        dao.observeByCategoryId(categoryId)
+        progressDao.observeByCategoryId(categoryId)
 
-    suspend fun add(progress: DailyCategoryProgressEntity) = dao.insert(progress)
+    suspend fun add(progress: DailyCategoryProgressEntity) = progressDao.insert(progress)
 
-    suspend fun update(progress: DailyCategoryProgressEntity) = dao.update(progress)
+    suspend fun update(progress: DailyCategoryProgressEntity) = progressDao.update(progress)
 
-    suspend fun getByDate(date: String): List<DailyCategoryProgressEntity> = dao.getByDate(date)
+    suspend fun getByDate(date: String): List<DailyCategoryProgressEntity> = progressDao.getByDate(date)
 
     suspend fun getByCategoryAndDate(categoryId: Int, date: String): DailyCategoryProgressEntity? =
-        dao.getByCategoryAndDate(categoryId, date)
+        progressDao.getByCategoryAndDate(categoryId, date)
 
-    suspend fun getAll(): List<DailyCategoryProgressEntity> = dao.observeAll().first()
+    suspend fun writeDayByCategoryNames(date: String, completedNames: List<String>, incompletedNames: List<String>){
+        val completedIds = categoryDao.getIdsByName(completedNames)
+        val incompletedIds = categoryDao.getIdsByName(incompletedNames)
+
+        progressDao.writeDay(date, completedIds, incompletedIds)
+    }
+
+    suspend fun rewriteDayByCategoryIds(date: String, completedIds: List<Int>, incompletedIds: List<Int>) {
+        progressDao.rewriteDay(date, completedIds, incompletedIds)
+    }
+
+    suspend fun getAll(): List<DailyCategoryProgressEntity> = progressDao.observeAll().first()
 }

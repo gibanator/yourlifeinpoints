@@ -70,7 +70,7 @@ fun CommentScreen(
                 val isSelected = uiState.selectedCategories.contains(index)
 
                 OneComment(
-                    category = category,
+                    category = category.name,
                     isSelected = isSelected,
                     modifier = Modifier.fillMaxWidth()
                 )

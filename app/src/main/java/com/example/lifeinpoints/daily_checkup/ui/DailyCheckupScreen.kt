@@ -79,8 +79,8 @@ fun DailyCheckupScreen(
                 selectedCategories = uiState.selectedCategories,
                 isDayEnded = uiState.isDayEnded,
                 isMultiplierMode = uiState.isMultiplierMode,
-                onCategoryClick = { index, category ->
-                    vm.toggleCategory(index)
+                onCategoryClick = { id ->
+                    vm.toggleCategory(id)
                 },
                 onToggleMultiplierMode = { vm.toggleMultiplierMode() },
                 onAddComment = onNavigateToComments,
@@ -89,7 +89,9 @@ fun DailyCheckupScreen(
             // Карточка блокировки выбора
             DayCompletionCard(
                 isDayEnded = uiState.isDayEnded,
-                onToggleDayEnded = { vm.toggleDayEnded() },
+                onToggleDayEnded = {
+                    vm.toggleDayEnded()
+                    vm.saveProgress() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp)
@@ -169,11 +171,11 @@ fun WeekBarWithButtons(
 
 @Composable
 fun CategoryListCard(
-    categories: List<String>,
+    categories: List<CategoryUi>,
     selectedCategories: Set<Int>,
     isDayEnded: Boolean,
     isMultiplierMode: Boolean,
-    onCategoryClick: (Int, String) -> Unit,
+    onCategoryClick: (Int) -> Unit,
     onToggleMultiplierMode: () -> Unit,
     onAddComment: () -> Unit,
     modifier: Modifier = Modifier
@@ -188,14 +190,15 @@ fun CategoryListCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Список категорий
-            categories.forEachIndexed { index, category ->
-                val isSelected = selectedCategories.contains(index)
+            categories.forEach { category ->
+                val isSelected = category.id in selectedCategories
+                val id = category.id
 
                 CategoryRow(
-                    category = category,
+                    category = category.name,
                     isSelected = isSelected,
                     isDayEnded = isDayEnded,
-                    onCategoryClick = { onCategoryClick(index, category) }
+                    onCategoryClick = { onCategoryClick(id) }
                 )
             }
 

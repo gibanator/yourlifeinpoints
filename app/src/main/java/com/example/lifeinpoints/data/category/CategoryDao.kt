@@ -50,6 +50,11 @@ interface CategoryDao {
 //    @Query("SELECT * FROM categories")
 //    suspend fun getAll(): List<CategoryEntity>
 
+    @Query("SELECT id FROM categories WHERE name IN (:categoryNames)")
+    suspend fun getIdsByName(categoryNames: List<String>): List<Int>
+
+    @Query("SELECT id FROM categories")
+    suspend fun getAllIds(): List<Int>
 //    @Query("SELECT * FROM categories WHERE userId = :userId")
 //    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>
 //
