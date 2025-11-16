@@ -9,6 +9,7 @@ import com.example.lifeinpoints.data.category.CategoryEntity
 
 @Entity(
     tableName = "daily_category_progress",
+    primaryKeys = ["date", "categoryId"],
     foreignKeys = [
         ForeignKey(
             entity = CategoryEntity::class,
@@ -18,14 +19,10 @@ import com.example.lifeinpoints.data.category.CategoryEntity
         )
     ],
     indices = [
-        Index(value = ["date"], unique = true),
         Index(value = ["categoryId"])
     ]
 )
 data class DailyCategoryProgressEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-
     val categoryId: Int,
 
     val date: String, // формат "YYYY-MM-DD"

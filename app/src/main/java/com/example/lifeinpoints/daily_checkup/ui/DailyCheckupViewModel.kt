@@ -1,5 +1,6 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,26 +35,29 @@ class DailyCheckupViewModel @Inject constructor(
     }
 
     private suspend fun initStateForDay(selected: LocalDate) {
-        val categoriesForDay = dailyProgressRepo
+        val week = weekDatesOf(selected)
+        val completedCategories = dailyProgressRepo
             .getByDate(selected.toString())
-        val completedCategories = categoriesForDay
             .filter { it.value }
             .map { it.categoryId }
             .toSet()
-        val allCategories = categoryRepo.getAll()
-            .map { it.name }
-            .toSet()
-        val week = weekDatesOf(selected)
-
-        update {
-            it.copy(
-                selectedDate = selected,
-                currentWeek = mapToUi(week, selected),
-                selectedCategories = completedCategories,
-                allCategories = allCategories
-            )
+        categoryRepo.observeAll().collect { categories ->
+            val uiCategories = categories.map { CategoryUi(id = it.id, name = it.name) }
+            update {
+                it.copy(
+                    selectedDate = selected,
+                    currentWeek = mapToUi(week, selected),
+                    selectedCategories = completedCategories,
+                    allCategories = uiCategories,
+                    isDayEnded = false // TODO: make the day ended val in db???
+                )
+            }
+            Log.d("Categories", "${uiCategories.forEach { it.id }}")
         }
+
         savedStateHandle["selectedDay"] = selected.toString()
+
+
     }
 
     /**
@@ -83,6 +87,10 @@ class DailyCheckupViewModel @Inject constructor(
                 currentWeek = mapToUi(weekDatesOf(newSelected), newSelected)
             )
         }
+
+        viewModelScope.launch {
+            initStateForDay(newSelected)
+        }
     }
 
     fun toNextWeek() {
@@ -94,6 +102,9 @@ class DailyCheckupViewModel @Inject constructor(
                 selectedDate = newSelected,
                 currentWeek = mapToUi(weekDatesOf(newSelected), newSelected)
             )
+        }
+        viewModelScope.launch {
+            initStateForDay(newSelected)
         }
     }
 
@@ -109,6 +120,7 @@ class DailyCheckupViewModel @Inject constructor(
         } else {
             newSelection.add(index)
         }
+        Log.d("Categories", "${newSelection.sorted()}")
         _uiState.update {
             it.copy(
                 selectedCategories = newSelection
@@ -150,6 +162,20 @@ class DailyCheckupViewModel @Inject constructor(
 
     private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
         _uiState.update(x)
+    }
+
+    fun saveProgress() {
+        viewModelScope.launch {
+            val completed = _uiState.value.selectedCategories.toList()
+            val incompleted = _uiState.value.allCategories.map {it.id} - completed
+            Log.d("Progress", "completed=${completed.sorted()} incompleted=${incompleted.sorted()}")
+
+            dailyProgressRepo.rewriteDayByCategoryIds(
+                date = _uiState.value.selectedDate.toString(),
+                completedIds = completed,
+                incompletedIds = incompleted
+            )
+        }
     }
 
 }

@@ -118,6 +118,9 @@ class CategoryRepository @Inject constructor(
     suspend fun categoryExists(userId: Int, categoryName: String): Boolean {
         return dao.countByName(categoryName) > 0
     }
+
+    suspend fun getAllIds() = dao.getAllIds()
+
 }
 
 fun defaultCategories() = listOf(

@@ -40,6 +40,11 @@ interface CategoryDao {
     @Query("SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(:categoryName)")
     suspend fun countByName(categoryName: String): Int
 
+    @Query("SELECT id FROM categories WHERE name IN (:categoryNames)")
+    suspend fun getIdsByName(categoryNames: List<String>): List<Int>
+
+    @Query("SELECT id FROM categories")
+    suspend fun getAllIds(): List<Int>
 //    @Query("SELECT * FROM categories WHERE userId = :userId")
 //    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>
 //
