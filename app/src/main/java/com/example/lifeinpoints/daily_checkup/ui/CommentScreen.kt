@@ -66,7 +66,7 @@ fun CommentScreen(
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            uiState.allCategories.forEachIndexed { index, category ->
+            uiState.orderedCategories.forEachIndexed { index, category ->
                 val isSelected = uiState.selectedCategories.contains(index)
 
                 OneComment(
@@ -76,7 +76,7 @@ fun CommentScreen(
                 )
 
                 // Добавляем отступ после каждого комментария, кроме последнего
-                if (index < uiState.allCategories.size - 1) {
+                if (index < uiState.orderedCategories.size - 1) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }

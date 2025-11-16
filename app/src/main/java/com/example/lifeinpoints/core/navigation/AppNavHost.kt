@@ -14,6 +14,7 @@ import com.example.lifeinpoints.Settings.SettingsScreen
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
 import com.example.lifeinpoints.categories.AddCategoryScreen
 import com.example.lifeinpoints.categories.CategoriesScreen
+import com.example.lifeinpoints.categories.CategoryVisibilityScreen
 import com.example.lifeinpoints.categories.EditCategoryScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupScreen
@@ -87,6 +88,9 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onCategoriesClick = {
                     navController.navigate("categories")
+                },
+                onVisibilityClick = {
+                    navController.navigate("category_visibility")
                 }
             )
         }
@@ -127,6 +131,28 @@ fun AppNavHost(
                     navController.popBackStack()
                     // Можно показать snackbar сообщение об успехе
                 }
+            )
+        }
+
+        composable("categories") {
+            CategoriesScreen(
+                onBack = { navController.popBackStack() },
+                onAddCategory = {
+                    navController.navigate("add_category")
+                },
+                onEditCategory = { categoryId ->
+                    navController.navigate("edit_category/$categoryId")
+                },
+                onManageVisibility = { // Добавим новый параметр
+                    navController.navigate("category_visibility")
+                }
+            )
+        }
+
+// Добавим новый маршрут для управления видимостью
+        composable("category_visibility") {
+            CategoryVisibilityScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

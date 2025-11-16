@@ -20,15 +20,15 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): CategoryDatabase =
         Room.databaseBuilder(context, CategoryDatabase::class.java, "category_db")
-            .fallbackToDestructiveMigration(true)
+            .fallbackToDestructiveMigration() // Для тестирования - пересоздаем БД
             .build()
 
-//    @Provides
-//    fun provideUserDao(db: CategoryDatabase): UserDao = db.userDao()
-
     @Provides
-    fun provideCategory(db: CategoryDatabase): CategoryDao = db.categoryDao()
+    fun provideCategoryDao(db: CategoryDatabase): CategoryDao = db.categoryDao()
 
     @Provides
     fun provideDailyProgressDao(db: CategoryDatabase): DailyCategoryProgressDao = db.dailyProgressDao()
+    //    @Provides
+//    fun provideUserDao(db: CategoryDatabase): UserDao = db.userDao()
+
 }

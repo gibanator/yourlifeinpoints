@@ -30,5 +30,6 @@ data class DailyCheckupUiState (
     val isDayEnded: Boolean = false,
     val selectedCategories: Set<Int> = emptySet(),
     val allCategories: List<CategoryUi> = emptyList(),
-    val isMultiplierMode: Boolean = false
+    val isMultiplierMode: Boolean = false,
+    val orderedCategories: List<CategoryUI> = emptyList()
 )

@@ -19,18 +19,35 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DailyCheckupViewModel @Inject constructor(
-    private val categoryRepo: CategoryRepository,
+    private val categoryRepository: CategoryRepository,
     private val dailyProgressRepo: DailyCategoryProgressRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel()  {
-    val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
+
+    private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
     init {
+        // Инициализируем системные категории при создании ViewModel
+        viewModelScope.launch {
+            categoryRepository.initializeSystemCategories()
+        }
+
         val today = savedStateHandle.get<String>("selectedDay")
             ?.let(LocalDate::parse) ?: LocalDate.now()
         viewModelScope.launch {
             initStateForDay(today)
+        }
+
+        // Подписываемся на изменения видимых категорий
+        viewModelScope.launch {
+            categoryRepository.observeVisibleCategories().collect { visibleCategories ->
+                // Обновляем состояние, когда меняются видимые категории
+                val currentState = _uiState.value
+                if (currentState.selectedDate != null) {
+                    initStateForDay(currentState.selectedDate)
+                }
+            }
         }
     }
 
@@ -41,20 +58,22 @@ class DailyCheckupViewModel @Inject constructor(
             .filter { it.value }
             .map { it.categoryId }
             .toSet()
-        categoryRepo.observeAll().collect { categories ->
-            val uiCategories = categories.map { CategoryUi(id = it.id, name = it.name) }
-            update {
-                it.copy(
-                    selectedDate = selected,
-                    currentWeek = mapToUi(week, selected),
-                    selectedCategories = completedCategories,
-                    allCategories = uiCategories,
-                    isDayEnded = false // TODO: make the day ended val in db???
-                )
-            }
-            Log.d("Categories", "${uiCategories.forEach { it.id }}")
-        }
 
+        // Используем только видимые категории для главного экрана
+        val visibleCategories = categoryRepository.getVisibleCategories()
+            .map { CategoryUi(id = it.id, name = it.name) }
+        
+
+        update {
+            it.copy(
+                selectedDate = selected,
+                currentWeek = mapToUi(week, selected),
+                selectedCategories = completedCategories,
+                allCategories = visibleCategories,
+                orderedCategories = visibleCategories // Сохраняем упорядоченный список видимых категорий
+            )
+        }
+        Log.d("Categories", "${uiCategories.forEach { it.id }}")
         savedStateHandle["selectedDay"] = selected.toString()
 
 
@@ -75,7 +94,6 @@ class DailyCheckupViewModel @Inject constructor(
                 date = day
             )
         }
-
 
     fun toPrevWeek() {
         val old = _uiState.value.selectedDate
@@ -158,7 +176,6 @@ class DailyCheckupViewModel @Inject constructor(
             initStateForDay(day)
         }
     }
-
 
     private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
         _uiState.update(x)

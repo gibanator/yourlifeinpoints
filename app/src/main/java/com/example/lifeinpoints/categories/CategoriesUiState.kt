@@ -10,5 +10,6 @@ data class CategoriesUiState(
 data class CategoryUiItem(
     val id: Int,
     var name: String,
-    val isStatic: Boolean = false
+    val isStatic: Boolean = false,
+    val isVisible: Boolean = true // Добавляем поле видимости
 )

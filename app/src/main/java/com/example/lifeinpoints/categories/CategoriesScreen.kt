@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -57,6 +58,7 @@ fun CategoriesScreen(
     onBack: () -> Unit = {},
     onAddCategory: () -> Unit = {},
     onEditCategory: (Int) -> Unit = {}, // Добавляем параметр для редактирования
+    onManageVisibility: () -> Unit = {},
     vm: CategoriesViewModel = hiltViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
@@ -74,6 +76,12 @@ fun CategoriesScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    // Кнопка управления видимостью
+                    IconButton(onClick = onManageVisibility) {
+                        Icon(Icons.Default.Visibility, contentDescription = "Manage Visibility")
                     }
                 }
             )

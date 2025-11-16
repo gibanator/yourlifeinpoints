@@ -62,6 +62,7 @@ dependencies {
     //implementation(libs.androidx.room.runtime.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
