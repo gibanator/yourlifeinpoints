@@ -217,6 +217,8 @@ class CategoryRepository @Inject constructor(
 
     suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()
 
+    suspend fun getVisibleCategoriesCreatedBefore(fromTime: Long) = dao.getVisibleCategoriesCreatedBefore(fromTime)
+
     // Обновим системные категории - по умолчанию все видимые
     suspend fun getAllIds() = dao.getAllIds()
 

@@ -3,6 +3,7 @@ package com.example.lifeinpoints.util
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.temporal.WeekFields
 
 /**
@@ -55,3 +56,19 @@ fun allDatesOfMonthView(month: YearMonth, firstDayOfWeek: DayOfWeek = DayOfWeek.
         .takeWhile { !it.isAfter(endDate) }
         .toList()
 }
+
+/**
+ * Converts this [LocalDate] to epoch milliseconds at the end of the day
+ * (23:59:59.999) in the system default time zone.
+ *
+ * Useful when selecting all records created on or before this date.
+ *
+ * @return epoch milliseconds representing the last moment of this date
+ *         in the system default time zone.
+ */
+fun LocalDate.toEpochMilliAtEndOfDay(): Long =
+    this.plusDays(1)
+        .atStartOfDay(ZoneId.systemDefault())
+        .minusNanos(1)
+        .toInstant()
+        .toEpochMilli()

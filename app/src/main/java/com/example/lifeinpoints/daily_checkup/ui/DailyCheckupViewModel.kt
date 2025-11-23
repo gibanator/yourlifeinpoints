@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
+import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,20 +61,25 @@ class DailyCheckupViewModel @Inject constructor(
             .toSet()
 
         // Используем только видимые категории для главного экрана
-        val visibleCategories = categoryRepository.getVisibleCategories()
-            .map { CategoryUi(id = it.id, name = it.name) }
-        
+//        val visibleCategories = categoryRepository.getVisibleCategories()
+//            .map { CategoryUi(id = it.id, name = it.name) }
 
-        update {
-            it.copy(
+        // которые созданы не позже этой даты
+        val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
+        val visibleCategories = categoryRepository.getVisibleCategoriesCreatedBefore(selectedDayMillis)
+            .map { CategoryUi(id = it.id, name = it.name) }
+
+        update { state ->
+            state.copy(
                 selectedDate = selected,
                 currentWeek = mapToUi(week, selected),
-                selectedCategories = completedCategories,
+                selectedCategories = completedCategories.filter { it in visibleCategories.map { it.id } }.toSet(),
                 allCategories = visibleCategories,
-                orderedCategories = visibleCategories // Сохраняем упорядоченный список видимых категорий
+                orderedCategories = visibleCategories, // Сохраняем упорядоченный список видимых категорий
+                isDayEnded = false
             )
         }
-        Log.d("Categories", "${uiCategories.forEach { it.id }}")
+        Log.d("Categories", "${visibleCategories.forEach { it.id }}")
         savedStateHandle["selectedDay"] = selected.toString()
 
 

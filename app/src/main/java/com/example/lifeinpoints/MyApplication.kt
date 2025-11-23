@@ -12,10 +12,10 @@ import javax.inject.Inject
 class MyApplication : Application() {
     @Inject lateinit var db: CategoryDatabase
 
-    override fun onCreate() {
-        super.onCreate()
-        CoroutineScope(Dispatchers.IO).launch {
-            db.clearAllTables()
-        }
-    }
+//    override fun onCreate() {
+//        super.onCreate()
+//        CoroutineScope(Dispatchers.IO).launch {
+//            db.clearAllTables()
+//        }
+//    }
 }

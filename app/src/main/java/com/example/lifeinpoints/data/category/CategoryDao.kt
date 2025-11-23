@@ -47,6 +47,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE isVisible = 1 ORDER BY isSystem ASC, sortOrder DESC")
     suspend fun getVisibleCategories(): List<CategoryEntity>
 
+    @Query("SELECT * FROM categories WHERE isVisible = 1 AND createdAt <= :fromTime ORDER BY isSystem ASC, sortOrder DESC")
+    suspend fun getVisibleCategoriesCreatedBefore(fromTime: Long): List<CategoryEntity>
+
 //    @Query("SELECT * FROM categories")
 //    suspend fun getAll(): List<CategoryEntity>
 
