@@ -56,7 +56,8 @@ fun AppWithTopAndBottomBar() {
                     start = padding.calculateStartPadding(LayoutDirection.Ltr),
                     end = padding.calculateEndPadding(LayoutDirection.Ltr),
                     bottom = padding.calculateBottomPadding()
-                )
+                ),
+                settingsVm = settingsVm
             )
         }
     }
