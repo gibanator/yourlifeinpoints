@@ -7,6 +7,7 @@ import java.time.YearMonth
  * Class that represents day in month view
  *
  */
+// com.example.lifeinpoints.calendar/DayInMonth.kt
 data class DayInMonth(
     val date: LocalDate,
     val isInCurrentMonth: Boolean,
@@ -15,10 +16,10 @@ data class DayInMonth(
     val isFuture: Boolean
 ) {
     enum class CompletionCategory{
-        NONE,
-        COMPLETED,
-        PARTIAL,
-        FUTURE
+        NONE,           // День не завершен
+        COMPLETED,      // День завершен (кнопка нажата)
+        PARTIAL,        // Можно использовать для частичного выполнения
+        FUTURE          // Будущие дни
     }
 }
 data class CalendarUiState(
