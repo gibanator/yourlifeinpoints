@@ -4,8 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressDao
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressEntity
-import com.example.lifeinpoints.data.user.UserDao
-import com.example.lifeinpoints.data.user.UserEntity
 
 @Database(
     entities = [
@@ -13,7 +11,7 @@ import com.example.lifeinpoints.data.user.UserEntity
         CategoryEntity::class,                // обновленная (добавлен user_id)
         DailyCategoryProgressEntity::class    // существующая
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {

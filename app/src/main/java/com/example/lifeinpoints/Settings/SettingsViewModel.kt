@@ -1,13 +1,12 @@
 package com.example.lifeinpoints.Settings
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.lifeinpoints.core.ui.theme.ThemeType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import com.example.lifeinpoints.core.ui.theme.ThemeType
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +22,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setTheme(themeType: ThemeType) {
+        Log.d("ThemeVM", "setTheme: $themeType")
         _currentTheme.value = themeType
         // Сохраняем в SavedStateHandle для сохранения при смене конфигурации
         savedStateHandle["currentTheme"] = themeType.name

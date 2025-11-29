@@ -1,5 +1,6 @@
 package com.example.lifeinpoints.Settings
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,10 +26,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.core.ui.theme.ThemeType
 
 
@@ -39,7 +37,7 @@ fun SettingsScreen(
     onBack: () -> Unit = {},
     onCategoriesClick: () -> Unit = {}, // Новый параметр для навигации
     onVisibilityClick: () -> Unit = {},
-    vm: SettingsViewModel = hiltViewModel()
+    vm: SettingsViewModel
 ) {
     val currentTheme by vm.currentTheme.collectAsState()
 
@@ -64,7 +62,7 @@ fun SettingsScreen(
             Text(
                 text = "Theme",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
 
             ThemeSelectionCard(
@@ -76,7 +74,7 @@ fun SettingsScreen(
             Text(
                 text = "Content",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
 
             CategoriesCard(
@@ -164,7 +162,8 @@ fun ThemeSelectionCard(
                 title = "System Default",
                 subtitle = "Follow system theme",
                 isSelected = currentTheme == ThemeType.SYSTEM,
-                onClick = { onThemeSelected(ThemeType.SYSTEM) }
+                onClick = { onThemeSelected(ThemeType.SYSTEM)
+                Log.d("Theme", "Changed theme to system") }
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -207,7 +206,7 @@ fun ThemeOption(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                fontWeight = FontWeight.Medium
             )
             Text(
                 text = subtitle,
