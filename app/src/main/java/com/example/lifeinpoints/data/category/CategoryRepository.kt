@@ -19,7 +19,8 @@ class CategoryRepository @Inject constructor(
             color = "#FF6B6B",
             sortOrder = 0,
             isSystem = true,
-            isVisible = true
+            isVisible = true,
+            createdAt = 0L
         ),
         CategoryEntity(
             id = 2,
@@ -27,7 +28,8 @@ class CategoryRepository @Inject constructor(
             color = "#4ECDC4",
             sortOrder = 1,
             isSystem = true,
-            isVisible = true
+            isVisible = true,
+            createdAt = 0L
         ),
         CategoryEntity(
             id = 3,
@@ -35,7 +37,8 @@ class CategoryRepository @Inject constructor(
             color = "#45B7D1",
             sortOrder = 2,
             isSystem = true,
-            isVisible = true
+            isVisible = true,
+            createdAt = 0L
         ),
         CategoryEntity(
             id = 4,
@@ -43,7 +46,8 @@ class CategoryRepository @Inject constructor(
             color = "#96CEB4",
             sortOrder = 3,
             isSystem = true,
-            isVisible = true
+            isVisible = true,
+            createdAt = 0L
         ),
         CategoryEntity(
             id = 5,
@@ -51,7 +55,8 @@ class CategoryRepository @Inject constructor(
             color = "#FFEAA7",
             sortOrder = 4,
             isSystem = true,
-            isVisible = true
+            isVisible = true,
+            createdAt = 0L
         )
     )
 
