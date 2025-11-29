@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.lifeinpoints.data.category.CategoryDao
 import com.example.lifeinpoints.data.category.CategoryDatabase
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressDao
+import com.example.lifeinpoints.data.daycompletion.DayCompletionDao
 import com.example.lifeinpoints.data.user.UserDao
 import dagger.Module
 import dagger.Provides
@@ -30,5 +31,8 @@ object DatabaseModule {
     fun provideDailyProgressDao(db: CategoryDatabase): DailyCategoryProgressDao = db.dailyProgressDao()
     //    @Provides
 //    fun provideUserDao(db: CategoryDatabase): UserDao = db.userDao()
+
+    @Provides
+    fun provideDayCompletionDao(db: CategoryDatabase): DayCompletionDao = db.dayCompletionDao()
 
 }

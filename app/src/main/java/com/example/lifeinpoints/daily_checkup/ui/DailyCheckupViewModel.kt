@@ -1,3 +1,4 @@
+// com.example.lifeinpoints.daily_checkup.ui/DailyCheckupViewModel.kt
 package com.example.lifeinpoints.daily_checkup.ui
 
 import android.util.Log
@@ -6,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
+import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class DailyCheckupViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val dailyProgressRepo: DailyCategoryProgressRepository,
+    private val dayCompletionRepo: DayCompletionRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel()  {
 
@@ -60,9 +63,8 @@ class DailyCheckupViewModel @Inject constructor(
             .map { it.categoryId }
             .toSet()
 
-        // Используем только видимые категории для главного экрана
-//        val visibleCategories = categoryRepository.getVisibleCategories()
-//            .map { CategoryUi(id = it.id, name = it.name) }
+        // Получаем состояние завершенности дня из базы
+        val isDayCompleted = dayCompletionRepo.getDayCompletion(selected.toString())
 
         // которые созданы не позже этой даты
         val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
@@ -76,13 +78,11 @@ class DailyCheckupViewModel @Inject constructor(
                 selectedCategories = completedCategories.filter { it in visibleCategories.map { it.id } }.toSet(),
                 allCategories = visibleCategories,
                 orderedCategories = visibleCategories, // Сохраняем упорядоченный список видимых категорий
-                isDayEnded = false
+                isDayEnded = isDayCompleted
             )
         }
         Log.d("Categories", "${visibleCategories.forEach { it.id }}")
         savedStateHandle["selectedDay"] = selected.toString()
-
-
     }
 
     /**
@@ -153,8 +153,12 @@ class DailyCheckupViewModel @Inject constructor(
     }
 
     fun toggleDayEnded() {
-        _uiState.update {
-            it.copy(isDayEnded = !it.isDayEnded)
+        viewModelScope.launch {
+            val newState = dayCompletionRepo.toggleDayCompletion(_uiState.value.selectedDate.toString())
+            _uiState.update {
+                it.copy(isDayEnded = newState)
+            }
+            saveProgress()
         }
     }
 
@@ -200,5 +204,4 @@ class DailyCheckupViewModel @Inject constructor(
             )
         }
     }
-
 }
