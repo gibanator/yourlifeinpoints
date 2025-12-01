@@ -8,6 +8,8 @@ object Routes {
     const val DailyCheckupWithArgs = "daily_checkup?date={date}"
     const val Calendar = "calendar"
 
+    const val Statistics = "statistics"  // Добавляем новый маршрут
+
     const val Settings = "settings"
 
     const val ADD_CATEGORY = "add_category"

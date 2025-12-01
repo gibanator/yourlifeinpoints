@@ -19,6 +19,8 @@ import com.example.lifeinpoints.categories.CategoryVisibilityScreen
 import com.example.lifeinpoints.categories.EditCategoryScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
+import com.example.lifeinpoints.statistics.StatisticsScreen  // Импортируем новый экран
+import com.example.lifeinpoints.statistics.StatisticsViewModel
 import java.time.LocalDate
 
 @Composable
@@ -27,6 +29,9 @@ fun AppNavHost(
     settingsVm: SettingsViewModel,
     modifier: Modifier = Modifier
 ) {
+
+    val statisticsViewModel: StatisticsViewModel = hiltViewModel()
+
     NavHost(
         navController,
         startDestination = Routes.DailyCheckup,
@@ -97,6 +102,10 @@ fun AppNavHost(
             )
         }
 
+        composable(Routes.Statistics) {
+            StatisticsScreen()
+        }
+
         // Добавим новый composable:
 
         composable(Routes.ADD_CATEGORY) {
@@ -152,6 +161,12 @@ fun AppNavHost(
         }
 
 // Добавим новый маршрут для управления видимостью
+        composable("category_visibility") {
+            CategoryVisibilityScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
         composable("category_visibility") {
             CategoryVisibilityScreen(
                 onBack = { navController.popBackStack() }

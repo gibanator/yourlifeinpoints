@@ -1,6 +1,7 @@
 package com.example.lifeinpoints.core.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assessment  // Иконка для статистики
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -51,5 +52,6 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(Routes.DailyCheckup, Icons.Default.Home, "Main"),
     BottomNavItem(Routes.Calendar, Icons.Default.DateRange, "Calendar"),
+    BottomNavItem(Routes.Statistics, Icons.Default.Assessment, "Statistics"),
     BottomNavItem(Routes.Settings, Icons.Default.Settings, "Settings")
 )

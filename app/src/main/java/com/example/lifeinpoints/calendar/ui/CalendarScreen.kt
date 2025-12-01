@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lifeinpoints.calendar.CalendarUiState
@@ -26,7 +27,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun CalendarScreen(
     modifier: Modifier = Modifier,
-    vm: CalendarViewModel = viewModel(),
+    vm: CalendarViewModel = hiltViewModel(),
     toCertainDate: (LocalDate?) -> Unit
 ) {
     val calendarUiState by vm.uiState.collectAsStateWithLifecycle()
