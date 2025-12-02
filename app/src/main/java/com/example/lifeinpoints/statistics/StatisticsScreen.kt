@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import java.time.format.DateTimeFormatter
+import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -69,12 +70,24 @@ fun StatisticsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            CompactMonthSelector(
-                currentMonth = uiState.currentMonth,
-                viewType = uiState.viewType,
-                onPrevMonth = { viewModel.prevMonth() },
-                onNextMonth = { viewModel.nextMonth() },
-                onViewTypeToggle = { viewModel.toggleViewType() },
+            // Селектор периода (неделя/месяц/год)
+            PeriodSelector(
+                uiState = uiState,
+                onPrevPeriod = {
+                    when (uiState.viewType) {
+                        ViewType.MONTH -> viewModel.prevMonth()
+                        ViewType.WEEK -> viewModel.prevWeek()
+                        ViewType.YEAR -> viewModel.prevYear()
+                    }
+                },
+                onNextPeriod = {
+                    when (uiState.viewType) {
+                        ViewType.MONTH -> viewModel.nextMonth()
+                        ViewType.WEEK -> viewModel.nextWeek()
+                        ViewType.YEAR -> viewModel.nextYear()
+                    }
+                },
+                onToggleViewType = { viewModel.toggleViewType() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -98,70 +111,124 @@ fun StatisticsScreen(
                     )
                 }
             } else {
-                // Таблица статистики с умным центрированием
-                SmartCenteredTable(
-                    monthData = uiState.monthData,
-                    categories = uiState.categories,
-                    viewType = uiState.viewType,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                )
+                // Таблица статистики
+                when (uiState.viewType) {
+                    ViewType.MONTH -> {
+                        SmartCenteredTable(
+                            data = uiState.monthData,
+                            categories = uiState.categories,
+                            isWeekMode = false,
+                            isYearMode = false,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 8.dp)
+                        )
+                    }
+                    ViewType.WEEK -> {
+                        SmartCenteredTable(
+                            data = uiState.weekData,
+                            categories = uiState.categories,
+                            isWeekMode = true,
+                            isYearMode = false,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 8.dp)
+                        )
+                    }
+                    ViewType.YEAR -> {
+                        YearTable(
+                            yearData = uiState.yearData,
+                            categories = uiState.categories,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 8.dp)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                SummaryStatsCard(
-                    summary = uiState.summary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                )
+                // Сводная статистика
+                when (uiState.viewType) {
+                    ViewType.MONTH -> {
+                        MonthSummaryStatsCard(
+                            summary = uiState.monthSummary,
+                            currentMonth = uiState.currentMonth,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
+                    ViewType.WEEK -> {
+                        WeekSummaryStatsCard(
+                            summary = uiState.weekSummary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
+                    ViewType.YEAR -> {
+                        YearSummaryStatsCard(
+                            summary = uiState.yearSummary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun CompactMonthSelector(
-    currentMonth: java.time.YearMonth,
-    viewType: ViewType,
-    onPrevMonth: () -> Unit,
-    onNextMonth: () -> Unit,
-    onViewTypeToggle: () -> Unit,
+fun PeriodSelector(
+    uiState: StatisticsUiState,
+    onPrevPeriod: () -> Unit,
+    onNextPeriod: () -> Unit,
+    onToggleViewType: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formatter = DateTimeFormatter.ofPattern("MMM yyyy")
+    val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
 
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        // Кнопка предыдущего периода
         IconButton(
-            onClick = onPrevMonth,
+            onClick = onPrevPeriod,
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous month",
+                contentDescription = "Previous",
                 modifier = Modifier.size(24.dp)
             )
         }
 
+        // Отображение текущего периода
         Box(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
+            val periodText = when (uiState.viewType) {
+                ViewType.MONTH -> uiState.currentMonth.format(monthFormatter)
+                ViewType.WEEK -> uiState.weekSummary.weekRange
+                ViewType.YEAR -> uiState.currentYear.toString()
+            }
+
             Text(
-                text = "${currentMonth.format(formatter)} • ${viewType.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "$periodText • ${uiState.viewType.name.lowercase().replaceFirstChar { it.uppercase() }}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onViewTypeToggle() }
+                    .clickable { onToggleViewType() }
                     .padding(vertical = 8.dp, horizontal = 16.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -171,13 +238,14 @@ fun CompactMonthSelector(
             )
         }
 
+        // Кнопка следующего периода
         IconButton(
-            onClick = onNextMonth,
+            onClick = onNextPeriod,
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next month",
+                contentDescription = "Next",
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -185,95 +253,14 @@ fun CompactMonthSelector(
 }
 
 @Composable
-fun SummaryStatsCard(
-    summary: SummaryStats,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "Monthly Summary",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                SummaryItem(
-                    title = "Days",
-                    value = "${summary.completedDays}/${summary.totalDays}",
-                    subtitle = "completed"
-                )
-
-                SummaryItem(
-                    title = "Average",
-                    value = "%.1f".format(summary.averagePerDay),
-                    subtitle = "per day"
-                )
-
-                SummaryItem(
-                    title = "Best Day",
-                    value = if (summary.bestDay > 0) "#${summary.bestDay}" else "-",
-                    subtitle = "${summary.bestDayCount} categories"
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun SummaryItem(
-    title: String,
-    value: String,
-    subtitle: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
 fun SmartCenteredTable(
-    monthData: List<DayStatistics>,
+    data: List<DayStatistics>,
     categories: List<CategoryStats>,
-    viewType: ViewType,
+    isWeekMode: Boolean,
+    isYearMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    // Рассчитываем общее количество ячеек
-    val totalCells = 2 + categories.size // День + Сумма + Категории
+    val totalCells = 2 + categories.size
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -289,10 +276,11 @@ fun SmartCenteredTable(
                 modifier = Modifier.padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Заголовок таблицы с учетом четности ячеек
+                // Заголовок таблицы
                 TableHeaderRow(
                     categories = categories,
-                    viewType = viewType,
+                    isWeekMode = isWeekMode,
+                    isYearMode = isYearMode,
                     totalCells = totalCells,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -304,11 +292,11 @@ fun SmartCenteredTable(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(monthData) { dayData ->
+                    items(data) { dayData ->
                         TableRow(
                             dayData = dayData,
                             categories = categories,
-                            viewType = viewType,
+                            isWeekMode = isWeekMode,
                             totalCells = totalCells,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -319,37 +307,177 @@ fun SmartCenteredTable(
     }
 }
 
+// Новая таблица для годового режима
 @Composable
-fun TableHeaderRow(
+fun YearTable(
+    yearData: List<MonthStatistics>,
     categories: List<CategoryStats>,
-    viewType: ViewType,
+    modifier: Modifier = Modifier
+) {
+    val totalCells = 2 + categories.size
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Заголовок таблицы для года
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
+                ) {
+                    // Колонка месяца
+                    TableHeaderCell(
+                        text = "Month",
+                        isVisible = true,
+                        modifier = Modifier
+                            .height(28.dp)
+                            .weight(0.5f)
+                    )
+
+                    // Колонка суммы
+                    TableHeaderCell(
+                        text = "Total",
+                        modifier = Modifier
+                            .height(28.dp)
+                            .weight(0.6f)
+                    )
+
+                    // Колонки категорий
+                    val categoryWeight = 0.4f
+                    categories.forEach { category ->
+                        TableHeaderCell(
+                            text = category.name.take(3),
+                            isVisible = category.isVisible,
+                            modifier = Modifier
+                                .height(28.dp)
+                                .weight(categoryWeight)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Тело таблицы для года
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(yearData) { monthData ->
+                        YearTableRow(
+                            monthData = monthData,
+                            categories = categories,
+                            totalCells = totalCells,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Строка таблицы для года
+@Composable
+fun YearTableRow(
+    monthData: MonthStatistics,
+    categories: List<CategoryStats>,
     totalCells: Int,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = if (totalCells % 2 == 0) {
-            // Четное количество ячеек - центрируем между двумя центральными
-            Arrangement.Center
-        } else {
-            // Нечетное количество ячеек - центрируем центральную ячейку
-            Arrangement.Center
-        }
+        horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
     ) {
-        // Распределяем ширину ячеек пропорционально их содержанию
-        // День - самая узкая ячейка
+        // Колонка месяца
+        TableCell(
+            text = monthData.monthName,
+            modifier = Modifier
+                .height(28.dp)
+                .weight(0.5f)
+        )
+
+        // Колонка суммы
+        TableCell(
+            text = monthData.totalSelected.toString(),
+            modifier = Modifier
+                .height(28.dp)
+                .weight(0.6f),
+            backgroundColor = if (monthData.totalSelected > 0) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        )
+
+        // Колонки категорий
+        val categoryWeight = 0.4f
+        categories.forEach { category ->
+            val categorySum = monthData.categorySums[category.id] ?: 0
+            val hasValue = categorySum > 0
+
+            TableCell(
+                text = if (hasValue) categorySum.toString() else "",
+                modifier = Modifier
+                    .height(28.dp)
+                    .weight(categoryWeight),
+                backgroundColor = if (hasValue) {
+                    // Разная интенсивность цвета в зависимости от значения
+                    val alpha = 0.2f + (categorySum.toFloat() / 31f * 0.8f).coerceAtMost(0.8f)
+                    if (category.isVisible) {
+                        MaterialTheme.colorScheme.primary.copy(alpha = alpha)
+                    } else {
+                        MaterialTheme.colorScheme.secondary.copy(alpha = alpha)
+                    }
+                } else {
+                    MaterialTheme.colorScheme.surface
+                },
+                textColor = if (hasValue) {
+                    if (category.isVisible) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.secondary
+                } else Color.Transparent
+            )
+        }
+    }
+}
+
+@Composable
+fun TableHeaderRow(
+    categories: List<CategoryStats>,
+    isWeekMode: Boolean,
+    isYearMode: Boolean = false,
+    totalCells: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
+    ) {
+        // Первая колонка: день недели или число месяца
+        val firstColumnText = when {
+            isYearMode -> "Month"
+            isWeekMode -> "Day"
+            else -> "Day"
+        }
+
         TableHeaderCell(
-            text = when (viewType) {
-                ViewType.MONTH -> "Day"
-                ViewType.WEEK -> "Date"
-            },
+            text = firstColumnText,
             isVisible = true,
             modifier = Modifier
                 .height(28.dp)
-                .weight(0.5f) // Самая узкая
+                .weight(0.5f)
         )
 
-        // Сумма - немного шире дня
+        // Вторая колонка: сумма
         TableHeaderCell(
             text = "Total",
             modifier = Modifier
@@ -357,7 +485,7 @@ fun TableHeaderRow(
                 .weight(0.6f)
         )
 
-        // Категории - самые узкие
+        // Колонки категорий
         val categoryWeight = 0.4f
         categories.forEach { category ->
             TableHeaderCell(
@@ -375,32 +503,29 @@ fun TableHeaderRow(
 fun TableRow(
     dayData: DayStatistics,
     categories: List<CategoryStats>,
-    viewType: ViewType,
+    isWeekMode: Boolean,
     totalCells: Int,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = if (totalCells % 2 == 0) {
-            Arrangement.Center
-        } else {
-            Arrangement.Center
-        }
+        horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
     ) {
-        val dayText = when (viewType) {
-            ViewType.MONTH -> dayData.day.toString()
-            ViewType.WEEK -> dayData.date.substring(8..9)
+        // Первая колонка: день недели + число или просто число
+        val dayText = if (isWeekMode) {
+            "${dayData.dayOfWeek ?: ""}\n${dayData.day}"
+        } else {
+            dayData.day.toString()
         }
 
-        // Ячейка дня - самая узкая
         TableCell(
             text = dayText,
             modifier = Modifier
                 .height(28.dp)
-                .weight(0.5f) // Самая узкая
+                .weight(0.5f)
         )
 
-        // Ячейка суммы - немного шире
+        // Вторая колонка: сумма
         TableCell(
             text = dayData.totalSelected.toString(),
             modifier = Modifier
@@ -413,7 +538,7 @@ fun TableRow(
             }
         )
 
-        // Ячейки категорий - самые узкие
+        // Колонки категорий
         val categoryWeight = 0.4f
         categories.forEach { category ->
             val isSelected = dayData.categorySelections[category.id] == true
@@ -462,7 +587,7 @@ fun TableHeaderCell(
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 10.sp
             )
@@ -498,8 +623,189 @@ fun TableCell(
             color = textColor,
             textAlign = TextAlign.Center,
             fontSize = 10.sp,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun MonthSummaryStatsCard(
+    summary: SummaryStats,
+    currentMonth: YearMonth,
+    modifier: Modifier = Modifier
+) {
+    val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "${currentMonth.format(monthFormatter)} Summary",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                SummaryItem(
+                    title = "Days",
+                    value = "${summary.completedDays}/${summary.totalDays}",
+                    subtitle = "completed"
+                )
+
+                SummaryItem(
+                    title = "Average",
+                    value = "%.1f".format(summary.averagePerDay),
+                    subtitle = "per day"
+                )
+
+                SummaryItem(
+                    title = "Best Day",
+                    value = if (summary.bestDay > 0) "#${summary.bestDay}" else "-",
+                    subtitle = "${summary.bestDayCount} categories"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun WeekSummaryStatsCard(
+    summary: WeekSummaryStats,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Week Summary",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                SummaryItem(
+                    title = "Days",
+                    value = "${summary.completedDays}/${summary.totalDays}",
+                    subtitle = "completed"
+                )
+
+                SummaryItem(
+                    title = "Average",
+                    value = "%.1f".format(summary.averagePerDay),
+                    subtitle = "per day"
+                )
+
+                SummaryItem(
+                    title = "Best Day",
+                    value = summary.bestDay,
+                    subtitle = "${summary.bestDayCount} categories"
+                )
+            }
+        }
+    }
+}
+
+// Новая карточка сводной статистики за год
+@Composable
+fun YearSummaryStatsCard(
+    summary: YearSummaryStats,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "${summary.year} Summary",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                SummaryItem(
+                    title = "Months",
+                    value = "${summary.completedMonths}/${summary.totalMonths}",
+                    subtitle = "completed"
+                )
+
+                SummaryItem(
+                    title = "Average",
+                    value = "%.1f".format(summary.averagePerMonth),
+                    subtitle = "per month"
+                )
+
+                SummaryItem(
+                    title = "Best Month",
+                    value = summary.bestMonth,
+                    subtitle = "${summary.bestMonthCount} categories"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SummaryItem(
+    title: String,
+    value: String,
+    subtitle: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
     }
 }
