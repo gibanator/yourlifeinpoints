@@ -18,7 +18,7 @@ import com.example.lifeinpoints.data.user.UserEntity
         DailyCategoryProgressEntity::class,    // существующая
         DayCompletionEntity::class  // Добавляем новую сущность
     ],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {

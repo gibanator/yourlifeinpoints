@@ -55,6 +55,12 @@ class DailyCheckupViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Function for initializing the state for a date. Gets the data for day from the database and
+     * applies it to UiState.
+     *
+     * @param selected Date to initialize
+     */
     private suspend fun initStateForDay(selected: LocalDate) {
         val week = weekDatesOf(selected)
         val completedCategories = dailyProgressRepo
