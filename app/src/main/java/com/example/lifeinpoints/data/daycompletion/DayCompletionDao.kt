@@ -26,7 +26,8 @@ interface DayCompletionDao {
     @Query("SELECT * FROM day_completion WHERE date BETWEEN :startDate AND :endDate")
     suspend fun getByDateRange(startDate: String, endDate: String): List<DayCompletionEntity>
 
-    @Query("SELECT * FROM day_completion WHERE isCompleted = 1 ORDER BY date DESC")
+    // Изменяем этот запрос - убираем фильтр по isCompleted = 1
+    @Query("SELECT * FROM day_completion ORDER BY date DESC")
     fun observeAllCompletedDays(): Flow<List<DayCompletionEntity>>
 
     @Query("DELETE FROM day_completion WHERE date = :date")

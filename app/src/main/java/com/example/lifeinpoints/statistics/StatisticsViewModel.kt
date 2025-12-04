@@ -43,6 +43,7 @@ class StatisticsViewModel @Inject constructor(
 
     init {
         setupCategorySubscription()
+        setupDayCompletionSubscription() // Добавляем подписку на изменения завершения дней
         loadStatistics()
     }
 
@@ -56,6 +57,17 @@ class StatisticsViewModel @Inject constructor(
             .debounce(300)
             .onEach { categories ->
                 reloadStatistics(categories)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    // Добавляем новую подписку на изменения завершения дней
+    private fun setupDayCompletionSubscription() {
+        dayCompletionRepo.observeAllChanges()
+            .debounce(500) // Небольшая задержка, чтобы избежать множественных перезагрузок
+            .onEach {
+                // При любом изменении завершения дня перезагружаем статистику
+                loadStatistics()
             }
             .launchIn(viewModelScope)
     }
@@ -259,8 +271,8 @@ class StatisticsViewModel @Inject constructor(
         )
     }
 
+    // Обновляем метод loadStatistics для работы с уже загруженными категориями
     fun loadStatistics() {
-        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 val allCategories = categoryRepository.getAll()
@@ -564,6 +576,10 @@ class StatisticsViewModel @Inject constructor(
         loadStatistics()
     }
     fun forceRefresh() {
+        _forceRefresh.value = _forceRefresh.value + 1
+    }
+
+    fun refreshStatistics() {
         _forceRefresh.value = _forceRefresh.value + 1
     }
 }

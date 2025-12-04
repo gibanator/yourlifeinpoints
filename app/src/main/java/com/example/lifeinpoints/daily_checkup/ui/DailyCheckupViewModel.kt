@@ -31,6 +31,9 @@ class DailyCheckupViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
+    // Добавляем флаг для уведомления об изменениях
+    private val _dayCompletedEvent = MutableStateFlow(false)
+
     init {
         // Инициализируем системные категории при создании ViewModel
         viewModelScope.launch {
@@ -159,6 +162,13 @@ class DailyCheckupViewModel @Inject constructor(
                 it.copy(isDayEnded = newState)
             }
             saveProgress()
+
+            // Уведомляем об изменении состояния дня
+            _dayCompletedEvent.value = true
+            _dayCompletedEvent.value = false // сбрасываем для следующего события
+
+            // Можно также добавить уведомление через SharedFlow или Event
+            Log.d("DailyCheckupVM", "Day ended: ${_uiState.value.selectedDate}")
         }
     }
 
