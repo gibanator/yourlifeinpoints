@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -31,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,15 +44,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.lifeinpoints.statistics.ui.PieChartWithLegend
+import com.google.accompanist.pager.ExperimentalPagerApi
 import java.time.format.DateTimeFormatter
 import java.time.YearMonth
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun StatisticsScreen(
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Обновляем статистику при каждом появлении экрана
+    LaunchedEffect(Unit) {
+        viewModel.loadStatistics()
+    }
+
+    // Состояние для Pager
+    val pagerState = rememberPagerState()
 
     Scaffold(
         topBar = {
@@ -70,7 +85,7 @@ fun StatisticsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Селектор периода (неделя/месяц/год)
+            // Селектор периода
             PeriodSelector(
                 uiState = uiState,
                 onPrevPeriod = {
@@ -111,71 +126,135 @@ fun StatisticsScreen(
                     )
                 }
             } else {
-                // Таблица статистики
-                when (uiState.viewType) {
-                    ViewType.MONTH -> {
-                        SmartCenteredTable(
-                            data = uiState.monthData,
-                            categories = uiState.categories,
-                            isWeekMode = false,
-                            isYearMode = false,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 8.dp)
-                        )
-                    }
-                    ViewType.WEEK -> {
-                        SmartCenteredTable(
-                            data = uiState.weekData,
-                            categories = uiState.categories,
-                            isWeekMode = true,
-                            isYearMode = false,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 8.dp)
-                        )
-                    }
-                    ViewType.YEAR -> {
-                        YearTable(
-                            yearData = uiState.yearData,
-                            categories = uiState.categories,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 8.dp)
-                        )
+                // HorizontalPager для переключения между таблицей и диаграммой
+                HorizontalPager(
+                    count = 2,
+                    state = pagerState,
+                    modifier = Modifier
+                        .weight(1f)
+                ) { page ->
+                    when (page) {
+                        0 -> {
+                            // Первая страница: таблица
+                            Column(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                // Таблица статистики
+                                when (uiState.viewType) {
+                                    ViewType.MONTH -> {
+                                        SmartCenteredTable(
+                                            data = uiState.monthData,
+                                            categories = uiState.categories,
+                                            isWeekMode = false,
+                                            isYearMode = false,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .padding(horizontal = 8.dp)
+                                        )
+                                    }
+                                    ViewType.WEEK -> {
+                                        SmartCenteredTable(
+                                            data = uiState.weekData,
+                                            categories = uiState.categories,
+                                            isWeekMode = true,
+                                            isYearMode = false,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .padding(horizontal = 8.dp)
+                                        )
+                                    }
+                                    ViewType.YEAR -> {
+                                        YearTable(
+                                            yearData = uiState.yearData,
+                                            categories = uiState.categories,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .padding(horizontal = 8.dp)
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Сводная статистика
+                                when (uiState.viewType) {
+                                    ViewType.MONTH -> {
+                                        MonthSummaryStatsCard(
+                                            summary = uiState.monthSummary,
+                                            currentMonth = uiState.currentMonth,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp)
+                                        )
+                                    }
+                                    ViewType.WEEK -> {
+                                        WeekSummaryStatsCard(
+                                            summary = uiState.weekSummary,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp)
+                                        )
+                                    }
+                                    ViewType.YEAR -> {
+                                        YearSummaryStatsCard(
+                                            summary = uiState.yearSummary,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        1 -> {
+                            // Вторая страница: круговая диаграмма
+                            if (uiState.pieChartData.isNotEmpty()) {
+                                // Генерируем заголовок в зависимости от типа представления
+                                val pieChartTitle = when (uiState.viewType) {
+                                    ViewType.MONTH -> "Распределение по категориям за ${uiState.currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))}"
+                                    ViewType.WEEK -> "Распределение по категориям за неделю"
+                                    ViewType.YEAR -> "Распределение по категориям за ${uiState.currentYear}"
+                                }
+
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    PieChartWithLegend(
+                                        data = uiState.pieChartData,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        title = pieChartTitle,
+                                        innerRadiusRatio = 0.6f,
+                                        showLegend = true,
+                                        cardElevation = 4,
+                                        cornerRadius = 16
+                                    )
+                                }
+                            } else {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Нет данных для отображения диаграммы",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Сводная статистика
-                when (uiState.viewType) {
-                    ViewType.MONTH -> {
-                        MonthSummaryStatsCard(
-                            summary = uiState.monthSummary,
-                            currentMonth = uiState.currentMonth,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        )
-                    }
-                    ViewType.WEEK -> {
-                        WeekSummaryStatsCard(
-                            summary = uiState.weekSummary,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        )
-                    }
-                    ViewType.YEAR -> {
-                        YearSummaryStatsCard(
-                            summary = uiState.yearSummary,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        )
-                    }
-                }
+                // Индикатор страниц (точки внизу)
+                HorizontalPagerIndicator(
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(16.dp)
+                )
             }
         }
     }

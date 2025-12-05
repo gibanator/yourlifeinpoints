@@ -39,7 +39,7 @@ class DayCompletionRepository @Inject constructor(
         return newState
     }
 
-    // Добавляем новый метод для подписки на все изменения
+    // Добавляем метод для подписки на все изменения
     fun observeAllChanges(): Flow<List<DayCompletionEntity>> {
         return dao.observeAllCompletedDays()
     }

@@ -24,8 +24,16 @@ data class StatisticsUiState(
     val viewType: ViewType = ViewType.MONTH,
     val monthSummary: SummaryStats = SummaryStats(),
     val weekSummary: WeekSummaryStats = WeekSummaryStats(),
-    val yearSummary: YearSummaryStats = YearSummaryStats()  // Статистика за год
+    val yearSummary: YearSummaryStats = YearSummaryStats(),
+    val pieChartData: List<com.example.lifeinpoints.statistics.ui.PieChartItem> = emptyList(),
+    val displayMode: DisplayMode = DisplayMode.TABLE
 )
+
+// Добавим enum для типа отображения
+enum class DisplayMode {
+    TABLE,
+    CHART
+}
 
 data class DayStatistics(
     val day: Int,

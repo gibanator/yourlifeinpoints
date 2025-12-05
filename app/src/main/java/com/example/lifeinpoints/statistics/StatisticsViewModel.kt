@@ -1,11 +1,13 @@
 // com.example.lifeinpoints.statistics/StatisticsViewModel.kt
 package com.example.lifeinpoints.statistics
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
+import com.example.lifeinpoints.statistics.ui.PieChartItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,9 +43,23 @@ class StatisticsViewModel @Inject constructor(
     private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
     private val monthFormatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)
 
+    // Цвета для категорий (можно будет сделать настраиваемыми)
+    private val categoryColors = listOf(
+        Color(0xFF4CAF50), // Зеленый
+        Color(0xFF2196F3), // Синий
+        Color(0xFFF44336), // Красный
+        Color(0xFFFF9800), // Оранжевый
+        Color(0xFF9C27B0), // Фиолетовый
+        Color(0xFF00BCD4), // Бирюзовый
+        Color(0xFF795548), // Коричневый
+        Color(0xFF607D8B), // Серо-голубой
+        Color(0xFFFFC107), // Янтарный
+        Color(0xFFE91E63)  // Розовый
+    )
+
     init {
         setupCategorySubscription()
-        setupDayCompletionSubscription() // Добавляем подписку на изменения завершения дней
+        setupDayCompletionSubscription()
         loadStatistics()
     }
 
@@ -61,12 +77,10 @@ class StatisticsViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // Добавляем новую подписку на изменения завершения дней
     private fun setupDayCompletionSubscription() {
         dayCompletionRepo.observeAllChanges()
-            .debounce(500) // Небольшая задержка, чтобы избежать множественных перезагрузок
+            .debounce(500)
             .onEach {
-                // При любом изменении завершения дня перезагружаем статистику
                 loadStatistics()
             }
             .launchIn(viewModelScope)
@@ -81,53 +95,56 @@ class StatisticsViewModel @Inject constructor(
 
                 when (currentState.viewType) {
                     ViewType.MONTH -> {
-                        // Загружаем месячные данные
                         val monthData = loadMonthData(currentState.currentMonth, allCategories.map { it.id })
                         val relevantCategoryIds = findRelevantCategories(monthData, allCategories)
                         val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
                         val filteredMonthData = filterMonthDataForRelevantCategories(monthData, relevantCategoryIds)
                         val monthSummary = calculateMonthSummaryStats(filteredMonthData, currentState.currentMonth)
+                        val pieChartData = preparePieChartDataForMonth(filteredMonthData, categoriesToShow)
 
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 monthData = filteredMonthData,
                                 categories = categoriesToShow,
-                                monthSummary = monthSummary
+                                monthSummary = monthSummary,
+                                pieChartData = pieChartData
                             )
                         }
                     }
                     ViewType.WEEK -> {
-                        // Загружаем недельные данные
                         val weekData = loadWeekData(currentState.currentWeekStart, allCategories.map { it.id })
                         val relevantCategoryIds = findRelevantCategories(weekData, allCategories)
                         val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
                         val filteredWeekData = filterWeekDataForRelevantCategories(weekData, relevantCategoryIds)
                         val weekSummary = calculateWeekSummaryStats(filteredWeekData, currentState.currentWeekStart)
+                        val pieChartData = preparePieChartDataForWeek(filteredWeekData, categoriesToShow)
 
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 weekData = filteredWeekData,
                                 categories = categoriesToShow,
-                                weekSummary = weekSummary
+                                weekSummary = weekSummary,
+                                pieChartData = pieChartData
                             )
                         }
                     }
                     ViewType.YEAR -> {
-                        // Загружаем годовые данные
                         val yearData = loadYearData(currentState.currentYear, allCategories.map { it.id })
                         val relevantCategoryIds = findRelevantCategoriesForYear(yearData, allCategories)
                         val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
                         val filteredYearData = filterYearDataForRelevantCategories(yearData, relevantCategoryIds)
                         val yearSummary = calculateYearSummaryStats(filteredYearData, currentState.currentYear)
+                        val pieChartData = preparePieChartDataForYear(filteredYearData, categoriesToShow)
 
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 yearData = filteredYearData,
                                 categories = categoriesToShow,
-                                yearSummary = yearSummary
+                                yearSummary = yearSummary,
+                                pieChartData = pieChartData
                             )
                         }
                     }
@@ -142,6 +159,101 @@ class StatisticsViewModel @Inject constructor(
             }
         }
     }
+
+    // Добавляем метод для переключения режима отображения
+    fun toggleDisplayMode() {
+        _uiState.update {
+            val newMode = when (it.displayMode) {
+                DisplayMode.TABLE -> DisplayMode.CHART
+                DisplayMode.CHART -> DisplayMode.TABLE
+            }
+            it.copy(displayMode = newMode)
+        }
+    }
+
+    // Подготовка данных для круговой диаграммы (месяц)
+    private fun preparePieChartDataForMonth(
+        monthData: List<DayStatistics>,
+        categories: List<CategoryStats>
+    ): List<PieChartItem> {
+        if (categories.isEmpty()) return emptyList()
+
+        val categoryCounts = mutableMapOf<Int, Int>()
+        monthData.forEach { day ->
+            if (day.totalSelected > 0) {
+                day.categorySelections.forEach { (categoryId, isSelected) ->
+                    if (isSelected) {
+                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
+                    }
+                }
+            }
+        }
+
+        return categories.mapIndexed { index, category ->
+            val count = categoryCounts[category.id] ?: 0
+            PieChartItem(
+                label = category.name,
+                value = count.toFloat(),
+                color = categoryColors[index % categoryColors.size]
+            )
+        }.filter { it.value > 0 }
+    }
+
+    // Подготовка данных для круговой диаграммы (неделя)
+    private fun preparePieChartDataForWeek(
+        weekData: List<DayStatistics>,
+        categories: List<CategoryStats>
+    ): List<PieChartItem> {
+        if (categories.isEmpty()) return emptyList()
+
+        val categoryCounts = mutableMapOf<Int, Int>()
+        weekData.forEach { day ->
+            if (day.totalSelected > 0) {
+                day.categorySelections.forEach { (categoryId, isSelected) ->
+                    if (isSelected) {
+                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
+                    }
+                }
+            }
+        }
+
+        return categories.mapIndexed { index, category ->
+            val count = categoryCounts[category.id] ?: 0
+            PieChartItem(
+                label = category.name,
+                value = count.toFloat(),
+                color = categoryColors[index % categoryColors.size]
+            )
+        }.filter { it.value > 0 }
+    }
+
+    // Подготовка данных для круговой диаграммы (год)
+    private fun preparePieChartDataForYear(
+        yearData: List<MonthStatistics>,
+        categories: List<CategoryStats>
+    ): List<PieChartItem> {
+        if (categories.isEmpty()) return emptyList()
+
+        val categoryCounts = mutableMapOf<Int, Int>()
+        yearData.forEach { month ->
+            month.categorySums.forEach { (categoryId, sum) ->
+                if (sum > 0) {
+                    categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + sum
+                }
+            }
+        }
+
+        return categories.mapIndexed { index, category ->
+            val count = categoryCounts[category.id] ?: 0
+            PieChartItem(
+                label = category.name,
+                value = count.toFloat(),
+                color = categoryColors[index % categoryColors.size]
+            )
+        }.filter { it.value > 0 }
+    }
+
+
 
     // Загрузка данных за год
     private suspend fun loadYearData(
@@ -271,8 +383,8 @@ class StatisticsViewModel @Inject constructor(
         )
     }
 
-    // Обновляем метод loadStatistics для работы с уже загруженными категориями
     fun loadStatistics() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 val allCategories = categoryRepository.getAll()
@@ -579,7 +691,4 @@ class StatisticsViewModel @Inject constructor(
         _forceRefresh.value = _forceRefresh.value + 1
     }
 
-    fun refreshStatistics() {
-        _forceRefresh.value = _forceRefresh.value + 1
-    }
 }
