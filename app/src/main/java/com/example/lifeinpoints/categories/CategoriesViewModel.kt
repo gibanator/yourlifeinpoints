@@ -96,12 +96,11 @@ class CategoriesViewModel @Inject constructor(
     // Метод для изменения видимости
     suspend fun setCategoryVisibility(categoryId: Int, isVisible: Boolean): Result<Unit> {
         return try {
-            // Получаем текущую категорию из базы
             val category = categoryRepository.getById(categoryId)
             if (category != null) {
-                // Обновляем только поле видимости
                 val updatedCategory = category.copy(isVisible = isVisible)
                 categoryRepository.updateCategory(updatedCategory)
+                Result.success(Unit)
             } else {
                 Result.failure(Exception("Category not found"))
             }

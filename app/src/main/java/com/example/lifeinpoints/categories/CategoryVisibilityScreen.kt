@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.lifeinpoints.statistics.StatisticsViewModel
 import kotlinx.coroutines.launch
 
 // com.example.lifeinpoints.categories/CategoryVisibilityScreen.kt
@@ -20,18 +21,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun CategoryVisibilityScreen(
     onBack: () -> Unit,
-    viewModel: CategoriesViewModel = hiltViewModel()
+    viewModel: CategoriesViewModel = hiltViewModel(),
+    statisticsViewModel: StatisticsViewModel = hiltViewModel() // Добавляем ViewModel статистики
 ) {
     val categoriesState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-
-    // Отладочная информация
-    LaunchedEffect(categoriesState.categories) {
-        println("DEBUG: CategoryVisibilityScreen - Categories count: ${categoriesState.categories.size}")
-        categoriesState.categories.forEach { category ->
-            println("DEBUG: Category '${category.name}' - isVisible: ${category.isVisible}, isStatic: ${category.isStatic}")
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -50,7 +44,6 @@ fun CategoryVisibilityScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            // Информационная карточка
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -75,7 +68,6 @@ fun CategoryVisibilityScreen(
                 }
             }
 
-            // Список категорий с переключателями
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +80,11 @@ fun CategoryVisibilityScreen(
                         category = category,
                         onVisibilityChanged = { isVisible ->
                             coroutineScope.launch {
+                                // Изменяем видимость категории
                                 viewModel.setCategoryVisibility(category.id, isVisible)
+
+                                // Принудительно обновляем статистику
+                                statisticsViewModel.forceRefresh()
                             }
                         }
                     )
@@ -97,6 +93,7 @@ fun CategoryVisibilityScreen(
         }
     }
 }
+
 
 @Composable
 fun CategoryVisibilityItem(
