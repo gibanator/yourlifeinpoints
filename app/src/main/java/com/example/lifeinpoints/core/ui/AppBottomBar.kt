@@ -50,7 +50,7 @@ data class BottomNavItem(
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Routes.DailyCheckup, Icons.Default.Home, "Main"),
+    BottomNavItem(Routes.DailyCheckupWithArgs, Icons.Default.Home, "Main"),
     BottomNavItem(Routes.Calendar, Icons.Default.DateRange, "Calendar"),
     BottomNavItem(Routes.Statistics, Icons.Default.Assessment, "Statistics"),
     BottomNavItem(Routes.Settings, Icons.Default.Settings, "Settings")

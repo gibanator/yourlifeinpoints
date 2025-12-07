@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -66,7 +68,6 @@ fun DailyCheckupScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
         ) {
             WeekBarWithButtons(
                 days = uiState.currentWeek,
@@ -74,6 +75,7 @@ fun DailyCheckupScreen(
                 toPrevWeek = vm::toPrevWeek,
                 toNextWeek = vm::toNextWeek,
             )
+            Spacer(Modifier.height(12.dp))
             CategoryListCard(
                 categories = uiState.orderedCategories,
                 selectedCategories = uiState.selectedCategories,
@@ -85,7 +87,10 @@ fun DailyCheckupScreen(
                 onToggleMultiplierMode = { vm.toggleMultiplierMode() },
                 onAddComment = onNavigateToComments,
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
+            Spacer(Modifier.height(12.dp))
             // Карточка блокировки выбора
             DayCompletionCard(
                 isDayEnded = uiState.isDayEnded,
@@ -186,20 +191,28 @@ fun CategoryListCard(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .padding(8.dp)
+           ,
         ) {
-            // Список категорий
-            categories.forEach { category ->
-                val isSelected = category.id in selectedCategories
-                val id = category.id
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Список категорий
+                categories.forEach { category ->
+                    val isSelected = category.id in selectedCategories
+                    val id = category.id
 
-                CategoryRow(
-                    category = category.name,
-                    isSelected = isSelected,
-                    isDayEnded = isDayEnded,
-                    onCategoryClick = { onCategoryClick(id) }
-                )
+                    CategoryRow(
+                        category = category.name,
+                        isSelected = isSelected,
+                        isDayEnded = isDayEnded,
+                        onCategoryClick = { onCategoryClick(id) }
+                    )
+                }
             }
 
             // Добавляем пространство между списком категорий и кнопками
@@ -354,7 +367,7 @@ fun DayCompletionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isDayEnded) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surface
+            containerColor = if (isDayEnded) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -390,7 +403,7 @@ fun CategoryListItem(
     }
 
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp), // закомментил потому что сильно мозолит глаза
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp)

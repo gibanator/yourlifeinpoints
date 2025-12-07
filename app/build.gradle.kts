@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.contentpager)
     implementation(libs.room.runtime)
+    implementation(libs.androidx.datastore)
     //implementation(libs.androidx.room.common.jvm)
     //implementation(libs.androidx.room.runtime.android)
     ksp(libs.hilt.compiler)

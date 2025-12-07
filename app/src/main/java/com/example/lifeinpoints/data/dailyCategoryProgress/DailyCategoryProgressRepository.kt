@@ -23,6 +23,13 @@ class DailyCategoryProgressRepository @Inject constructor(
     suspend fun getByCategoryAndDate(categoryId: Int, date: String): DailyCategoryProgressEntity? =
         progressDao.getByCategoryAndDate(categoryId, date)
 
+    /**
+     * Writes the day progress (the done and undone categories, by names) to the database.
+     *
+     * @param date Date
+     * @param completedNames Names of completed categories
+     * @param incompletedNames Names of incompleted categories
+     */
     suspend fun writeDayByCategoryNames(date: String, completedNames: List<String>, incompletedNames: List<String>){
         val completedIds = categoryDao.getIdsByName(completedNames)
         val incompletedIds = categoryDao.getIdsByName(incompletedNames)
@@ -30,6 +37,13 @@ class DailyCategoryProgressRepository @Inject constructor(
         progressDao.writeDay(date, completedIds, incompletedIds)
     }
 
+    /**
+     * Writes the day progress (the done and undone categories, by id) to the database.
+     *
+     * @param date Date
+     * @param completedIds Ids of completed categories
+     * @param incompletedIds Ids of incompleted categories
+     */
     suspend fun rewriteDayByCategoryIds(date: String, completedIds: List<Int>, incompletedIds: List<Int>) {
         progressDao.rewriteDay(date, completedIds, incompletedIds)
     }

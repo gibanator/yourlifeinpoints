@@ -10,11 +10,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.lifeinpoints.daily_checkup.ui.CommentScreen
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupScreen
+import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 
 @Composable
 fun DailyCheckupNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    dailyVm: DailyCheckupViewModel
     // Передаем необходимые параметры из родительского компонента
 ) {
     NavHost(
@@ -26,13 +28,15 @@ fun DailyCheckupNavHost(
             DailyCheckupScreen(
                 onNavigateToComments = {
                     navController.navigate(ScreenDest.CommentScreen.route)
-                }
+                },
+                vm = dailyVm
             )
         }
 
         composable(ScreenDest.CommentScreen.route) {
             CommentScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                vm = dailyVm
             )
         }
     }

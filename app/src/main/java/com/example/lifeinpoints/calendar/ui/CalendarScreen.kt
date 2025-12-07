@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 fun CalendarScreen(
     modifier: Modifier = Modifier,
     vm: CalendarViewModel = hiltViewModel(),
-    toCertainDate: (LocalDate?) -> Unit
+    toCertainDate: (String?) -> Unit
 ) {
     val calendarUiState by vm.uiState.collectAsStateWithLifecycle()
 

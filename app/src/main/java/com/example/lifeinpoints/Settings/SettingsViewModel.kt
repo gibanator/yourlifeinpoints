@@ -3,35 +3,33 @@ package com.example.lifeinpoints.Settings
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.core.ui.theme.ThemeType
+import com.example.lifeinpoints.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val repo: SettingsRepository
 ) : ViewModel() {
 
-    private val _currentTheme = MutableStateFlow(ThemeType.SYSTEM)
-    val currentTheme: StateFlow<ThemeType> = _currentTheme
+    val currentTheme: StateFlow<ThemeType> =
+        repo.currentTheme.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = ThemeType.SYSTEM
+        )
 
-    init {
-        loadSavedTheme()
-    }
-
-    fun setTheme(themeType: ThemeType) {
-        Log.d("ThemeVM", "setTheme: $themeType")
-        _currentTheme.value = themeType
-        // Сохраняем в SavedStateHandle для сохранения при смене конфигурации
-        savedStateHandle["currentTheme"] = themeType.name
-    }
-
-    private fun loadSavedTheme() {
-        val savedTheme = savedStateHandle.get<String>("currentTheme")
-        savedTheme?.let {
-            _currentTheme.value = ThemeType.valueOf(it)
+    fun setTheme(theme: ThemeType) {
+        viewModelScope.launch {
+            repo.updateTheme(theme)
         }
     }
 }

@@ -34,44 +34,31 @@ fun AppNavHost(
 
     NavHost(
         navController,
-        startDestination = Routes.DailyCheckup,
+        startDestination = Routes.DailyCheckupWithArgs,
         modifier = modifier
     ) {
-        composable(
-            route = Routes.DailyCheckup,
-        ) {
-            DailyCheckupNavHost(
-            )
-        }
-
         composable(
             route = Routes.DailyCheckupWithArgs,
             arguments = listOf(
                 navArgument("date") {
                     type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
+                    defaultValue = LocalDate.now().toString()
                 }
             )
         ) { backStackEntry ->
-            val dateStr = backStackEntry.arguments?.getString("date")
-            val date = dateStr?.let { LocalDate.parse(it) }
-            val vm: DailyCheckupViewModel = hiltViewModel()
-            LaunchedEffect(date) {
-                if (date != null) vm.onDaySelected(date)
-            }
-            DailyCheckupNavHost(
-            )
+            val vm: DailyCheckupViewModel = hiltViewModel(backStackEntry)
+            DailyCheckupNavHost(dailyVm = vm)
         }
+
         composable(Routes.Calendar) {
             CalendarScreen(
                 toCertainDate = { date ->
-                    navController.navigate(Routes.checkupForDay(date)) {
+                    navController.navigate(Routes.checkupForDay(date ?: LocalDate.now().toString())) {
                         launchSingleTop = true
-                        restoreState = false
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
+//                        restoreState = false
+//                        popUpTo(navController.graph.findStartDestination().id) {
+//                            saveState = true
+//                        }
                     }
                 }
             )
