@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun CommentScreen(
     onBack: () -> Unit,
-    vm: DailyCheckupViewModel = hiltViewModel() // Получаем ViewModel
+    vm: DailyCheckupViewModel // Получаем ViewModel
 ) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }

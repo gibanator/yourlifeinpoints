@@ -1,7 +1,5 @@
 package com.example.lifeinpoints.calendar.ui
 
-
-
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,7 +41,7 @@ import java.time.format.DateTimeFormatter
 fun MonthCalendar(
     monthDays: List<DayInMonth>,
     weeksCount: Int,
-    onDateClick: (LocalDate?) -> Unit,
+    onDateClick: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -72,7 +70,7 @@ fun MonthCalendar(
                             shape = RoundedCornerShape(10.dp)
                         )
                         .padding(4.dp)
-                        .clickable(enabled = day.isInCurrentMonth) {onDateClick(day.date)}
+                        .clickable(enabled = day.isInCurrentMonth) {onDateClick(day.date.toString())}
                     ) {
                         Text(
                             text = day.date.dayOfMonth.toString(),

@@ -28,6 +28,7 @@ class DailyCheckupViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel()  {
 
+    private val id = hashCode()
     private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
@@ -37,20 +38,20 @@ class DailyCheckupViewModel @Inject constructor(
             categoryRepository.initializeSystemCategories()
         }
 
-        val today = savedStateHandle.get<String>("selectedDay")
-            ?.let(LocalDate::parse) ?: LocalDate.now()
-        viewModelScope.launch {
-            initStateForDay(today)
-        }
+        val dateStr = savedStateHandle.get<String>("date")
+        val today = dateStr?.let(LocalDate::parse) ?: LocalDate.now()
+
+        Log.d("VM", "init(), vmId=$id, dateArg=$dateStr, parsed=$today")
+//        viewModelScope.launch {
+//            Log.d("VM", "initStateForDay() from init, vmId=$id, day=$today")
+//            initStateForDay(today)
+//        }
 
         // Подписываемся на изменения видимых категорий
         viewModelScope.launch {
             categoryRepository.observeVisibleCategories().collect { visibleCategories ->
                 // Обновляем состояние, когда меняются видимые категории
-                val currentState = _uiState.value
-                if (currentState.selectedDate != null) {
-                    initStateForDay(currentState.selectedDate)
-                }
+                initStateForDay(today)
             }
         }
     }
@@ -62,6 +63,7 @@ class DailyCheckupViewModel @Inject constructor(
      * @param selected Date to initialize
      */
     private suspend fun initStateForDay(selected: LocalDate) {
+        Log.d("VM", "initStateForDay() CALLED, vmId=$id, day=$selected")
         val week = weekDatesOf(selected)
         val completedCategories = dailyProgressRepo
             .getByDate(selected.toString())
