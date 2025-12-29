@@ -1,8 +1,10 @@
 // com.example.lifeinpoints.data.daycompletion/DayCompletionRepository.kt
 package com.example.lifeinpoints.data.daycompletion
 
+import com.example.lifeinpoints.calendar.DayInMonth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,4 +45,27 @@ class DayCompletionRepository @Inject constructor(
     fun observeAllChanges(): Flow<List<DayCompletionEntity>> {
         return dao.observeAllCompletedDays()
     }
+
+    fun observeYear(year: Int): Flow<Map<LocalDate, DayInMonth.CompletionCategory>> {
+        val from = "$year-01-01"
+        val to = "$year-12-31"
+
+        return dao.observeRange(from, to).map { rows ->
+            rows.associate { row ->
+                val date = LocalDate.parse(row.date)
+                val cat =
+                    if (row.isCompleted)
+                        DayInMonth.CompletionCategory.COMPLETED
+                    else
+                        DayInMonth.CompletionCategory.NONE
+                date to cat
+            }
+        }
+    }
+
+    fun observeRange(
+        from: LocalDate,
+        to: LocalDate
+    ): Flow<Map<LocalDate, DayInMonth.CompletionCategory>> =
+        observeYear(from.year)
 }

@@ -22,13 +22,32 @@ data class DayInMonth(
         FUTURE          // Будущие дни
     }
 }
+
+data class MonthUi(
+    val month: YearMonth,
+    val days: List<DayInMonth>,
+    val weeksCount: Int
+)
+
+//data class CalendarUiState(
+//    val mode: Mode = Mode.MONTH,
+//    val isLoading: Boolean = false,
+//    val error: String? = null,
+//
+//    val currentMonth: YearMonth = YearMonth.now(),
+////    val monthDays: List<DayInMonth> = emptyList(),
+////    val monthWeeksCount: Int = 0,
+//
+//    val currentYear: Int = YearMonth.now().year,
+////    val yearMonths: List<MonthUi> = emptyList()
+//){
+//    enum class Mode {MONTH, YEAR}
+//}
+
 data class CalendarUiState(
     val mode: Mode = Mode.MONTH,
-    val currentMonth: YearMonth = YearMonth.now(),
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val days: List<DayInMonth> = emptyList(),
-    val weeksCount: Int = 0
+    val selectedMonth: YearMonth = YearMonth.now(),
+    val yearCursor: YearMonth = YearMonth.now(),
 ){
     enum class Mode {MONTH, YEAR}
 }

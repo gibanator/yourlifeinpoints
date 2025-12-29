@@ -30,6 +30,10 @@ interface DayCompletionDao {
     @Query("SELECT * FROM day_completion ORDER BY date DESC")
     fun observeAllCompletedDays(): Flow<List<DayCompletionEntity>>
 
+    @Query("SELECT * FROM day_completion WHERE date BETWEEN :fromDate AND :toDate")
+    fun observeRange(fromDate: String, toDate: String): Flow<List<DayCompletionEntity>>
+
+
     @Query("DELETE FROM day_completion WHERE date = :date")
     suspend fun deleteByDate(date: String)
 }

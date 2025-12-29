@@ -17,10 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lifeinpoints.calendar.CalendarUiState
 import com.example.lifeinpoints.calendar.CalendarViewModel
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,22 +30,30 @@ fun CalendarScreen(
 ) {
     val calendarUiState by vm.uiState.collectAsStateWithLifecycle()
 
+    val monthUi by vm.monthUi.collectAsStateWithLifecycle()
+    val yearMonths by vm.yearUi.collectAsStateWithLifecycle()
 //    LaunchedEffect(Unit) {
 //        vm.initMonthlyView(YearMonth.of(2025, 9))
 //    }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         if (calendarUiState.mode == CalendarUiState.Mode.MONTH)
-                            calendarUiState.currentMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
-                        else calendarUiState.currentMonth.year.toString()
+                            calendarUiState.selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
+                        else
+                            calendarUiState.yearCursor.year.toString()
                     )
                 },
                 actions = {
-                    IconButton(onClick = {vm.switchMode()}) {
+                    IconButton(
+                        onClick = {
+                            if (calendarUiState.mode == CalendarUiState.Mode.MONTH) vm.openYear()
+                            else vm.openMonth()
+                        }
+                    ) {
                         Icon(Icons.Default.DateRange, contentDescription = "Select")
                     }
                 }
@@ -55,20 +61,32 @@ fun CalendarScreen(
         }
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
             if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
                 CalendarHeader(
-                    month = calendarUiState.currentMonth,
-                    onPrev = { vm.prevMonth() },
-                    onNext = { vm.nextMonth() }
+                    month = calendarUiState.selectedMonth,
+                    onPrev = vm::prevMonth,
+                    onNext = vm::nextMonth
                 )
                 MonthCalendar (
-                    calendarUiState.days,
-                    calendarUiState.weeksCount,
+                    monthDays = monthUi.days,
+                    weeksCount = monthUi.weeksCount,
                     onDateClick = toCertainDate
+                )
+            }
+            else {
+                YearCalendarView(
+                    year = calendarUiState.yearCursor.year,
+                    months = yearMonths,
+
+                    onPrevYear = vm::prevYear,
+                    onNextYear = vm::nextYear,
+
+                    onMonthClick = { ym -> vm.openMonth(ym) }
                 )
             }
         }
