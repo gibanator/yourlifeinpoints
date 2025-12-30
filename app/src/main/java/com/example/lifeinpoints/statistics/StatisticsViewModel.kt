@@ -690,5 +690,4 @@ class StatisticsViewModel @Inject constructor(
     fun forceRefresh() {
         _forceRefresh.value = _forceRefresh.value + 1
     }
-
 }

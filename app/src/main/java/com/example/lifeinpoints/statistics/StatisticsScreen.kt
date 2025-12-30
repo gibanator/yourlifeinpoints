@@ -105,7 +105,7 @@ fun StatisticsScreen(
                 onToggleViewType = { viewModel.toggleViewType() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 0.dp)
             )
 
             if (uiState.isLoading) {
@@ -224,12 +224,12 @@ fun StatisticsScreen(
                                         data = uiState.pieChartData,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(16.dp),
-                                        title = pieChartTitle,
+                                            .padding(0.dp),
+                                        title = null,
                                         innerRadiusRatio = 0.6f,
                                         showLegend = true,
-                                        cardElevation = 4,
-                                        cornerRadius = 16
+                                        cardElevation = 2,
+                                        cornerRadius = 12
                                     )
                                 }
                             } else {
@@ -253,7 +253,7 @@ fun StatisticsScreen(
                     pagerState = pagerState,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(16.dp)
+                        .padding(0.dp)
                 )
             }
         }
@@ -308,11 +308,12 @@ fun PeriodSelector(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onToggleViewType() }
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .padding(vertical = 0.dp, horizontal = 16.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = MaterialTheme.shapes.small
                     )
+
                     .padding(8.dp)
             )
         }
