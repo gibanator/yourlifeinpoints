@@ -1,6 +1,7 @@
 // com.example.lifeinpoints.statistics/StatisticsUiState.kt
 package com.example.lifeinpoints.statistics
 
+import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
 import java.time.YearMonth
 import java.time.LocalDate
 import java.time.Year
@@ -25,7 +26,7 @@ data class StatisticsUiState(
     val monthSummary: SummaryStats = SummaryStats(),
     val weekSummary: WeekSummaryStats = WeekSummaryStats(),
     val yearSummary: YearSummaryStats = YearSummaryStats(),
-    val pieChartData: List<com.example.lifeinpoints.statistics.ui.PieChartItem> = emptyList(),
+    val pieChartData: List<PieChartItem> = emptyList(),
     val displayMode: DisplayMode = DisplayMode.TABLE
 )
 

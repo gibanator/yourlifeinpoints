@@ -1,5 +1,5 @@
 // com/example/lifeinpoints/statistics/ui/PieChart.kt
-package com.example.lifeinpoints.statistics.ui
+package com.example.lifeinpoints.statistics.ui.PieChart
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,20 +34,15 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
-import kotlin.math.cos
 import kotlin.math.min
-import kotlin.math.sin
-import kotlin.math.max
 
 /**
  * Композируемый компонент для отображения кольцевой диаграммы с легендой.
@@ -315,7 +308,7 @@ private fun LegendItem(
     item: PieChartItem,
     percentage: Int,
     itemHeight: Dp,
-    fontSize: androidx.compose.ui.unit.TextUnit,
+    fontSize: TextUnit,
     showPercentage: Boolean = true,
     compactMode: Boolean = false
 ) {
@@ -456,7 +449,7 @@ private fun DrawScope.drawPieSegment(
  * @return Размер шрифта в TextUnit
  */
 @Composable
-private fun calculateResponsiveFontSize(screenHeight: Dp, ratio: Float): androidx.compose.ui.unit.TextUnit {
+private fun calculateResponsiveFontSize(screenHeight: Dp, ratio: Float): TextUnit {
     val density = LocalDensity.current
     return with(density) {
         (screenHeight * ratio).toSp() // Конвертируем в sp (масштабируемые пиксели)
