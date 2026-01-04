@@ -8,6 +8,7 @@ import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
+import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,6 @@ import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
-// ViewModel для экрана статистики, внедряющий зависимости через Hilt
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     private val dayCompletionRepo: DayCompletionRepository,
@@ -34,20 +34,23 @@ class StatisticsViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository
 ) : ViewModel() {
 
-    // Приватный MutableStateFlow для хранения состояния UI
     private val _uiState = MutableStateFlow(StatisticsUiState())
-    // Публичный неизменяемый StateFlow для наблюдения из UI
     val uiState: StateFlow<StatisticsUiState> = _uiState.asStateFlow()
 
-    // Счётчик для принудительного обновления данных
     private val _forceRefresh = MutableStateFlow(0)
 
-    // Форматтеры дат для отображения
     private val dateFormatter = DateTimeFormatter.ofPattern("d")
     private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
     private val monthFormatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)
 
-    // Палитра цветов для отображения категорий на диаграммах
+    // Цвета для временных графиков (в зависимости от типа представления)
+    private val timeSeriesColors = mapOf(
+        ViewType.MONTH to Color(0xFF2196F3), // Синий для месяца
+        ViewType.WEEK to Color(0xFF4CAF50),  // Зеленый для недели
+        ViewType.YEAR to Color(0xFFF44336)   // Красный для года
+    )
+
+    // Палитра цветов для категорий на круговых диаграммах
     private val categoryColors = listOf(
         Color(0xFF4CAF50), // Зеленый
         Color(0xFF2196F3), // Синий
@@ -62,23 +65,18 @@ class StatisticsViewModel @Inject constructor(
     )
 
     init {
-        // Инициализация подписок на изменение данных
         setupCategorySubscription()
         setupDayCompletionSubscription()
-        // Загрузка начальной статистики
         loadStatistics()
     }
 
-    // Настройка подписки на изменения категорий
     private fun setupCategorySubscription() {
-        // Комбинируем поток категорий и счётчик обновлений
         combine(
             categoryRepository.observeAll(),
             _forceRefresh
         ) { categories, _ ->
             categories
         }
-            // Дебаунс для предотвращения частых обновлений
             .debounce(300)
             .onEach { categories ->
                 reloadStatistics(categories)
@@ -86,10 +84,8 @@ class StatisticsViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // Настройка подписки на изменения завершения дней
     private fun setupDayCompletionSubscription() {
         dayCompletionRepo.observeAllChanges()
-            // Дебаунс для предотвращения частых обновлений
             .debounce(500)
             .onEach {
                 loadStatistics()
@@ -97,7 +93,6 @@ class StatisticsViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // Перезагрузка статистики с учётом текущего типа представления
     private fun reloadStatistics(
         allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
     ) {
@@ -105,16 +100,15 @@ class StatisticsViewModel @Inject constructor(
             try {
                 val currentState = _uiState.value
 
-                // В зависимости от текущего типа представления загружаем соответствующие данные
                 when (currentState.viewType) {
                     ViewType.MONTH -> {
-                        // Загрузка и обработка месячных данных
                         val monthData = loadMonthData(currentState.currentMonth, allCategories.map { it.id })
                         val relevantCategoryIds = findRelevantCategories(monthData, allCategories)
                         val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
                         val filteredMonthData = filterMonthDataForRelevantCategories(monthData, relevantCategoryIds)
                         val monthSummary = calculateMonthSummaryStats(filteredMonthData, currentState.currentMonth)
                         val pieChartData = preparePieChartDataForMonth(filteredMonthData, categoriesToShow)
+                        val timeSeriesData = prepareTimeSeriesDataForMonth(filteredMonthData)
 
                         _uiState.update {
                             it.copy(
@@ -122,18 +116,19 @@ class StatisticsViewModel @Inject constructor(
                                 monthData = filteredMonthData,
                                 categories = categoriesToShow,
                                 monthSummary = monthSummary,
-                                pieChartData = pieChartData
+                                pieChartData = pieChartData,
+                                timeSeriesData = timeSeriesData
                             )
                         }
                     }
                     ViewType.WEEK -> {
-                        // Загрузка и обработка недельных данных
                         val weekData = loadWeekData(currentState.currentWeekStart, allCategories.map { it.id })
                         val relevantCategoryIds = findRelevantCategories(weekData, allCategories)
                         val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
                         val filteredWeekData = filterWeekDataForRelevantCategories(weekData, relevantCategoryIds)
                         val weekSummary = calculateWeekSummaryStats(filteredWeekData, currentState.currentWeekStart)
                         val pieChartData = preparePieChartDataForWeek(filteredWeekData, categoriesToShow)
+                        val timeSeriesData = prepareTimeSeriesDataForWeek(filteredWeekData)
 
                         _uiState.update {
                             it.copy(
@@ -141,18 +136,19 @@ class StatisticsViewModel @Inject constructor(
                                 weekData = filteredWeekData,
                                 categories = categoriesToShow,
                                 weekSummary = weekSummary,
-                                pieChartData = pieChartData
+                                pieChartData = pieChartData,
+                                timeSeriesData = timeSeriesData
                             )
                         }
                     }
                     ViewType.YEAR -> {
-                        // Загрузка и обработка годовых данных
                         val yearData = loadYearData(currentState.currentYear, allCategories.map { it.id })
                         val relevantCategoryIds = findRelevantCategoriesForYear(yearData, allCategories)
                         val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
                         val filteredYearData = filterYearDataForRelevantCategories(yearData, relevantCategoryIds)
                         val yearSummary = calculateYearSummaryStats(filteredYearData, currentState.currentYear)
                         val pieChartData = preparePieChartDataForYear(filteredYearData, categoriesToShow)
+                        val timeSeriesData = prepareTimeSeriesDataForYear(filteredYearData)
 
                         _uiState.update {
                             it.copy(
@@ -160,13 +156,13 @@ class StatisticsViewModel @Inject constructor(
                                 yearData = filteredYearData,
                                 categories = categoriesToShow,
                                 yearSummary = yearSummary,
-                                pieChartData = pieChartData
+                                pieChartData = pieChartData,
+                                timeSeriesData = timeSeriesData
                             )
                         }
                     }
                 }
             } catch (e: Exception) {
-                // Обработка ошибок при загрузке данных
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -177,14 +173,65 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    // Переключение режима отображения (таблица/диаграмма)
-    fun toggleDisplayMode() {
-        _uiState.update {
-            val newMode = when (it.displayMode) {
-                DisplayMode.TABLE -> DisplayMode.CHART
-                DisplayMode.CHART -> DisplayMode.TABLE
+    fun loadStatistics() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            try {
+                val allCategories = categoryRepository.getAll()
+                reloadStatistics(allCategories)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Failed to load statistics: ${e.message}"
+                    )
+                }
             }
-            it.copy(displayMode = newMode)
+        }
+    }
+
+    // Подготовка временных данных для месяца (по дням)
+    private fun prepareTimeSeriesDataForMonth(
+        monthData: List<DayStatistics>
+    ): List<TimeSeriesData> {
+        if (monthData.isEmpty()) return emptyList()
+
+        return monthData.mapIndexed { index, day ->
+            TimeSeriesData(
+                label = (index + 1).toString(), // Просто номер дня
+                value = day.totalSelected.toFloat(),
+                color = timeSeriesColors[ViewType.MONTH]
+            )
+        }
+    }
+
+    // Подготовка временных данных для недели (по дням недели)
+    private fun prepareTimeSeriesDataForWeek(
+        weekData: List<DayStatistics>
+    ): List<TimeSeriesData> {
+        if (weekData.isEmpty()) return emptyList()
+
+        return weekData.map { day ->
+            TimeSeriesData(
+                label = day.dayOfWeek ?: day.day.toString(),
+                value = day.totalSelected.toFloat(),
+                color = timeSeriesColors[ViewType.WEEK]
+            )
+        }
+    }
+
+    // Подготовка временных данных для года (по месяцам)
+    private fun prepareTimeSeriesDataForYear(
+        yearData: List<MonthStatistics>
+    ): List<TimeSeriesData> {
+        if (yearData.isEmpty()) return emptyList()
+
+        return yearData.map { month ->
+            TimeSeriesData(
+                label = month.monthName,
+                value = month.totalSelected.toFloat(),
+                color = timeSeriesColors[ViewType.YEAR]
+            )
         }
     }
 
@@ -195,7 +242,6 @@ class StatisticsViewModel @Inject constructor(
     ): List<PieChartItem> {
         if (categories.isEmpty()) return emptyList()
 
-        // Подсчёт количества выборов для каждой категории
         val categoryCounts = mutableMapOf<Int, Int>()
         monthData.forEach { day ->
             if (day.totalSelected > 0) {
@@ -207,7 +253,6 @@ class StatisticsViewModel @Inject constructor(
             }
         }
 
-        // Преобразование данных в формат PieChartItem
         return categories.mapIndexed { index, category ->
             val count = categoryCounts[category.id] ?: 0
             PieChartItem(
@@ -215,7 +260,7 @@ class StatisticsViewModel @Inject constructor(
                 value = count.toFloat(),
                 color = categoryColors[index % categoryColors.size]
             )
-        }.filter { it.value > 0 } // Фильтрация категорий с нулевыми значениями
+        }.filter { it.value > 0 }
     }
 
     // Подготовка данных для круговой диаграммы (неделя)
@@ -225,7 +270,6 @@ class StatisticsViewModel @Inject constructor(
     ): List<PieChartItem> {
         if (categories.isEmpty()) return emptyList()
 
-        // Подсчёт количества выборов для каждой категории
         val categoryCounts = mutableMapOf<Int, Int>()
         weekData.forEach { day ->
             if (day.totalSelected > 0) {
@@ -237,7 +281,6 @@ class StatisticsViewModel @Inject constructor(
             }
         }
 
-        // Преобразование данных в формат PieChartItem
         return categories.mapIndexed { index, category ->
             val count = categoryCounts[category.id] ?: 0
             PieChartItem(
@@ -245,7 +288,7 @@ class StatisticsViewModel @Inject constructor(
                 value = count.toFloat(),
                 color = categoryColors[index % categoryColors.size]
             )
-        }.filter { it.value > 0 } // Фильтрация категорий с нулевыми значениями
+        }.filter { it.value > 0 }
     }
 
     // Подготовка данных для круговой диаграммы (год)
@@ -255,7 +298,6 @@ class StatisticsViewModel @Inject constructor(
     ): List<PieChartItem> {
         if (categories.isEmpty()) return emptyList()
 
-        // Суммирование значений по категориям за все месяцы
         val categoryCounts = mutableMapOf<Int, Int>()
         yearData.forEach { month ->
             month.categorySums.forEach { (categoryId, sum) ->
@@ -265,7 +307,6 @@ class StatisticsViewModel @Inject constructor(
             }
         }
 
-        // Преобразование данных в формат PieChartItem
         return categories.mapIndexed { index, category ->
             val count = categoryCounts[category.id] ?: 0
             PieChartItem(
@@ -273,22 +314,111 @@ class StatisticsViewModel @Inject constructor(
                 value = count.toFloat(),
                 color = categoryColors[index % categoryColors.size]
             )
-        }.filter { it.value > 0 } // Фильтрация категорий с нулевыми значениями
+        }.filter { it.value > 0 }
     }
 
-    // Загрузка данных за год
+    private suspend fun loadMonthData(
+        month: YearMonth,
+        categoryIds: List<Int>
+    ): List<DayStatistics> {
+        val daysInMonth = month.lengthOfMonth()
+        val monthData = mutableListOf<DayStatistics>()
+
+        for (day in 1..daysInMonth) {
+            val date = month.atDay(day)
+            val dateString = date.toString()
+            val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
+
+            if (isDayCompleted) {
+                val dailyProgress = dailyProgressRepo.getByDate(dateString)
+                val progressMap = dailyProgress.associate { it.categoryId to it.value }
+                val totalSelected = progressMap.values.count { it }
+
+                val categorySelections = categoryIds.associateWith { categoryId ->
+                    progressMap[categoryId] ?: false
+                }
+
+                monthData.add(
+                    DayStatistics(
+                        day = day,
+                        date = dateString,
+                        totalSelected = totalSelected,
+                        categorySelections = categorySelections
+                    )
+                )
+            } else {
+                val categorySelections = categoryIds.associateWith { false }
+                monthData.add(
+                    DayStatistics(
+                        day = day,
+                        date = dateString,
+                        totalSelected = 0,
+                        categorySelections = categorySelections
+                    )
+                )
+            }
+        }
+
+        return monthData
+    }
+
+    private suspend fun loadWeekData(
+        weekStart: LocalDate,
+        categoryIds: List<Int>
+    ): List<DayStatistics> {
+        val weekData = mutableListOf<DayStatistics>()
+
+        for (i in 0..6) {
+            val date = weekStart.plusDays(i.toLong())
+            val dateString = date.toString()
+            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+            val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
+
+            if (isDayCompleted) {
+                val dailyProgress = dailyProgressRepo.getByDate(dateString)
+                val progressMap = dailyProgress.associate { it.categoryId to it.value }
+                val totalSelected = progressMap.values.count { it }
+
+                val categorySelections = categoryIds.associateWith { categoryId ->
+                    progressMap[categoryId] ?: false
+                }
+
+                weekData.add(
+                    DayStatistics(
+                        day = date.dayOfMonth,
+                        date = dateString,
+                        dayOfWeek = dayOfWeek,
+                        totalSelected = totalSelected,
+                        categorySelections = categorySelections
+                    )
+                )
+            } else {
+                val categorySelections = categoryIds.associateWith { false }
+                weekData.add(
+                    DayStatistics(
+                        day = date.dayOfMonth,
+                        date = dateString,
+                        dayOfWeek = dayOfWeek,
+                        totalSelected = 0,
+                        categorySelections = categorySelections
+                    )
+                )
+            }
+        }
+
+        return weekData
+    }
+
     private suspend fun loadYearData(
         year: Year,
         categoryIds: List<Int>
     ): List<MonthStatistics> {
         val yearData = mutableListOf<MonthStatistics>()
 
-        // Проходим по всем месяцам года (1-12)
         for (monthNumber in 1..12) {
             val yearMonth = YearMonth.of(year.value, monthNumber)
             val monthName = yearMonth.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
 
-            // Инициализируем мапу для сумм по категориям
             val categorySums = mutableMapOf<Int, Int>()
             categoryIds.forEach { categoryId ->
                 categorySums[categoryId] = 0
@@ -296,7 +426,6 @@ class StatisticsViewModel @Inject constructor(
 
             var totalSelected = 0
 
-            // Проходим по всем дням месяца
             val daysInMonth = yearMonth.lengthOfMonth()
             for (day in 1..daysInMonth) {
                 val date = yearMonth.atDay(day)
@@ -307,7 +436,6 @@ class StatisticsViewModel @Inject constructor(
                     val dailyProgress = dailyProgressRepo.getByDate(dateString)
                     val progressMap = dailyProgress.associate { it.categoryId to it.value }
 
-                    // Суммируем выбранные категории для этого дня
                     progressMap.forEach { (categoryId, isSelected) ->
                         if (isSelected && categoryId in categoryIds) {
                             categorySums[categoryId] = categorySums[categoryId]!! + 1
@@ -330,211 +458,16 @@ class StatisticsViewModel @Inject constructor(
         return yearData
     }
 
-    // Находим релевантные категории для года
-    private fun findRelevantCategoriesForYear(
-        yearData: List<MonthStatistics>,
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
-    ): Set<Int> {
-        val relevantCategoryIds = mutableSetOf<Int>()
-
-        // Добавляем все видимые категории
-        allCategories
-            .filter { it.isVisible }
-            .forEach { relevantCategoryIds.add(it.id) }
-
-        // Находим категории, которые были выбраны хотя бы в одном месяце
-        yearData.forEach { monthData ->
-            monthData.categorySums.forEach { (categoryId, sum) ->
-                if (sum > 0) {
-                    relevantCategoryIds.add(categoryId)
-                }
-            }
-        }
-
-        return relevantCategoryIds
-    }
-
-    // Фильтруем годовые данные, оставляя только релевантные категории
-    private fun filterYearDataForRelevantCategories(
-        yearData: List<MonthStatistics>,
-        relevantCategoryIds: Set<Int>
-    ): List<MonthStatistics> {
-        return yearData.map { monthData ->
-            // Фильтруем суммы по категориям
-            val filteredSums = monthData.categorySums
-                .filterKeys { categoryId -> categoryId in relevantCategoryIds }
-
-            // Пересчитываем общую сумму после фильтрации
-            val newTotalSelected = filteredSums.values.sum()
-
-            monthData.copy(
-                totalSelected = newTotalSelected,
-                categorySums = filteredSums
-            )
-        }
-    }
-
-    // Расчет статистики за год
-    private fun calculateYearSummaryStats(
-        yearData: List<MonthStatistics>,
-        year: Year
-    ): YearSummaryStats {
-        // Месяцы, в которых был хотя бы один завершенный день (totalSelected > 0)
-        val completedMonths = yearData.count { it.totalSelected > 0 }
-
-        // Общее количество выбранных категорий за год
-        val totalCategoriesSelected = yearData.sumOf { it.totalSelected }
-
-        // Среднее количество выбранных категорий в месяц (только для месяцев с данными)
-        val averagePerMonth = if (completedMonths > 0)
-            totalCategoriesSelected.toDouble() / completedMonths
-        else 0.0
-
-        // Лучший месяц (с максимальным количеством выборов)
-        val bestMonthData = yearData.maxByOrNull { it.totalSelected }
-        val bestMonth = bestMonthData?.monthName ?: ""
-        val bestMonthCount = bestMonthData?.totalSelected ?: 0
-
-        return YearSummaryStats(
-            completedMonths = completedMonths,
-            totalCategoriesSelected = totalCategoriesSelected,
-            averagePerMonth = averagePerMonth,
-            bestMonth = bestMonth,
-            bestMonthCount = bestMonthCount,
-            year = year.value
-        )
-    }
-
-    // Основной метод загрузки статистики
-    fun loadStatistics() {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val allCategories = categoryRepository.getAll()
-                reloadStatistics(allCategories)
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Failed to load statistics: ${e.message}"
-                    )
-                }
-            }
-        }
-    }
-
-    // Загрузка данных за месяц
-    private suspend fun loadMonthData(
-        month: YearMonth,
-        categoryIds: List<Int>
-    ): List<DayStatistics> {
-        val daysInMonth = month.lengthOfMonth()
-        val monthData = mutableListOf<DayStatistics>()
-
-        for (day in 1..daysInMonth) {
-            val date = month.atDay(day)
-            val dateString = date.toString()
-            val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
-
-            if (isDayCompleted) {
-                // Загрузка данных прогресса для завершённого дня
-                val dailyProgress = dailyProgressRepo.getByDate(dateString)
-                val progressMap = dailyProgress.associate { it.categoryId to it.value }
-                val totalSelected = progressMap.values.count { it }
-
-                val categorySelections = categoryIds.associateWith { categoryId ->
-                    progressMap[categoryId] ?: false
-                }
-
-                monthData.add(
-                    DayStatistics(
-                        day = day,
-                        date = dateString,
-                        totalSelected = totalSelected,
-                        categorySelections = categorySelections
-                    )
-                )
-            } else {
-                // Для незавершённого дня все категории не выбраны
-                val categorySelections = categoryIds.associateWith { false }
-                monthData.add(
-                    DayStatistics(
-                        day = day,
-                        date = dateString,
-                        totalSelected = 0,
-                        categorySelections = categorySelections
-                    )
-                )
-            }
-        }
-
-        return monthData
-    }
-
-    // Загрузка данных за неделю
-    private suspend fun loadWeekData(
-        weekStart: LocalDate,
-        categoryIds: List<Int>
-    ): List<DayStatistics> {
-        val weekData = mutableListOf<DayStatistics>()
-
-        // Генерируем все дни недели (с понедельника по воскресенье)
-        for (i in 0..6) {
-            val date = weekStart.plusDays(i.toLong())
-            val dateString = date.toString()
-            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-            val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
-
-            if (isDayCompleted) {
-                // Загрузка данных прогресса для завершённого дня
-                val dailyProgress = dailyProgressRepo.getByDate(dateString)
-                val progressMap = dailyProgress.associate { it.categoryId to it.value }
-                val totalSelected = progressMap.values.count { it }
-
-                val categorySelections = categoryIds.associateWith { categoryId ->
-                    progressMap[categoryId] ?: false
-                }
-
-                weekData.add(
-                    DayStatistics(
-                        day = date.dayOfMonth,
-                        date = dateString,
-                        dayOfWeek = dayOfWeek,
-                        totalSelected = totalSelected,
-                        categorySelections = categorySelections
-                    )
-                )
-            } else {
-                // Для незавершённого дня все категории не выбраны
-                val categorySelections = categoryIds.associateWith { false }
-                weekData.add(
-                    DayStatistics(
-                        day = date.dayOfMonth,
-                        date = dateString,
-                        dayOfWeek = dayOfWeek,
-                        totalSelected = 0,
-                        categorySelections = categorySelections
-                    )
-                )
-            }
-        }
-
-        return weekData
-    }
-
-    // Нахождение релевантных категорий (используется для месяца и недели)
     private fun findRelevantCategories(
         data: List<DayStatistics>,
         allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
     ): Set<Int> {
         val relevantCategoryIds = mutableSetOf<Int>()
 
-        // Добавляем все видимые категории
         allCategories
             .filter { it.isVisible }
             .forEach { relevantCategoryIds.add(it.id) }
 
-        // Добавляем категории, которые были выбраны хотя бы раз
         data.forEach { dayData ->
             if (dayData.totalSelected > 0) {
                 dayData.categorySelections.forEach { (categoryId, isSelected) ->
@@ -548,7 +481,27 @@ class StatisticsViewModel @Inject constructor(
         return relevantCategoryIds
     }
 
-    // Фильтрация категорий по релевантным ID
+    private fun findRelevantCategoriesForYear(
+        yearData: List<MonthStatistics>,
+        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+    ): Set<Int> {
+        val relevantCategoryIds = mutableSetOf<Int>()
+
+        allCategories
+            .filter { it.isVisible }
+            .forEach { relevantCategoryIds.add(it.id) }
+
+        yearData.forEach { monthData ->
+            monthData.categorySums.forEach { (categoryId, sum) ->
+                if (sum > 0) {
+                    relevantCategoryIds.add(categoryId)
+                }
+            }
+        }
+
+        return relevantCategoryIds
+    }
+
     private fun filterCategories(
         allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>,
         relevantCategoryIds: Set<Int>
@@ -558,17 +511,14 @@ class StatisticsViewModel @Inject constructor(
             .map { category -> CategoryStats(category.id, category.name, category.isVisible) }
     }
 
-    // Фильтрация месячных данных по релевантным категориям
     private fun filterMonthDataForRelevantCategories(
         monthData: List<DayStatistics>,
         relevantCategoryIds: Set<Int>
     ): List<DayStatistics> {
         return monthData.map { dayData ->
-            // Фильтруем выборы категорий
             val filteredSelections = dayData.categorySelections
                 .filterKeys { categoryId -> categoryId in relevantCategoryIds }
 
-            // Пересчитываем общее количество выбранных категорий
             val newTotalSelected = filteredSelections.values.count { it }
 
             dayData.copy(
@@ -578,17 +528,14 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    // Фильтрация недельных данных по релевантным категориям
     private fun filterWeekDataForRelevantCategories(
         weekData: List<DayStatistics>,
         relevantCategoryIds: Set<Int>
     ): List<DayStatistics> {
         return weekData.map { dayData ->
-            // Фильтруем выборы категорий
             val filteredSelections = dayData.categorySelections
                 .filterKeys { categoryId -> categoryId in relevantCategoryIds }
 
-            // Пересчитываем общее количество выбранных категорий
             val newTotalSelected = filteredSelections.values.count { it }
 
             dayData.copy(
@@ -598,21 +545,33 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    // Расчёт статистики за месяц
+    private fun filterYearDataForRelevantCategories(
+        yearData: List<MonthStatistics>,
+        relevantCategoryIds: Set<Int>
+    ): List<MonthStatistics> {
+        return yearData.map { monthData ->
+            val filteredSums = monthData.categorySums
+                .filterKeys { categoryId -> categoryId in relevantCategoryIds }
+
+            val newTotalSelected = filteredSums.values.sum()
+
+            monthData.copy(
+                totalSelected = newTotalSelected,
+                categorySums = filteredSums
+            )
+        }
+    }
+
     private fun calculateMonthSummaryStats(
         monthData: List<DayStatistics>,
         month: YearMonth
     ): SummaryStats {
-        // Количество завершённых дней (с хотя бы одной выбранной категорией)
         val completedDays = monthData.count { it.totalSelected > 0 }
-        // Общее количество выбранных категорий за месяц
         val totalCategoriesSelected = monthData.sumOf { it.totalSelected }
-        // Среднее количество категорий в день (только для завершённых дней)
         val averagePerDay = if (completedDays > 0)
             totalCategoriesSelected.toDouble() / completedDays
         else 0.0
 
-        // Лучший день (с максимальным количеством выборов)
         val bestDay = monthData.maxByOrNull { it.totalSelected }
 
         return SummaryStats(
@@ -625,26 +584,20 @@ class StatisticsViewModel @Inject constructor(
         )
     }
 
-    // Расчёт статистики за неделю
     private fun calculateWeekSummaryStats(
         weekData: List<DayStatistics>,
         weekStart: LocalDate
     ): WeekSummaryStats {
-        // Количество завершённых дней (с хотя бы одной выбранной категорией)
         val completedDays = weekData.count { it.totalSelected > 0 }
-        // Общее количество выбранных категорий за неделю
         val totalCategoriesSelected = weekData.sumOf { it.totalSelected }
-        // Среднее количество категорий в день (только для завершённых дней)
         val averagePerDay = if (completedDays > 0)
             totalCategoriesSelected.toDouble() / completedDays
         else 0.0
 
-        // Лучший день недели (с максимальным количеством выборов)
         val bestDayData = weekData.maxByOrNull { it.totalSelected }
         val bestDay = bestDayData?.dayOfWeek ?: ""
         val bestDayCount = bestDayData?.totalSelected ?: 0
 
-        // Форматируем диапазон недели
         val weekEnd = weekStart.plusDays(6)
         val weekRange = if (weekStart.month == weekEnd.month) {
             "${weekStart.dayOfMonth} - ${weekEnd.dayOfMonth} ${weekStart.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}"
@@ -663,7 +616,30 @@ class StatisticsViewModel @Inject constructor(
         )
     }
 
-    // Методы для навигации по месяцам
+    private fun calculateYearSummaryStats(
+        yearData: List<MonthStatistics>,
+        year: Year
+    ): YearSummaryStats {
+        val completedMonths = yearData.count { it.totalSelected > 0 }
+        val totalCategoriesSelected = yearData.sumOf { it.totalSelected }
+        val averagePerMonth = if (completedMonths > 0)
+            totalCategoriesSelected.toDouble() / completedMonths
+        else 0.0
+
+        val bestMonthData = yearData.maxByOrNull { it.totalSelected }
+        val bestMonth = bestMonthData?.monthName ?: ""
+        val bestMonthCount = bestMonthData?.totalSelected ?: 0
+
+        return YearSummaryStats(
+            completedMonths = completedMonths,
+            totalCategoriesSelected = totalCategoriesSelected,
+            averagePerMonth = averagePerMonth,
+            bestMonth = bestMonth,
+            bestMonthCount = bestMonthCount,
+            year = year.value
+        )
+    }
+
     fun nextMonth() {
         _uiState.update {
             it.copy(
@@ -684,7 +660,6 @@ class StatisticsViewModel @Inject constructor(
         loadStatistics()
     }
 
-    // Методы для навигации по неделям
     fun nextWeek() {
         _uiState.update {
             it.copy(
@@ -695,7 +670,16 @@ class StatisticsViewModel @Inject constructor(
         loadStatistics()
     }
 
-    // Методы для навигации по годам
+    fun prevWeek() {
+        _uiState.update {
+            it.copy(
+                currentWeekStart = it.currentWeekStart.minusWeeks(1),
+                viewType = ViewType.WEEK
+            )
+        }
+        loadStatistics()
+    }
+
     fun nextYear() {
         _uiState.update {
             it.copy(
@@ -716,17 +700,6 @@ class StatisticsViewModel @Inject constructor(
         loadStatistics()
     }
 
-    fun prevWeek() {
-        _uiState.update {
-            it.copy(
-                currentWeekStart = it.currentWeekStart.minusWeeks(1),
-                viewType = ViewType.WEEK
-            )
-        }
-        loadStatistics()
-    }
-
-    // Переключение типа представления (месяц/неделя/год)
     fun toggleViewType() {
         _uiState.update {
             val newViewType = when (it.viewType) {
@@ -739,7 +712,6 @@ class StatisticsViewModel @Inject constructor(
         loadStatistics()
     }
 
-    // Принудительное обновление данных
     fun forceRefresh() {
         _forceRefresh.value = _forceRefresh.value + 1
     }

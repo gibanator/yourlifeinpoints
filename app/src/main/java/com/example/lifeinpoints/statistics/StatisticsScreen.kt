@@ -42,14 +42,16 @@ import com.example.lifeinpoints.statistics.ui.AdaptiveWeekSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveYearSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartWithLegend
 import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
-import com.example.lifeinpoints.statistics.ui.graf.ChartWithLegend
+import com.example.lifeinpoints.statistics.ui.chart.ChartType
+import com.example.lifeinpoints.statistics.ui.chart.TimePeriod
+import com.example.lifeinpoints.statistics.ui.chart.ChartWithLegend
 import com.example.lifeinpoints.statistics.ui.table.AdaptiveSmartCenteredTable
 import com.example.lifeinpoints.statistics.ui.table.AdaptiveYearTable
 import com.google.accompanist.pager.ExperimentalPagerApi
-import java.time.format.DateTimeFormatter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
@@ -127,7 +129,7 @@ fun StatisticsScreen(
                     )
                 }
             } else {
-                // HorizontalPager для переключения между таблицей и диаграммой
+                // HorizontalPager для переключения между таблицей, круговой диаграммой и графиком
                 HorizontalPager(
                     count = 3,
                     state = pagerState,
@@ -201,7 +203,7 @@ fun StatisticsScreen(
                                             screenHeight = screenHeight,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                //.padding(screenHeight * 0.02f)
+                                                .padding(screenHeight * 0.02f)
                                         )
                                     }
                                 }
@@ -218,7 +220,11 @@ fun StatisticsScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(screenHeight * 0.02f),
-                                    title = null, //Если хочется название диаграммы, то туть
+                                    title = when (uiState.viewType) {
+                                        ViewType.MONTH -> "Категории за месяц"
+                                        ViewType.WEEK -> "Категории за неделю"
+                                        ViewType.YEAR -> "Категории за год"
+                                    },
                                     innerRadiusRatio = 0.6f,
                                     showLegend = true,
                                     cardElevation = 2,
@@ -226,20 +232,47 @@ fun StatisticsScreen(
                                 )
                             }
                         }
-                        2 ->{
-                            // Третья страница: графики
+                        2 -> {
+                            // Третья страница: временной график
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.Center
-                            )
-                            {
-                                ChartWithLegend(
-                                    data = uiState.pieChartData,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(screenHeight * 0.02f),
-                                    title = "Charts", //Если хочется название диаграммы, то туть
-                            )
+                            ) {
+                                if (uiState.timeSeriesData.isNotEmpty()) {
+                                    ChartWithLegend(
+                                        timeSeriesData = uiState.timeSeriesData,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(screenHeight * 0.02f),
+                                        title = when (uiState.viewType) {
+                                            ViewType.MONTH -> "Баллы по дням месяца"
+                                            ViewType.WEEK -> "Баллы по дням недели"
+                                            ViewType.YEAR -> "Баллы по месяцам года"
+                                        },
+                                        chartType = ChartType.VERTICAL_BAR,
+                                        timePeriod = when (uiState.viewType) {
+                                            ViewType.MONTH -> TimePeriod.DAY
+                                            ViewType.WEEK -> TimePeriod.WEEK
+                                            ViewType.YEAR -> TimePeriod.MONTH
+                                        },
+                                        showGrid = true,
+                                        barSpacingRatio = 0.2f,
+                                        barCornerRadius = 4f,
+                                        showDataLabels = true
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "Нет данных для графика",
+                                            fontSize = calculateAdaptiveFontSize(screenHeight, 0.018f),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -250,7 +283,7 @@ fun StatisticsScreen(
                     pagerState = pagerState,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(bottom = screenHeight * 0.0f)
+                        .padding(bottom = screenHeight * 0.00f)
                 )
             }
         }

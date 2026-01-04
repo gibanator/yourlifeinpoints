@@ -2,6 +2,7 @@
 package com.example.lifeinpoints.statistics
 
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
+import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesData
 import java.time.YearMonth
 import java.time.LocalDate
 import java.time.Year
@@ -9,7 +10,7 @@ import java.time.Year
 enum class ViewType {
     MONTH,
     WEEK,
-    YEAR  // Добавляем годовой режим
+    YEAR
 }
 
 data class StatisticsUiState(
@@ -17,20 +18,21 @@ data class StatisticsUiState(
     val error: String? = null,
     val currentMonth: YearMonth = YearMonth.now(),
     val currentWeekStart: LocalDate = getStartOfCurrentWeek(),
-    val currentYear: Year = Year.now(),  // Добавляем текущий год
+    val currentYear: Year = Year.now(),
     val monthData: List<DayStatistics> = emptyList(),
     val weekData: List<DayStatistics> = emptyList(),
-    val yearData: List<MonthStatistics> = emptyList(),  // Данные за год
+    val yearData: List<MonthStatistics> = emptyList(),
     val categories: List<CategoryStats> = emptyList(),
     val viewType: ViewType = ViewType.MONTH,
     val monthSummary: SummaryStats = SummaryStats(),
     val weekSummary: WeekSummaryStats = WeekSummaryStats(),
     val yearSummary: YearSummaryStats = YearSummaryStats(),
     val pieChartData: List<PieChartItem> = emptyList(),
-    val displayMode: DisplayMode = DisplayMode.TABLE
+    val timeSeriesData: List<TimeSeriesData> = emptyList(), // Новое поле для временных данных
+    val displayMode: DisplayMode = DisplayMode.TABLE,
+    val selectedCategoryIdsForChart: Set<Int> = emptySet()
 )
 
-// Добавим enum для типа отображения
 enum class DisplayMode {
     TABLE,
     CHART
@@ -44,12 +46,11 @@ data class DayStatistics(
     val categorySelections: Map<Int, Boolean>
 )
 
-// Новая структура для месячной статистики в годовом режиме
 data class MonthStatistics(
-    val monthNumber: Int, // 1-12
-    val monthName: String, // "Jan", "Feb", etc.
-    val totalSelected: Int, // Общая сумма выбранных категорий за месяц
-    val categorySums: Map<Int, Int> // categoryId -> сумма выбранных раз за месяц
+    val monthNumber: Int,
+    val monthName: String,
+    val totalSelected: Int,
+    val categorySums: Map<Int, Int>
 )
 
 data class CategoryStats(
@@ -77,18 +78,16 @@ data class WeekSummaryStats(
     val weekRange: String = ""
 )
 
-// Новая статистика для года
 data class YearSummaryStats(
     val totalMonths: Int = 12,
-    val completedMonths: Int = 0, // Месяцы, в которых был хотя бы один завершенный день
+    val completedMonths: Int = 0,
     val totalCategoriesSelected: Int = 0,
     val averagePerMonth: Double = 0.0,
-    val bestMonth: String = "", // Название лучшего месяца
+    val bestMonth: String = "",
     val bestMonthCount: Int = 0,
     val year: Int = Year.now().value
 )
 
-// Вспомогательная функция для получения начала текущей недели (понедельник)
 fun getStartOfCurrentWeek(): LocalDate {
     val today = LocalDate.now()
     return today.with(java.time.DayOfWeek.MONDAY)

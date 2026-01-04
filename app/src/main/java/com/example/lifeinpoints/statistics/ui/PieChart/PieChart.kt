@@ -405,7 +405,7 @@ private fun calculateOptimalLegendType(
         }
 
         // Для небольшого количества (4 и меньше) используем горизонтальную линию
-        itemCount <= 4 -> LegendType.ROW
+        itemCount <= 0 -> LegendType.ROW
 
         // По умолчанию используем колонку
         else -> LegendType.COLUMN
