@@ -28,9 +28,10 @@ data class StatisticsUiState(
     val weekSummary: WeekSummaryStats = WeekSummaryStats(),
     val yearSummary: YearSummaryStats = YearSummaryStats(),
     val pieChartData: List<PieChartItem> = emptyList(),
-    val timeSeriesData: List<TimeSeriesData> = emptyList(), // Новое поле для временных данных
-    val displayMode: DisplayMode = DisplayMode.TABLE,
-    val selectedCategoryIdsForChart: Set<Int> = emptySet()
+    val timeSeriesData: List<TimeSeriesData> = emptyList(),
+    val filteredTimeSeriesData: List<TimeSeriesData> = emptyList(), // Добавляем отфильтрованные данные
+    val selectedCategoryIds: Set<Int> = emptySet(), // Выбранные категории
+    val displayMode: DisplayMode = DisplayMode.TABLE
 )
 
 enum class DisplayMode {

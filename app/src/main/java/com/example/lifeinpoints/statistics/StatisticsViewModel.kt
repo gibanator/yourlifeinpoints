@@ -1,4 +1,3 @@
-// com.example.lifeinpoints.statistics/StatisticsViewModel.kt
 package com.example.lifeinpoints.statistics
 
 import androidx.compose.ui.graphics.Color
@@ -43,14 +42,14 @@ class StatisticsViewModel @Inject constructor(
     private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
     private val monthFormatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)
 
-    // Цвета для временных графиков (в зависимости от типа представления)
+    // Цвета для временных графиков
     private val timeSeriesColors = mapOf(
-        ViewType.MONTH to Color(0xFF2196F3), // Синий для месяца
-        ViewType.WEEK to Color(0xFF4CAF50),  // Зеленый для недели
-        ViewType.YEAR to Color(0xFFF44336)   // Красный для года
+        ViewType.MONTH to Color(0xFF2196F3),
+        ViewType.WEEK to Color(0xFF4CAF50),
+        ViewType.YEAR to Color(0xFFF44336)
     )
 
-    // Палитра цветов для категорий на круговых диаграммах
+    // Палитра цветов для категорий
     private val categoryColors = listOf(
         Color(0xFF4CAF50), // Зеленый
         Color(0xFF2196F3), // Синий
@@ -61,7 +60,12 @@ class StatisticsViewModel @Inject constructor(
         Color(0xFF795548), // Коричневый
         Color(0xFF607D8B), // Серо-голубой
         Color(0xFFFFC107), // Янтарный
-        Color(0xFFE91E63)  // Розовый
+        Color(0xFFE91E63), // Розовый
+        Color(0xFF8BC34A), // Светло-зеленый
+        Color(0xFFCDDC39), // Лаймовый
+        Color(0xFFFFEB3B), // Желтый
+        Color(0xFFFF5722), // Глубокий оранжевый
+        Color(0xFF9E9E9E)  // Серый
     )
 
     init {
@@ -93,6 +97,74 @@ class StatisticsViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    // Метод для переключения выбора категории
+    fun toggleCategorySelection(categoryId: Int) {
+        _uiState.update { currentState ->
+            val newSelectedIds = if (currentState.selectedCategoryIds.contains(categoryId)) {
+                currentState.selectedCategoryIds - categoryId
+            } else {
+                currentState.selectedCategoryIds + categoryId
+            }
+
+            // Пересчитываем временные данные с учетом выбранных категорий
+            val recalculatedTimeSeriesData = when (currentState.viewType) {
+                ViewType.MONTH -> prepareTimeSeriesDataForMonth(
+                    currentState.monthData,
+                    newSelectedIds
+                )
+                ViewType.WEEK -> prepareTimeSeriesDataForWeek(
+                    currentState.weekData,
+                    newSelectedIds
+                )
+                ViewType.YEAR -> prepareTimeSeriesDataForYear(
+                    currentState.yearData,
+                    newSelectedIds
+                )
+            }
+
+            currentState.copy(
+                selectedCategoryIds = newSelectedIds,
+                filteredTimeSeriesData = recalculatedTimeSeriesData
+            )
+        }
+    }
+
+    // Метод для выбора всех категорий
+    fun selectAllCategories() {
+        _uiState.update { currentState ->
+            val allCategoryIds = currentState.categories.map { it.id }.toSet()
+            val recalculatedTimeSeriesData = when (currentState.viewType) {
+                ViewType.MONTH -> prepareTimeSeriesDataForMonth(
+                    currentState.monthData,
+                    allCategoryIds
+                )
+                ViewType.WEEK -> prepareTimeSeriesDataForWeek(
+                    currentState.weekData,
+                    allCategoryIds
+                )
+                ViewType.YEAR -> prepareTimeSeriesDataForYear(
+                    currentState.yearData,
+                    allCategoryIds
+                )
+            }
+
+            currentState.copy(
+                selectedCategoryIds = allCategoryIds,
+                filteredTimeSeriesData = recalculatedTimeSeriesData
+            )
+        }
+    }
+
+    // Метод для сброса выбора категорий
+    fun deselectAllCategories() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedCategoryIds = emptySet(),
+                filteredTimeSeriesData = emptyList()
+            )
+        }
+    }
+
     private fun reloadStatistics(
         allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
     ) {
@@ -108,7 +180,10 @@ class StatisticsViewModel @Inject constructor(
                         val filteredMonthData = filterMonthDataForRelevantCategories(monthData, relevantCategoryIds)
                         val monthSummary = calculateMonthSummaryStats(filteredMonthData, currentState.currentMonth)
                         val pieChartData = preparePieChartDataForMonth(filteredMonthData, categoriesToShow)
-                        val timeSeriesData = prepareTimeSeriesDataForMonth(filteredMonthData)
+
+                        // Инициализируем выбранные категории (все по умолчанию)
+                        val initialSelectedIds = categoriesToShow.map { it.id }.toSet()
+                        val timeSeriesData = prepareTimeSeriesDataForMonth(filteredMonthData, initialSelectedIds)
 
                         _uiState.update {
                             it.copy(
@@ -117,7 +192,9 @@ class StatisticsViewModel @Inject constructor(
                                 categories = categoriesToShow,
                                 monthSummary = monthSummary,
                                 pieChartData = pieChartData,
-                                timeSeriesData = timeSeriesData
+                                timeSeriesData = timeSeriesData,
+                                filteredTimeSeriesData = timeSeriesData,
+                                selectedCategoryIds = initialSelectedIds
                             )
                         }
                     }
@@ -128,7 +205,9 @@ class StatisticsViewModel @Inject constructor(
                         val filteredWeekData = filterWeekDataForRelevantCategories(weekData, relevantCategoryIds)
                         val weekSummary = calculateWeekSummaryStats(filteredWeekData, currentState.currentWeekStart)
                         val pieChartData = preparePieChartDataForWeek(filteredWeekData, categoriesToShow)
-                        val timeSeriesData = prepareTimeSeriesDataForWeek(filteredWeekData)
+
+                        val initialSelectedIds = categoriesToShow.map { it.id }.toSet()
+                        val timeSeriesData = prepareTimeSeriesDataForWeek(filteredWeekData, initialSelectedIds)
 
                         _uiState.update {
                             it.copy(
@@ -137,7 +216,9 @@ class StatisticsViewModel @Inject constructor(
                                 categories = categoriesToShow,
                                 weekSummary = weekSummary,
                                 pieChartData = pieChartData,
-                                timeSeriesData = timeSeriesData
+                                timeSeriesData = timeSeriesData,
+                                filteredTimeSeriesData = timeSeriesData,
+                                selectedCategoryIds = initialSelectedIds
                             )
                         }
                     }
@@ -148,7 +229,9 @@ class StatisticsViewModel @Inject constructor(
                         val filteredYearData = filterYearDataForRelevantCategories(yearData, relevantCategoryIds)
                         val yearSummary = calculateYearSummaryStats(filteredYearData, currentState.currentYear)
                         val pieChartData = preparePieChartDataForYear(filteredYearData, categoriesToShow)
-                        val timeSeriesData = prepareTimeSeriesDataForYear(filteredYearData)
+
+                        val initialSelectedIds = categoriesToShow.map { it.id }.toSet()
+                        val timeSeriesData = prepareTimeSeriesDataForYear(filteredYearData, initialSelectedIds)
 
                         _uiState.update {
                             it.copy(
@@ -157,7 +240,9 @@ class StatisticsViewModel @Inject constructor(
                                 categories = categoriesToShow,
                                 yearSummary = yearSummary,
                                 pieChartData = pieChartData,
-                                timeSeriesData = timeSeriesData
+                                timeSeriesData = timeSeriesData,
+                                filteredTimeSeriesData = timeSeriesData,
+                                selectedCategoryIds = initialSelectedIds
                             )
                         }
                     }
@@ -170,6 +255,67 @@ class StatisticsViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    // Подготовка временных данных для месяца с учетом выбранных категорий
+    private fun prepareTimeSeriesDataForMonth(
+        monthData: List<DayStatistics>,
+        selectedCategoryIds: Set<Int>
+    ): List<TimeSeriesData> {
+        if (monthData.isEmpty() || selectedCategoryIds.isEmpty()) return emptyList()
+
+        return monthData.mapIndexed { index, day ->
+            // Считаем сумму только для выбранных категорий
+            val sumForSelectedCategories = day.categorySelections
+                .filterKeys { it in selectedCategoryIds }
+                .values.count { it }
+
+            TimeSeriesData(
+                label = (index + 1).toString(),
+                value = sumForSelectedCategories.toFloat(),
+                color = timeSeriesColors[ViewType.MONTH]
+            )
+        }
+    }
+
+    // Подготовка временных данных для недели с учетом выбранных категорий
+    private fun prepareTimeSeriesDataForWeek(
+        weekData: List<DayStatistics>,
+        selectedCategoryIds: Set<Int>
+    ): List<TimeSeriesData> {
+        if (weekData.isEmpty() || selectedCategoryIds.isEmpty()) return emptyList()
+
+        return weekData.map { day ->
+            val sumForSelectedCategories = day.categorySelections
+                .filterKeys { it in selectedCategoryIds }
+                .values.count { it }
+
+            TimeSeriesData(
+                label = day.dayOfWeek ?: day.day.toString(),
+                value = sumForSelectedCategories.toFloat(),
+                color = timeSeriesColors[ViewType.WEEK]
+            )
+        }
+    }
+
+    // Подготовка временных данных для года с учетом выбранных категорий
+    private fun prepareTimeSeriesDataForYear(
+        yearData: List<MonthStatistics>,
+        selectedCategoryIds: Set<Int>
+    ): List<TimeSeriesData> {
+        if (yearData.isEmpty() || selectedCategoryIds.isEmpty()) return emptyList()
+
+        return yearData.map { month ->
+            val sumForSelectedCategories = month.categorySums
+                .filterKeys { it in selectedCategoryIds }
+                .values.sum()
+
+            TimeSeriesData(
+                label = month.monthName,
+                value = sumForSelectedCategories.toFloat(),
+                color = timeSeriesColors[ViewType.YEAR]
+            )
         }
     }
 
@@ -190,133 +336,7 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    // Подготовка временных данных для месяца (по дням)
-    private fun prepareTimeSeriesDataForMonth(
-        monthData: List<DayStatistics>
-    ): List<TimeSeriesData> {
-        if (monthData.isEmpty()) return emptyList()
-
-        return monthData.mapIndexed { index, day ->
-            TimeSeriesData(
-                label = (index + 1).toString(), // Просто номер дня
-                value = day.totalSelected.toFloat(),
-                color = timeSeriesColors[ViewType.MONTH]
-            )
-        }
-    }
-
-    // Подготовка временных данных для недели (по дням недели)
-    private fun prepareTimeSeriesDataForWeek(
-        weekData: List<DayStatistics>
-    ): List<TimeSeriesData> {
-        if (weekData.isEmpty()) return emptyList()
-
-        return weekData.map { day ->
-            TimeSeriesData(
-                label = day.dayOfWeek ?: day.day.toString(),
-                value = day.totalSelected.toFloat(),
-                color = timeSeriesColors[ViewType.WEEK]
-            )
-        }
-    }
-
-    // Подготовка временных данных для года (по месяцам)
-    private fun prepareTimeSeriesDataForYear(
-        yearData: List<MonthStatistics>
-    ): List<TimeSeriesData> {
-        if (yearData.isEmpty()) return emptyList()
-
-        return yearData.map { month ->
-            TimeSeriesData(
-                label = month.monthName,
-                value = month.totalSelected.toFloat(),
-                color = timeSeriesColors[ViewType.YEAR]
-            )
-        }
-    }
-
-    // Подготовка данных для круговой диаграммы (месяц)
-    private fun preparePieChartDataForMonth(
-        monthData: List<DayStatistics>,
-        categories: List<CategoryStats>
-    ): List<PieChartItem> {
-        if (categories.isEmpty()) return emptyList()
-
-        val categoryCounts = mutableMapOf<Int, Int>()
-        monthData.forEach { day ->
-            if (day.totalSelected > 0) {
-                day.categorySelections.forEach { (categoryId, isSelected) ->
-                    if (isSelected) {
-                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
-                    }
-                }
-            }
-        }
-
-        return categories.mapIndexed { index, category ->
-            val count = categoryCounts[category.id] ?: 0
-            PieChartItem(
-                label = category.name,
-                value = count.toFloat(),
-                color = categoryColors[index % categoryColors.size]
-            )
-        }.filter { it.value > 0 }
-    }
-
-    // Подготовка данных для круговой диаграммы (неделя)
-    private fun preparePieChartDataForWeek(
-        weekData: List<DayStatistics>,
-        categories: List<CategoryStats>
-    ): List<PieChartItem> {
-        if (categories.isEmpty()) return emptyList()
-
-        val categoryCounts = mutableMapOf<Int, Int>()
-        weekData.forEach { day ->
-            if (day.totalSelected > 0) {
-                day.categorySelections.forEach { (categoryId, isSelected) ->
-                    if (isSelected) {
-                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
-                    }
-                }
-            }
-        }
-
-        return categories.mapIndexed { index, category ->
-            val count = categoryCounts[category.id] ?: 0
-            PieChartItem(
-                label = category.name,
-                value = count.toFloat(),
-                color = categoryColors[index % categoryColors.size]
-            )
-        }.filter { it.value > 0 }
-    }
-
-    // Подготовка данных для круговой диаграммы (год)
-    private fun preparePieChartDataForYear(
-        yearData: List<MonthStatistics>,
-        categories: List<CategoryStats>
-    ): List<PieChartItem> {
-        if (categories.isEmpty()) return emptyList()
-
-        val categoryCounts = mutableMapOf<Int, Int>()
-        yearData.forEach { month ->
-            month.categorySums.forEach { (categoryId, sum) ->
-                if (sum > 0) {
-                    categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + sum
-                }
-            }
-        }
-
-        return categories.mapIndexed { index, category ->
-            val count = categoryCounts[category.id] ?: 0
-            PieChartItem(
-                label = category.name,
-                value = count.toFloat(),
-                color = categoryColors[index % categoryColors.size]
-            )
-        }.filter { it.value > 0 }
-    }
-
+    // Остальные методы остаются без изменений
     private suspend fun loadMonthData(
         month: YearMonth,
         categoryIds: List<Int>
@@ -638,6 +658,86 @@ class StatisticsViewModel @Inject constructor(
             bestMonthCount = bestMonthCount,
             year = year.value
         )
+    }
+
+    // Подготовка данных для круговой диаграммы (остается без изменений)
+    private fun preparePieChartDataForMonth(
+        monthData: List<DayStatistics>,
+        categories: List<CategoryStats>
+    ): List<PieChartItem> {
+        if (categories.isEmpty()) return emptyList()
+
+        val categoryCounts = mutableMapOf<Int, Int>()
+        monthData.forEach { day ->
+            if (day.totalSelected > 0) {
+                day.categorySelections.forEach { (categoryId, isSelected) ->
+                    if (isSelected) {
+                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
+                    }
+                }
+            }
+        }
+
+        return categories.mapIndexed { index, category ->
+            val count = categoryCounts[category.id] ?: 0
+            PieChartItem(
+                label = category.name,
+                value = count.toFloat(),
+                color = categoryColors.getOrElse(index) { Color.Gray }
+            )
+        }.filter { it.value > 0 }
+    }
+
+    private fun preparePieChartDataForWeek(
+        weekData: List<DayStatistics>,
+        categories: List<CategoryStats>
+    ): List<PieChartItem> {
+        if (categories.isEmpty()) return emptyList()
+
+        val categoryCounts = mutableMapOf<Int, Int>()
+        weekData.forEach { day ->
+            if (day.totalSelected > 0) {
+                day.categorySelections.forEach { (categoryId, isSelected) ->
+                    if (isSelected) {
+                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
+                    }
+                }
+            }
+        }
+
+        return categories.mapIndexed { index, category ->
+            val count = categoryCounts[category.id] ?: 0
+            PieChartItem(
+                label = category.name,
+                value = count.toFloat(),
+                color = categoryColors.getOrElse(index) { Color.Gray }
+            )
+        }.filter { it.value > 0 }
+    }
+
+    private fun preparePieChartDataForYear(
+        yearData: List<MonthStatistics>,
+        categories: List<CategoryStats>
+    ): List<PieChartItem> {
+        if (categories.isEmpty()) return emptyList()
+
+        val categoryCounts = mutableMapOf<Int, Int>()
+        yearData.forEach { month ->
+            month.categorySums.forEach { (categoryId, sum) ->
+                if (sum > 0) {
+                    categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + sum
+                }
+            }
+        }
+
+        return categories.mapIndexed { index, category ->
+            val count = categoryCounts[category.id] ?: 0
+            PieChartItem(
+                label = category.name,
+                value = count.toFloat(),
+                color = categoryColors.getOrElse(index) { Color.Gray }
+            )
+        }.filter { it.value > 0 }
     }
 
     fun nextMonth() {

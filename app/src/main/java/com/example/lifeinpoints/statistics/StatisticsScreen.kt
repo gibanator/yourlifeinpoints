@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.statistics.ui.AdaptiveMonthSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveWeekSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveYearSummaryStatsCard
+import com.example.lifeinpoints.statistics.ui.CategoryFilter
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartWithLegend
 import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
 import com.example.lifeinpoints.statistics.ui.chart.ChartType
@@ -232,22 +233,37 @@ fun StatisticsScreen(
                                 )
                             }
                         }
+                        // В StatisticsScreen.kt, на странице 2 (графики):
                         2 -> {
-                            // Третья страница: временной график
+                            // Third page: time series chart
+                            val configuration = LocalConfiguration.current
+                            val screenWidth = configuration.screenWidthDp.dp
+                            val screenHeight = configuration.screenHeightDp.dp
+
                             Column(
                                 modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Center
+                                verticalArrangement = Arrangement.Top
                             ) {
-                                if (uiState.timeSeriesData.isNotEmpty()) {
+                                val dataToShow = if (uiState.selectedCategoryIds.isNotEmpty()) {
+                                    uiState.filteredTimeSeriesData
+                                } else {
+                                    emptyList()
+                                }
+
+                                if (dataToShow.isNotEmpty()) {
                                     ChartWithLegend(
-                                        timeSeriesData = uiState.timeSeriesData,
+                                        timeSeriesData = dataToShow,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(screenHeight * 0.02f),
+                                            .weight(0.6f) // 60% для графика
+                                            .padding(
+                                                horizontal = screenWidth * 0.02f,
+                                                vertical = screenHeight * 0.01f
+                                            ),
                                         title = when (uiState.viewType) {
-                                            ViewType.MONTH -> "Баллы по дням месяца"
-                                            ViewType.WEEK -> "Баллы по дням недели"
-                                            ViewType.YEAR -> "Баллы по месяцам года"
+                                            ViewType.MONTH -> "Points by days"
+                                            ViewType.WEEK -> "Points by week days"
+                                            ViewType.YEAR -> "Points by months"
                                         },
                                         chartType = ChartType.VERTICAL_BAR,
                                         timePeriod = when (uiState.viewType) {
@@ -263,15 +279,39 @@ fun StatisticsScreen(
                                 } else {
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxSize(),
+                                            .fillMaxWidth()
+                                            .weight(0.6f),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = "Нет данных для графика",
+                                            text = if (uiState.selectedCategoryIds.isEmpty()) {
+                                                "Select categories to display chart"
+                                            } else {
+                                                "No data for selected categories"
+                                            },
                                             fontSize = calculateAdaptiveFontSize(screenHeight, 0.018f),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                         )
                                     }
+                                }
+
+                                // Category filter with 3-column grid
+                                if (uiState.categories.isNotEmpty()) {
+                                    CategoryFilter(
+                                        categories = uiState.categories,
+                                        selectedCategoryIds = uiState.selectedCategoryIds,
+                                        onCategoryToggle = { categoryId ->
+                                            viewModel.toggleCategorySelection(categoryId)
+                                        },
+                                        onSelectAll = { viewModel.selectAllCategories() },
+                                        onDeselectAll = { viewModel.deselectAllCategories() },
+                                        screenHeight = screenHeight,
+                                        screenWidth = screenWidth,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(0.4f) // 40% для фильтра
+                                    )
                                 }
                             }
                         }
@@ -283,7 +323,7 @@ fun StatisticsScreen(
                     pagerState = pagerState,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(bottom = screenHeight * 0.00f)
+                        //.padding(bottom = screenHeight * 0.02f)
                 )
             }
         }
