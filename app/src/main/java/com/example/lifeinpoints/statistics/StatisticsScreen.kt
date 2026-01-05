@@ -1,9 +1,7 @@
-// com.example.lifeinpoints.statistics/StatisticsScreen.kt
 package com.example.lifeinpoints.statistics
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,14 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,20 +30,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.lifeinpoints.statistics.ui.PieChartWithLegend
+import com.example.lifeinpoints.statistics.ui.AdaptiveMonthSummaryStatsCard
+import com.example.lifeinpoints.statistics.ui.AdaptiveWeekSummaryStatsCard
+import com.example.lifeinpoints.statistics.ui.AdaptiveYearSummaryStatsCard
+import com.example.lifeinpoints.statistics.ui.CategoryFilter
+import com.example.lifeinpoints.statistics.ui.PieChart.PieChartWithLegend
+import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
+import com.example.lifeinpoints.statistics.ui.chart.ChartType
+import com.example.lifeinpoints.statistics.ui.chart.TimePeriod
+import com.example.lifeinpoints.statistics.ui.chart.ChartWithLegend
+import com.example.lifeinpoints.statistics.ui.table.AdaptiveSmartCenteredTable
+import com.example.lifeinpoints.statistics.ui.table.AdaptiveYearTable
 import com.google.accompanist.pager.ExperimentalPagerApi
-import java.time.format.DateTimeFormatter
-import java.time.YearMonth
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
@@ -58,13 +60,13 @@ fun StatisticsScreen(
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
-    // Обновляем статистику при каждом появлении экрана
     LaunchedEffect(Unit) {
         viewModel.loadStatistics()
     }
 
-    // Состояние для Pager
     val pagerState = rememberPagerState()
 
     Scaffold(
@@ -74,7 +76,7 @@ fun StatisticsScreen(
                     Text(
                         "Statistics",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = calculateAdaptiveFontSize(screenHeight, 0.022f)
                     )
                 }
             )
@@ -86,7 +88,7 @@ fun StatisticsScreen(
                 .padding(paddingValues)
         ) {
             // Селектор периода
-            PeriodSelector(
+            AdaptivePeriodSelector(
                 uiState = uiState,
                 onPrevPeriod = {
                     when (uiState.viewType) {
@@ -103,9 +105,10 @@ fun StatisticsScreen(
                     }
                 },
                 onToggleViewType = { viewModel.toggleViewType() },
+                screenHeight = screenHeight,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = screenHeight * 0.02f, vertical = screenHeight * 0.01f)
             )
 
             if (uiState.isLoading) {
@@ -122,13 +125,14 @@ fun StatisticsScreen(
                 ) {
                     Text(
                         text = uiState.error ?: "Error loading statistics",
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = calculateAdaptiveFontSize(screenHeight, 0.018f)
                     )
                 }
             } else {
-                // HorizontalPager для переключения между таблицей и диаграммой
+                // HorizontalPager для переключения между таблицей, круговой диаграммой и графиком
                 HorizontalPager(
-                    count = 2,
+                    count = 3,
                     state = pagerState,
                     modifier = Modifier
                         .weight(1f)
@@ -142,65 +146,65 @@ fun StatisticsScreen(
                                 // Таблица статистики
                                 when (uiState.viewType) {
                                     ViewType.MONTH -> {
-                                        SmartCenteredTable(
+                                        AdaptiveSmartCenteredTable(
                                             data = uiState.monthData,
                                             categories = uiState.categories,
                                             isWeekMode = false,
                                             isYearMode = false,
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .padding(horizontal = 8.dp)
                                         )
                                     }
                                     ViewType.WEEK -> {
-                                        SmartCenteredTable(
+                                        AdaptiveSmartCenteredTable(
                                             data = uiState.weekData,
                                             categories = uiState.categories,
                                             isWeekMode = true,
                                             isYearMode = false,
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .padding(horizontal = 8.dp)
                                         )
                                     }
                                     ViewType.YEAR -> {
-                                        YearTable(
+                                        AdaptiveYearTable(
                                             yearData = uiState.yearData,
                                             categories = uiState.categories,
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .padding(horizontal = 8.dp)
                                         )
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(screenHeight * 0.02f))
 
                                 // Сводная статистика
                                 when (uiState.viewType) {
                                     ViewType.MONTH -> {
-                                        MonthSummaryStatsCard(
+                                        AdaptiveMonthSummaryStatsCard(
                                             summary = uiState.monthSummary,
                                             currentMonth = uiState.currentMonth,
+                                            screenHeight = screenHeight,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(16.dp)
+                                                .padding(screenHeight * 0.02f)
                                         )
                                     }
                                     ViewType.WEEK -> {
-                                        WeekSummaryStatsCard(
+                                        AdaptiveWeekSummaryStatsCard(
                                             summary = uiState.weekSummary,
+                                            screenHeight = screenHeight,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(16.dp)
+                                                .padding(screenHeight * 0.02f)
                                         )
                                     }
                                     ViewType.YEAR -> {
-                                        YearSummaryStatsCard(
+                                        AdaptiveYearSummaryStatsCard(
                                             summary = uiState.yearSummary,
+                                            screenHeight = screenHeight,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(16.dp)
+                                                .padding(screenHeight * 0.02f)
                                         )
                                     }
                                 }
@@ -208,39 +212,105 @@ fun StatisticsScreen(
                         }
                         1 -> {
                             // Вторая страница: круговая диаграмма
-                            if (uiState.pieChartData.isNotEmpty()) {
-                                // Генерируем заголовок в зависимости от типа представления
-                                val pieChartTitle = when (uiState.viewType) {
-                                    ViewType.MONTH -> "Распределение по категориям за ${uiState.currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))}"
-                                    ViewType.WEEK -> "Распределение по категориям за неделю"
-                                    ViewType.YEAR -> "Распределение по категориям за ${uiState.currentYear}"
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                PieChartWithLegend(
+                                    data = uiState.pieChartData,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(screenHeight * 0.02f),
+                                    title = when (uiState.viewType) {
+                                        ViewType.MONTH -> "Категории за месяц"
+                                        ViewType.WEEK -> "Категории за неделю"
+                                        ViewType.YEAR -> "Категории за год"
+                                    },
+                                    innerRadiusRatio = 0.6f,
+                                    showLegend = true,
+                                    cardElevation = 2,
+                                    cornerRadius = 12
+                                )
+                            }
+                        }
+                        // В StatisticsScreen.kt, на странице 2 (графики):
+                        2 -> {
+                            // Third page: time series chart
+                            val configuration = LocalConfiguration.current
+                            val screenWidth = configuration.screenWidthDp.dp
+                            val screenHeight = configuration.screenHeightDp.dp
+
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                val dataToShow = if (uiState.selectedCategoryIds.isNotEmpty()) {
+                                    uiState.filteredTimeSeriesData
+                                } else {
+                                    emptyList()
                                 }
 
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    PieChartWithLegend(
-                                        data = uiState.pieChartData,
+                                if (dataToShow.isNotEmpty()) {
+                                    ChartWithLegend(
+                                        timeSeriesData = dataToShow,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(16.dp),
-                                        title = pieChartTitle,
-                                        innerRadiusRatio = 0.6f,
-                                        showLegend = true,
-                                        cardElevation = 4,
-                                        cornerRadius = 16
+                                            .weight(0.6f) // 60% для графика
+                                            .padding(
+                                                horizontal = screenWidth * 0.02f,
+                                                vertical = screenHeight * 0.01f
+                                            ),
+                                        title = when (uiState.viewType) {
+                                            ViewType.MONTH -> "Points by days"
+                                            ViewType.WEEK -> "Points by week days"
+                                            ViewType.YEAR -> "Points by months"
+                                        },
+                                        chartType = ChartType.VERTICAL_BAR,
+                                        timePeriod = when (uiState.viewType) {
+                                            ViewType.MONTH -> TimePeriod.DAY
+                                            ViewType.WEEK -> TimePeriod.WEEK
+                                            ViewType.YEAR -> TimePeriod.MONTH
+                                        },
+                                        showGrid = true,
+                                        barSpacingRatio = 0.2f,
+                                        barCornerRadius = 4f,
+                                        showDataLabels = true
                                     )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(0.6f),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = if (uiState.selectedCategoryIds.isEmpty()) {
+                                                "Select categories to display chart"
+                                            } else {
+                                                "No data for selected categories"
+                                            },
+                                            fontSize = calculateAdaptiveFontSize(screenHeight, 0.018f),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
                                 }
-                            } else {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Нет данных для отображения диаграммы",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+
+                                // Category filter with 3-column grid
+                                if (uiState.categories.isNotEmpty()) {
+                                    CategoryFilter(
+                                        categories = uiState.categories,
+                                        selectedCategoryIds = uiState.selectedCategoryIds,
+                                        onCategoryToggle = { categoryId ->
+                                            viewModel.toggleCategorySelection(categoryId)
+                                        },
+                                        onSelectAll = { viewModel.selectAllCategories() },
+                                        onDeselectAll = { viewModel.deselectAllCategories() },
+                                        screenHeight = screenHeight,
+                                        screenWidth = screenWidth,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(0.4f) // 40% для фильтра
                                     )
                                 }
                             }
@@ -253,7 +323,7 @@ fun StatisticsScreen(
                     pagerState = pagerState,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(16.dp)
+                        //.padding(bottom = screenHeight * 0.02f)
                 )
             }
         }
@@ -261,11 +331,12 @@ fun StatisticsScreen(
 }
 
 @Composable
-fun PeriodSelector(
+fun AdaptivePeriodSelector(
     uiState: StatisticsUiState,
     onPrevPeriod: () -> Unit,
     onNextPeriod: () -> Unit,
     onToggleViewType: () -> Unit,
+    screenHeight: Dp,
     modifier: Modifier = Modifier
 ) {
     val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
@@ -278,12 +349,12 @@ fun PeriodSelector(
         // Кнопка предыдущего периода
         IconButton(
             onClick = onPrevPeriod,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(screenHeight * 0.05f)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(screenHeight * 0.03f)
             )
         }
 
@@ -291,7 +362,7 @@ fun PeriodSelector(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = screenHeight * 0.01f),
             contentAlignment = Alignment.Center
         ) {
             val periodText = when (uiState.viewType) {
@@ -302,589 +373,35 @@ fun PeriodSelector(
 
             Text(
                 text = "$periodText • ${uiState.viewType.name.lowercase().replaceFirstChar { it.uppercase() }}",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
+                ),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onToggleViewType() }
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .padding(vertical = screenHeight * 0.01f, horizontal = screenHeight * 0.02f)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = MaterialTheme.shapes.small
                     )
-                    .padding(8.dp)
+                    .padding(screenHeight * 0.01f)
             )
         }
 
         // Кнопка следующего периода
         IconButton(
             onClick = onNextPeriod,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(screenHeight * 0.05f)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(screenHeight * 0.03f)
             )
         }
-    }
-}
-
-@Composable
-fun SmartCenteredTable(
-    data: List<DayStatistics>,
-    categories: List<CategoryStats>,
-    isWeekMode: Boolean,
-    isYearMode: Boolean = false,
-    modifier: Modifier = Modifier
-) {
-    val totalCells = 2 + categories.size
-
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Заголовок таблицы
-                TableHeaderRow(
-                    categories = categories,
-                    isWeekMode = isWeekMode,
-                    isYearMode = isYearMode,
-                    totalCells = totalCells,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Тело таблицы
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(data) { dayData ->
-                        TableRow(
-                            dayData = dayData,
-                            categories = categories,
-                            isWeekMode = isWeekMode,
-                            totalCells = totalCells,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Новая таблица для годового режима
-@Composable
-fun YearTable(
-    yearData: List<MonthStatistics>,
-    categories: List<CategoryStats>,
-    modifier: Modifier = Modifier
-) {
-    val totalCells = 2 + categories.size
-
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Заголовок таблицы для года
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
-                ) {
-                    // Колонка месяца
-                    TableHeaderCell(
-                        text = "Month",
-                        isVisible = true,
-                        modifier = Modifier
-                            .height(28.dp)
-                            .weight(0.5f)
-                    )
-
-                    // Колонка суммы
-                    TableHeaderCell(
-                        text = "Total",
-                        modifier = Modifier
-                            .height(28.dp)
-                            .weight(0.6f)
-                    )
-
-                    // Колонки категорий
-                    val categoryWeight = 0.4f
-                    categories.forEach { category ->
-                        TableHeaderCell(
-                            text = category.name.take(3),
-                            isVisible = category.isVisible,
-                            modifier = Modifier
-                                .height(28.dp)
-                                .weight(categoryWeight)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Тело таблицы для года
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(yearData) { monthData ->
-                        YearTableRow(
-                            monthData = monthData,
-                            categories = categories,
-                            totalCells = totalCells,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Строка таблицы для года
-@Composable
-fun YearTableRow(
-    monthData: MonthStatistics,
-    categories: List<CategoryStats>,
-    totalCells: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
-    ) {
-        // Колонка месяца
-        TableCell(
-            text = monthData.monthName,
-            modifier = Modifier
-                .height(28.dp)
-                .weight(0.5f)
-        )
-
-        // Колонка суммы
-        TableCell(
-            text = monthData.totalSelected.toString(),
-            modifier = Modifier
-                .height(28.dp)
-                .weight(0.6f),
-            backgroundColor = if (monthData.totalSelected > 0) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        )
-
-        // Колонки категорий
-        val categoryWeight = 0.4f
-        categories.forEach { category ->
-            val categorySum = monthData.categorySums[category.id] ?: 0
-            val hasValue = categorySum > 0
-
-            TableCell(
-                text = if (hasValue) categorySum.toString() else "",
-                modifier = Modifier
-                    .height(28.dp)
-                    .weight(categoryWeight),
-                backgroundColor = if (hasValue) {
-                    // Разная интенсивность цвета в зависимости от значения
-                    val alpha = 0.2f + (categorySum.toFloat() / 31f * 0.8f).coerceAtMost(0.8f)
-                    if (category.isVisible) {
-                        MaterialTheme.colorScheme.primary.copy(alpha = alpha)
-                    } else {
-                        MaterialTheme.colorScheme.secondary.copy(alpha = alpha)
-                    }
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-                textColor = if (hasValue) {
-                    if (category.isVisible) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.secondary
-                } else Color.Transparent
-            )
-        }
-    }
-}
-
-@Composable
-fun TableHeaderRow(
-    categories: List<CategoryStats>,
-    isWeekMode: Boolean,
-    isYearMode: Boolean = false,
-    totalCells: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
-    ) {
-        // Первая колонка: день недели или число месяца
-        val firstColumnText = when {
-            isYearMode -> "Month"
-            isWeekMode -> "Day"
-            else -> "Day"
-        }
-
-        TableHeaderCell(
-            text = firstColumnText,
-            isVisible = true,
-            modifier = Modifier
-                .height(28.dp)
-                .weight(0.5f)
-        )
-
-        // Вторая колонка: сумма
-        TableHeaderCell(
-            text = "Total",
-            modifier = Modifier
-                .height(28.dp)
-                .weight(0.6f)
-        )
-
-        // Колонки категорий
-        val categoryWeight = 0.4f
-        categories.forEach { category ->
-            TableHeaderCell(
-                text = category.name.take(3),
-                isVisible = category.isVisible,
-                modifier = Modifier
-                    .height(28.dp)
-                    .weight(categoryWeight)
-            )
-        }
-    }
-}
-
-@Composable
-fun TableRow(
-    dayData: DayStatistics,
-    categories: List<CategoryStats>,
-    isWeekMode: Boolean,
-    totalCells: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = if (totalCells % 2 == 0) Arrangement.Center else Arrangement.Center
-    ) {
-        // Первая колонка: день недели + число или просто число
-        val dayText = if (isWeekMode) {
-            "${dayData.dayOfWeek ?: ""}\n${dayData.day}"
-        } else {
-            dayData.day.toString()
-        }
-
-        TableCell(
-            text = dayText,
-            modifier = Modifier
-                .height(28.dp)
-                .weight(0.5f)
-        )
-
-        // Вторая колонка: сумма
-        TableCell(
-            text = dayData.totalSelected.toString(),
-            modifier = Modifier
-                .height(28.dp)
-                .weight(0.6f),
-            backgroundColor = if (dayData.totalSelected > 0) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        )
-
-        // Колонки категорий
-        val categoryWeight = 0.4f
-        categories.forEach { category ->
-            val isSelected = dayData.categorySelections[category.id] == true
-            TableCell(
-                text = if (isSelected) "✓" else "",
-                modifier = Modifier
-                    .height(28.dp)
-                    .weight(categoryWeight),
-                backgroundColor = if (isSelected) {
-                    if (category.isVisible) {
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                    } else {
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
-                    }
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-                textColor = if (isSelected) {
-                    if (category.isVisible) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.secondary
-                } else Color.Transparent
-            )
-        }
-    }
-}
-
-@Composable
-fun TableHeaderCell(
-    text: String,
-    isVisible: Boolean = true,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .border(1.dp, MaterialTheme.colorScheme.outline)
-            .background(
-                if (isVisible) MaterialTheme.colorScheme.surfaceVariant
-                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            )
-            .padding(1.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 10.sp
-            )
-            if (!isVisible) {
-                Text(
-                    text = "•",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun TableCell(
-    text: String,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    textColor: Color = MaterialTheme.colorScheme.onSurface
-) {
-    Box(
-        modifier = modifier
-            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
-            .background(backgroundColor)
-            .padding(1.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = textColor,
-            textAlign = TextAlign.Center,
-            fontSize = 10.sp,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-@Composable
-fun MonthSummaryStatsCard(
-    summary: SummaryStats,
-    currentMonth: YearMonth,
-    modifier: Modifier = Modifier
-) {
-    val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
-
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "${currentMonth.format(monthFormatter)} Summary",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                SummaryItem(
-                    title = "Days",
-                    value = "${summary.completedDays}/${summary.totalDays}",
-                    subtitle = "completed"
-                )
-
-                SummaryItem(
-                    title = "Average",
-                    value = "%.1f".format(summary.averagePerDay),
-                    subtitle = "per day"
-                )
-
-                SummaryItem(
-                    title = "Best Day",
-                    value = if (summary.bestDay > 0) "#${summary.bestDay}" else "-",
-                    subtitle = "${summary.bestDayCount} categories"
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun WeekSummaryStatsCard(
-    summary: WeekSummaryStats,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "Week Summary",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                SummaryItem(
-                    title = "Days",
-                    value = "${summary.completedDays}/${summary.totalDays}",
-                    subtitle = "completed"
-                )
-
-                SummaryItem(
-                    title = "Average",
-                    value = "%.1f".format(summary.averagePerDay),
-                    subtitle = "per day"
-                )
-
-                SummaryItem(
-                    title = "Best Day",
-                    value = summary.bestDay,
-                    subtitle = "${summary.bestDayCount} categories"
-                )
-            }
-        }
-    }
-}
-
-// Новая карточка сводной статистики за год
-@Composable
-fun YearSummaryStatsCard(
-    summary: YearSummaryStats,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "${summary.year} Summary",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                SummaryItem(
-                    title = "Months",
-                    value = "${summary.completedMonths}/${summary.totalMonths}",
-                    subtitle = "completed"
-                )
-
-                SummaryItem(
-                    title = "Average",
-                    value = "%.1f".format(summary.averagePerMonth),
-                    subtitle = "per month"
-                )
-
-                SummaryItem(
-                    title = "Best Month",
-                    value = summary.bestMonth,
-                    subtitle = "${summary.bestMonthCount} categories"
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun SummaryItem(
-    title: String,
-    value: String,
-    subtitle: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
     }
 }
