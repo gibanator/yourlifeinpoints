@@ -1,7 +1,9 @@
 package com.example.lifeinpoints.calendar.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -67,6 +69,9 @@ fun CalendarScreen(
                 .padding(16.dp)
         ) {
             if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
+
+                val stats = computeMonthStats(monthUi.month, monthUi.days)
+
                 CalendarHeader(
                     month = calendarUiState.selectedMonth,
                     onPrev = vm::prevMonth,
@@ -77,6 +82,9 @@ fun CalendarScreen(
                     weeksCount = monthUi.weeksCount,
                     onDateClick = toCertainDate
                 )
+                Spacer(Modifier.height(16.dp))
+
+                MonthStatsCard(stats = stats)
             }
             else {
                 YearCalendarView(
