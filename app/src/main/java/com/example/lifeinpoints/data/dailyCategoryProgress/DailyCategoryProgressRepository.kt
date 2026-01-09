@@ -48,5 +48,10 @@ class DailyCategoryProgressRepository @Inject constructor(
         progressDao.rewriteDay(date, completedIds, incompletedIds)
     }
 
+    suspend fun updateComment(categoryId: Int, date: String, comment: String?) =
+        progressDao.updateComment(
+            categoryId, date, comment
+        )
+
     suspend fun getAll(): List<DailyCategoryProgressEntity> = progressDao.observeAll().first()
 }

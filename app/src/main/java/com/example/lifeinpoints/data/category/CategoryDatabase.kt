@@ -4,11 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressDao
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressEntity
-
 import com.example.lifeinpoints.data.daycompletion.DayCompletionDao
 import com.example.lifeinpoints.data.daycompletion.DayCompletionEntity
-import com.example.lifeinpoints.data.user.UserDao
-import com.example.lifeinpoints.data.user.UserEntity
 
 
 @Database(
@@ -18,7 +15,7 @@ import com.example.lifeinpoints.data.user.UserEntity
         DailyCategoryProgressEntity::class,    // существующая
         DayCompletionEntity::class  // Добавляем новую сущность
     ],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {

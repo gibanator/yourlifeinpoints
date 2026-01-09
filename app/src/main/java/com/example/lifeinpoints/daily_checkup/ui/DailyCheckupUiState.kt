@@ -1,7 +1,6 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
 
-import com.example.lifeinpoints.data.category.CategoryRepository
 import java.time.LocalDate
 
 data class CategoryUi(
@@ -31,5 +30,8 @@ data class DailyCheckupUiState (
     val selectedCategories: Set<Int> = emptySet(),
     val allCategories: List<CategoryUi> = emptyList(),
     val isMultiplierMode: Boolean = false,
-    val orderedCategories: List<CategoryUi> = emptyList()
+    val orderedCategories: List<CategoryUi> = emptyList(),
+
+    val commentDrafts: Map<Int, String> = emptyMap(),
+    val savedComments: Map<Int, String?> = emptyMap()
 )

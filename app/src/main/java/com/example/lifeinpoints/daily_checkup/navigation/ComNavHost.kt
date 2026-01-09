@@ -4,6 +4,7 @@ package com.example.lifeinpoints.daily_checkup.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,7 +17,7 @@ import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 fun DailyCheckupNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    dailyVm: DailyCheckupViewModel
+    dailyVm: DailyCheckupViewModel = hiltViewModel(),
     // Передаем необходимые параметры из родительского компонента
 ) {
     NavHost(
@@ -35,8 +36,11 @@ fun DailyCheckupNavHost(
 
         composable(ScreenDest.CommentScreen.route) {
             CommentScreen(
-                onBack = { navController.popBackStack() },
-                vm = dailyVm
+                onBack = {
+                    navController.popBackStack()
+                         },
+                vm = dailyVm,
+
             )
         }
     }

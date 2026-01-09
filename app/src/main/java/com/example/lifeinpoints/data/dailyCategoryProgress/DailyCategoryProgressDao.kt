@@ -1,6 +1,5 @@
 package com.example.lifeinpoints.data.dailyCategoryProgress
 
-import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -51,8 +50,16 @@ interface DailyCategoryProgressDao {
         incompletedIds: List<Int>
     ) {
         val rows = buildList {
-            completedIds.forEach { add(DailyCategoryProgressEntity(date = date, categoryId = it, value = true)) }
-            incompletedIds.forEach { add(DailyCategoryProgressEntity(date = date, categoryId = it, value = false)) }
+            completedIds.forEach { add(DailyCategoryProgressEntity(
+                date = date,
+                categoryId = it,
+                value = true,
+                comment = null)) }
+            incompletedIds.forEach { add(DailyCategoryProgressEntity(
+                date = date,
+                categoryId = it,
+                value = false,
+                comment = null)) }
         }
 
         upsertAll(rows)
@@ -67,12 +74,20 @@ interface DailyCategoryProgressDao {
         deleteByDate(date)
 
         val rows = buildList {
-            completedIds.forEach { add(DailyCategoryProgressEntity(date = date, categoryId = it, value = true)) }
-            incompletedIds.forEach { add(DailyCategoryProgressEntity(date = date, categoryId = it, value = false)) }
+            completedIds.forEach { add(DailyCategoryProgressEntity(date = date, categoryId = it, value = true, comment = null)) }
+            incompletedIds.forEach { add(DailyCategoryProgressEntity(date = date, categoryId = it, value = false, comment = null)) }
         }
 
         insertAll(rows)
     }
+
+    @Query("""
+        UPDATE daily_category_progress
+        SET comment = :comment
+        WHERE categoryId = :categoryId
+          AND date = :date
+    """)
+    suspend fun updateComment(categoryId: Int, date: String, comment: String?)
 
     @Query("DELETE FROM daily_category_progress")
     suspend fun clearAll()

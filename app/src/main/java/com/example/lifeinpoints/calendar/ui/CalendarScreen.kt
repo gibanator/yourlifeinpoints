@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,6 +35,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.lifeinpoints.calendar.CalendarUiState
 import com.example.lifeinpoints.calendar.CalendarViewModel
+import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -47,6 +50,7 @@ fun CalendarScreen(
 
     val monthUi by vm.monthUi.collectAsStateWithLifecycle()
     val yearMonths by vm.yearUi.collectAsStateWithLifecycle()
+
 
     Scaffold(
         topBar = {
@@ -120,17 +124,15 @@ private fun CalendarModeSwitchCard(
     onNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
     val title = if (mode == CalendarUiState.Mode.MONTH) {
         selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
     } else {
         year.toString()
     }
 
-    val hint = if (mode == CalendarUiState.Mode.MONTH) {
-        "Tap to switch to year"
-    } else {
-        "Tap to switch to month"
-    }
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -149,13 +151,14 @@ private fun CalendarModeSwitchCard(
 
         Box(
             modifier = Modifier
-                .weight(1f),
+                .weight(1f)
+                .padding(horizontal = screenHeight * 0.01f),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "$title • ${mode.name.lowercase().replaceFirstChar { it.uppercase() }}",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    //fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
+                    fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -164,24 +167,24 @@ private fun CalendarModeSwitchCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onToggle() }
-                    //.padding(vertical = screenHeight * 0.01f, horizontal = screenHeight * 0.02f)
+                    .padding(vertical = screenHeight * 0.01f, horizontal = screenHeight * 0.02f)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = MaterialTheme.shapes.small
                     )
-                    //.padding(screenHeight * 0.01f)
+                    .padding(screenHeight * 0.01f)
             )
         }
 
         // Кнопка следующего периода
         IconButton(
             onClick = onNext,
-            modifier = modifier//Modifier.size(screenHeight * 0.05f)
+            modifier = Modifier.size(screenHeight * 0.05f)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                modifier = modifier//Modifier.size(screenHeight * 0.03f)
+                modifier = Modifier.size(screenHeight * 0.03f)
             )
         }
     }

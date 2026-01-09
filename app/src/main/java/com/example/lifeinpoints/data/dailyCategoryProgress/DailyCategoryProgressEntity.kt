@@ -4,7 +4,6 @@ package com.example.lifeinpoints.data.dailyCategoryProgress
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
 import com.example.lifeinpoints.data.category.CategoryEntity
 
 @Entity(
@@ -27,5 +26,7 @@ data class DailyCategoryProgressEntity(
 
     val date: String, // формат "YYYY-MM-DD"
 
-    val value: Boolean
+    val value: Boolean,
+
+    val comment: String?
 )

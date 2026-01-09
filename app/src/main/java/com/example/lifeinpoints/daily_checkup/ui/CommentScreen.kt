@@ -26,21 +26,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentScreen(
     onBack: () -> Unit,
-    vm: DailyCheckupViewModel // Получаем ViewModel
+    vm: DailyCheckupViewModel
 ) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }
@@ -51,7 +49,7 @@ fun CommentScreen(
             TopAppBar(
                 title = { Text(uiState.selectedDate.format(formatter)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { vm.commitCommentsAndLeave(onBack) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -67,47 +65,40 @@ fun CommentScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             uiState.orderedCategories.forEachIndexed { index, category ->
-                val isSelected = uiState.selectedCategories.contains(index)
+                val id = category.id
+                val isSelected = id in uiState.selectedCategories
+
+                val value = uiState.commentDrafts[id].orEmpty()
 
                 OneComment(
                     category = category.name,
-                    isSelected = isSelected,
+                    isSelected = isSelected, // only for color, not logic
+                    value = value,
+                    onValueChange = { vm.onCommentChanged(id, it) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Добавляем отступ после каждого комментария, кроме последнего
-                if (index < uiState.orderedCategories.size - 1) {
+                if (index < uiState.orderedCategories.lastIndex) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
-            // Добавляем дополнительное пространство внизу для лучшей прокрутки
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
+
 @Composable
 fun OneComment(
     category: String,
-    isSelected: Boolean = false,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
 ) {
-    val textState = remember { mutableStateOf("") }
-
-    // Используем тот же фиолетовый цвет, что и в DailyCheckupScreen
-    val cardColor = if (isSelected) {
-        Color(0xFF7E6DF8) // Тот же фиолетовый, что и для выбранных категорий
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-
-    // Цвет текста для заголовка
-    val textColor = if (isSelected) {
-        Color.White
-    } else {
-        MaterialTheme.colorScheme.onSurface
-    }
+    val cardColor = if (isSelected) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surface
+    val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
 
     Card(
         modifier = modifier,
@@ -128,8 +119,8 @@ fun OneComment(
             )
 
             TextField(
-                value = textState.value,
-                onValueChange = { textState.value = it },
+                value = value,
+                onValueChange = { onValueChange(it.take(100)) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,

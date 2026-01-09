@@ -42,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -50,11 +49,13 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
-    vm: DailyCheckupViewModel = hiltViewModel(),
+    vm: DailyCheckupViewModel,
     onNavigateToComments: () -> Unit
 ) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }
+
+
 
     Scaffold(
         topBar = {
@@ -62,7 +63,7 @@ fun DailyCheckupScreen(
                 title = { Text(uiState.selectedDate.format(formatter)) },
                 actions = {
                     OutlinedButton(onClick = { vm.goToToday() }) {
-                        Text("Today")
+                        Text("To today")
                     }
                 }
             )
@@ -274,7 +275,7 @@ fun ActionButtonsRow(
                     .padding(vertical = 10.dp)
             ) {
                 Text(
-                    text = "Add comment",
+                    text = "Add/Edit comments",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

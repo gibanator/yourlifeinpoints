@@ -65,11 +65,21 @@ class DailyCheckupViewModel @Inject constructor(
     private suspend fun initStateForDay(selected: LocalDate) {
         Log.d("VM", "initStateForDay() CALLED, vmId=$id, day=$selected")
         val week = weekDatesOf(selected)
-        val completedCategories = dailyProgressRepo
-            .getByDate(selected.toString())
-            .filter { it.value }
-            .map { it.categoryId }
-            .toSet()
+
+        val rows = dailyProgressRepo.getByDate(selected.toString())
+        val completedCategories: Set<Int> =
+            rows
+                .filter { it.value }
+                .map { it.categoryId }
+                .toSet()
+
+        val savedComments: Map<Int, String?> =
+            rows.associate { it.categoryId to it.comment }
+
+        val drafts: Map<Int, String> =
+            savedComments.mapValues { (_, c) -> c.orEmpty() }
+
+
 
         // Получаем состояние завершенности дня из базы
         val isDayCompleted = dayCompletionRepo.getDayCompletion(selected.toString())
@@ -86,7 +96,9 @@ class DailyCheckupViewModel @Inject constructor(
                 selectedCategories = completedCategories.filter { it in visibleCategories.map { it.id } }.toSet(),
                 allCategories = visibleCategories,
                 orderedCategories = visibleCategories, // Сохраняем упорядоченный список видимых категорий
-                isDayEnded = isDayCompleted
+                isDayEnded = isDayCompleted,
+                savedComments = savedComments,
+                commentDrafts = drafts
             )
         }
         Log.d("Categories", "${visibleCategories.forEach { it.id }}")
@@ -168,6 +180,35 @@ class DailyCheckupViewModel @Inject constructor(
             }
             saveProgress()
         }
+    }
+
+    fun onCommentChanged(categoryId: Int, newText: String) {
+        _uiState.update { s ->
+            s.copy(
+                commentDrafts = s.commentDrafts + (categoryId to newText.take(100))
+            )
+        }
+    }
+
+    fun commitCommentsAndLeave(onBack: () -> Unit) {
+        val s = _uiState.value
+        val date = s.selectedDate.toString()
+
+        viewModelScope.launch {
+            s.commentDrafts.forEach { (categoryId, raw) ->
+                val newClean = raw.trim().take(100)
+                val oldClean = s.savedComments[categoryId]?.trim().orEmpty()
+
+                when {
+                    newClean == oldClean -> Unit
+                    newClean.isNotEmpty() -> dailyProgressRepo.updateComment(categoryId, date, newClean)
+                    oldClean.isNotEmpty() -> dailyProgressRepo.updateComment(categoryId, date, null) // delete
+                    else -> Unit
+                }
+            }
+        }
+
+        onBack()
     }
 
     fun toggleMultiplierMode() {
