@@ -16,15 +16,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -39,20 +33,11 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun YearCalendarView(
-    year: Int,
     months: List<MonthUi>, // 12 items
-    onPrevYear: () -> Unit,
-    onNextYear: () -> Unit,
     onMonthClick: (YearMonth) -> Unit,  // switch to month mode
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        CalendarYearHeader(
-            year = year,
-            onPrevYear = onPrevYear,
-            onNextYear = onNextYear
-        )
-
         LazyVerticalGrid(
             columns = GridCells.Fixed(3), // classic 3x4
             contentPadding = PaddingValues(12.dp),
@@ -68,35 +53,6 @@ fun YearCalendarView(
                     onClick = { onMonthClick(m.month) }
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun CalendarYearHeader(
-    year: Int,
-    onPrevYear: () -> Unit,
-    onNextYear: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onPrevYear) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous year")
-        }
-
-        Text(
-            text = year.toString(),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-
-        IconButton(onClick = onNextYear) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next year")
         }
     }
 }

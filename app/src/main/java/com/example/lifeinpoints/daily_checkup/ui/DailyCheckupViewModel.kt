@@ -195,6 +195,22 @@ class DailyCheckupViewModel @Inject constructor(
         }
     }
 
+    fun goToToday() {
+        val today = LocalDate.now()
+
+        _uiState.update {
+            it.copy(
+                selectedDate = today,
+                currentWeek = mapToUi(weekDatesOf(today), today)
+            )
+        }
+
+        viewModelScope.launch {
+            initStateForDay(today)
+            savedStateHandle["selectedDay"] = today.toString()
+        }
+    }
+
     private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
         _uiState.update(x)
     }

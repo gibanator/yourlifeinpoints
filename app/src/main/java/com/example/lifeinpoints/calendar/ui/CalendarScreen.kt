@@ -1,26 +1,39 @@
 package com.example.lifeinpoints.calendar.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.lifeinpoints.calendar.CalendarUiState
 import com.example.lifeinpoints.calendar.CalendarViewModel
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,9 +47,6 @@ fun CalendarScreen(
 
     val monthUi by vm.monthUi.collectAsStateWithLifecycle()
     val yearMonths by vm.yearUi.collectAsStateWithLifecycle()
-//    LaunchedEffect(Unit) {
-//        vm.initMonthlyView(YearMonth.of(2025, 9))
-//    }
 
     Scaffold(
         topBar = {
@@ -48,16 +58,6 @@ fun CalendarScreen(
                         else
                             calendarUiState.yearCursor.year.toString()
                     )
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            if (calendarUiState.mode == CalendarUiState.Mode.MONTH) vm.openYear()
-                            else vm.openMonth()
-                        }
-                    ) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Select")
-                    }
                 }
             )
         }
@@ -68,15 +68,28 @@ fun CalendarScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
+            val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
+            CalendarModeSwitchCard(
+                mode = calendarUiState.mode,
+                selectedMonth = calendarUiState.selectedMonth,
+                year = calendarUiState.yearCursor.year,
+                onToggle = {
+                    if (isInMonthMode) vm.openYear()
+                    else vm.openMonth()
+                },
+                onPrev = {
+                    if (isInMonthMode) vm.prevMonth()
+                    else vm.prevYear()
+                },
+                onNext = {
+                    if (isInMonthMode) vm.nextMonth()
+                    else vm.nextYear()
+                }
+            )
             if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
 
                 val stats = computeMonthStats(monthUi.month, monthUi.days)
 
-                CalendarHeader(
-                    month = calendarUiState.selectedMonth,
-                    onPrev = vm::prevMonth,
-                    onNext = vm::nextMonth
-                )
                 MonthCalendar (
                     monthDays = monthUi.days,
                     weeksCount = monthUi.weeksCount,
@@ -88,16 +101,88 @@ fun CalendarScreen(
             }
             else {
                 YearCalendarView(
-                    year = calendarUiState.yearCursor.year,
                     months = yearMonths,
-
-                    onPrevYear = vm::prevYear,
-                    onNextYear = vm::nextYear,
-
                     onMonthClick = { ym -> vm.openMonth(ym) }
                 )
             }
         }
     }
 
+}
+
+@Composable
+private fun CalendarModeSwitchCard(
+    mode: CalendarUiState.Mode,
+    selectedMonth: YearMonth,
+    year: Int,
+    onToggle: () -> Unit,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val title = if (mode == CalendarUiState.Mode.MONTH) {
+        selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
+    } else {
+        year.toString()
+    }
+
+    val hint = if (mode == CalendarUiState.Mode.MONTH) {
+        "Tap to switch to year"
+    } else {
+        "Tap to switch to month"
+    }
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(
+            onClick = onPrev,
+            modifier = modifier
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Previous",
+                modifier = modifier
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "$title • ${mode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    //fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
+                ),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onToggle() }
+                    //.padding(vertical = screenHeight * 0.01f, horizontal = screenHeight * 0.02f)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    //.padding(screenHeight * 0.01f)
+            )
+        }
+
+        // Кнопка следующего периода
+        IconButton(
+            onClick = onNext,
+            modifier = modifier//Modifier.size(screenHeight * 0.05f)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = "Next",
+                modifier = modifier//Modifier.size(screenHeight * 0.03f)
+            )
+        }
+    }
 }
