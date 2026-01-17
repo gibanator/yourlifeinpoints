@@ -1,6 +1,8 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +31,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -67,13 +74,16 @@ fun CommentScreen(
             uiState.orderedCategories.forEachIndexed { index, category ->
                 val id = category.id
                 val isSelected = id in uiState.selectedCategories
-
                 val value = uiState.commentDrafts[id].orEmpty()
+
+                val templates = vm.getTemplatesForCategory(id)
+                Log.d("TEMPLATES", "${templates.size} found for category $id")
 
                 OneComment(
                     category = category.name,
-                    isSelected = isSelected, // only for color, not logic
+                    isSelected = isSelected,
                     value = value,
+                    templates = templates,
                     onValueChange = { vm.onCommentChanged(id, it) },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -82,6 +92,7 @@ fun CommentScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -93,12 +104,16 @@ fun CommentScreen(
 fun OneComment(
     category: String,
     value: String,
+    templates: List<String>,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
 ) {
     val cardColor = if (isSelected) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surface
     val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+
+    var menuOpen by remember { mutableStateOf(false) }
+    val menuItems = remember(templates) { templates.filter { it.isNotBlank() } }
 
     Card(
         modifier = modifier,
@@ -118,27 +133,57 @@ fun OneComment(
                 color = textColor
             )
 
-            TextField(
-                value = value,
-                onValueChange = { onValueChange(it.take(100)) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    focusedIndicatorColor = if (isSelected) Color.White.copy(alpha = 0.7f) else Color.Gray,
-                    unfocusedIndicatorColor = if (isSelected) Color.White.copy(alpha = 0.5f) else Color.LightGray,
-                    focusedTextColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = if (isSelected) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurface,
-                    cursorColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary
-                ),
-                placeholder = {
-                    Text(
-                        "Add your commentary...",
-                        color = if (isSelected) Color.White.copy(alpha = 0.7f) else Color.Gray
-                    )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                TextField(
+                    value = value,
+                    onValueChange = { onValueChange(it.take(100)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        if (menuItems.isNotEmpty()) {
+                            IconButton(onClick = { menuOpen = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Choose template",
+                                    tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = if (isSelected) Color.White.copy(alpha = 0.7f) else Color.Gray,
+                        unfocusedIndicatorColor = if (isSelected) Color.White.copy(alpha = 0.5f) else Color.LightGray,
+                        focusedTextColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = if (isSelected) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurface,
+                        cursorColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary
+                    ),
+                    placeholder = {
+                        Text(
+                            "Add your commentary...",
+                            color = if (isSelected) Color.White.copy(alpha = 0.7f) else Color.Gray
+                        )
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = menuOpen,
+                    onDismissRequest = { menuOpen = false }
+                ) {
+                    menuItems.forEach { template ->
+                        DropdownMenuItem(
+                            text = { Text(template, maxLines = 2) },
+                            onClick = {
+                                menuOpen = false
+                                onValueChange(template) // replace
+                                // or append:
+                                // onValueChange(if (value.isBlank()) template else value + "\n" + template)
+                            }
+                        )
+                    }
                 }
-            )
+            }
         }
     }
 }

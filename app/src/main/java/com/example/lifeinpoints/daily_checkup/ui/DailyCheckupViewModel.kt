@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
+import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
@@ -25,6 +26,7 @@ class DailyCheckupViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val dailyProgressRepo: DailyCategoryProgressRepository,
     private val dayCompletionRepo: DayCompletionRepository,
+    private val commentTemplateRepo: CommentTemplateRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel()  {
 
@@ -54,6 +56,22 @@ class DailyCheckupViewModel @Inject constructor(
                 initStateForDay(today)
             }
         }
+
+        viewModelScope.launch {
+            commentTemplateRepo.observeAll().collect { allTemplates ->
+                val visibleIds = _uiState.value.orderedCategories.map { it.id }.toSet()
+
+                val map: Map<Int, List<String>> =
+                    allTemplates
+                        .filter { it.categoryId.toInt() in visibleIds }
+                        .groupBy { it.categoryId.toInt() }
+                        .mapValues { (_, list) ->
+                            list.sortedBy { it.position }.map { it.text }
+                        }
+
+                _uiState.update { it.copy(templatesByCategory = map) }
+            }
+        }
     }
 
     /**
@@ -79,8 +97,6 @@ class DailyCheckupViewModel @Inject constructor(
         val drafts: Map<Int, String> =
             savedComments.mapValues { (_, c) -> c.orEmpty() }
 
-
-
         // Получаем состояние завершенности дня из базы
         val isDayCompleted = dayCompletionRepo.getDayCompletion(selected.toString())
 
@@ -88,6 +104,15 @@ class DailyCheckupViewModel @Inject constructor(
         val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
         val visibleCategories = categoryRepository.getVisibleCategoriesCreatedBefore(selectedDayMillis)
             .map { CategoryUi(id = it.id, name = it.name) }
+
+        val templatesByCategory: Map<Int, List<String>> =
+            visibleCategories.associate { cat ->
+                val list = commentTemplateRepo
+                    .getByCategory(cat.id.toLong())
+                    .sortedBy { it.position }
+                    .map { it.text }
+                cat.id to list
+            }
 
         update { state ->
             state.copy(
@@ -98,7 +123,8 @@ class DailyCheckupViewModel @Inject constructor(
                 orderedCategories = visibleCategories, // Сохраняем упорядоченный список видимых категорий
                 isDayEnded = isDayCompleted,
                 savedComments = savedComments,
-                commentDrafts = drafts
+                commentDrafts = drafts,
+                templatesByCategory = templatesByCategory
             )
         }
         Log.d("Categories", "${visibleCategories.forEach { it.id }}")
@@ -210,6 +236,9 @@ class DailyCheckupViewModel @Inject constructor(
 
         onBack()
     }
+
+    fun getTemplatesForCategory(categoryId: Int): List<String> =
+        _uiState.value.templatesByCategory[categoryId].orEmpty()
 
     fun toggleMultiplierMode() {
         _uiState.update {

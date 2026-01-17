@@ -1,10 +1,8 @@
 package com.example.lifeinpoints.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,7 +14,9 @@ import com.example.lifeinpoints.calendar.ui.CalendarScreen
 import com.example.lifeinpoints.categories.AddCategoryScreen
 import com.example.lifeinpoints.categories.CategoriesScreen
 import com.example.lifeinpoints.categories.CategoryVisibilityScreen
+import com.example.lifeinpoints.categories.comment_templates.CommentTemplatesCategoriesScreen
 import com.example.lifeinpoints.categories.EditCategoryScreen
+import com.example.lifeinpoints.categories.comment_templates.EditCommentTemplatesScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 import com.example.lifeinpoints.statistics.StatisticsScreen  // Импортируем новый экран
@@ -85,6 +85,9 @@ fun AppNavHost(
                 onVisibilityClick = {
                     navController.navigate("category_visibility")
                 },
+                onTemplatesClick = {
+                    navController.navigate("comment_templates")
+                },
                 vm = settingsVm
             )
         }
@@ -132,6 +135,20 @@ fun AppNavHost(
             )
         }
 
+        composable(
+            route = "edit_templates/{categoryId}",
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments!!.getInt("categoryId")
+
+            EditCommentTemplatesScreen(
+                categoryId = categoryId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
         composable("categories") {
             CategoriesScreen(
                 onBack = { navController.popBackStack() },
@@ -154,11 +171,13 @@ fun AppNavHost(
             )
         }
 
-        composable("category_visibility") {
-            CategoryVisibilityScreen(
-                onBack = { navController.popBackStack() }
+        composable("comment_templates") {
+            CommentTemplatesCategoriesScreen(
+                onBack = { navController.popBackStack() },
+                onOpenCategoryTemplates = { categoryId ->
+                    navController.navigate("edit_templates/$categoryId")
+                }
             )
         }
-
     }
 }
