@@ -37,6 +37,7 @@ fun SettingsScreen(
     onBack: () -> Unit = {},
     onCategoriesClick: () -> Unit = {}, // Новый параметр для навигации
     onVisibilityClick: () -> Unit = {},
+    onTemplatesClick: () -> Unit = {},
     vm: SettingsViewModel
 ) {
     val currentTheme by vm.currentTheme.collectAsState()
@@ -79,7 +80,8 @@ fun SettingsScreen(
 
             CategoriesCard(
                 onCategoriesClick = onCategoriesClick,
-                onVisibilityClick = onVisibilityClick
+                onVisibilityClick = onVisibilityClick,
+                onTemplatesClick = onTemplatesClick
             )
         }
     }
@@ -89,7 +91,8 @@ fun SettingsScreen(
 @Composable
 fun CategoriesCard(
     onCategoriesClick: () -> Unit,
-    onVisibilityClick: () -> Unit // Новый параметр
+    onVisibilityClick: () -> Unit, // Новый параметр
+    onTemplatesClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -139,6 +142,31 @@ fun CategoriesCard(
                     )
                     Text(
                         text = "Choose which categories appear on main screen",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Divider()
+
+            // Строка управления темплейтами
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onTemplatesClick() }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Manage comment templates for categories",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Add, edit or delete often-used comments for easy filling",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

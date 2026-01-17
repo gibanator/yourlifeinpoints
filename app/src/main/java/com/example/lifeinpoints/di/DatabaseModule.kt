@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.lifeinpoints.data.category.CategoryDao
 import com.example.lifeinpoints.data.category.CategoryDatabase
+import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateDao
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressDao
 import com.example.lifeinpoints.data.daycompletion.DayCompletionDao
 import com.example.lifeinpoints.data.user.UserDao
@@ -35,4 +36,6 @@ object DatabaseModule {
     @Provides
     fun provideDayCompletionDao(db: CategoryDatabase): DayCompletionDao = db.dayCompletionDao()
 
+    @Provides
+    fun provideCommentTemplateDao(db: CategoryDatabase): CommentTemplateDao = db.commentTemplateDao()
 }

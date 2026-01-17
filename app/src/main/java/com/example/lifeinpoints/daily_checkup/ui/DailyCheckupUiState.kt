@@ -33,5 +33,7 @@ data class DailyCheckupUiState (
     val orderedCategories: List<CategoryUi> = emptyList(),
 
     val commentDrafts: Map<Int, String> = emptyMap(),
-    val savedComments: Map<Int, String?> = emptyMap()
+    val savedComments: Map<Int, String?> = emptyMap(),
+
+    val templatesByCategory: Map<Int, List<String>> = emptyMap()
 )
