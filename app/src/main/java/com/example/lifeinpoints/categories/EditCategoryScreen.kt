@@ -1,6 +1,7 @@
 // EditCategoryScreen.kt
 package com.example.lifeinpoints.categories
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 
 // com.example.lifeinpoints.categories/EditCategoryScreen.kt
@@ -39,9 +41,14 @@ fun EditCategoryScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
-    // Загружаем данные категории при открытии экрана
-    LaunchedEffect(categoryId) {
-        viewModel.getCategoryById(categoryId)?.let { category ->
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val category = uiState.categories.firstOrNull { it.id == categoryId }
+
+
+    LaunchedEffect(category?.name) {
+        // only prefill if user hasn't typed yet
+        if (categoryName.isBlank() && category != null) {
             categoryName = category.name
         }
     }

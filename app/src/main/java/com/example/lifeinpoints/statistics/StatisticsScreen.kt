@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,8 +44,8 @@ import com.example.lifeinpoints.statistics.ui.CategoryFilter
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartWithLegend
 import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
 import com.example.lifeinpoints.statistics.ui.chart.ChartType
-import com.example.lifeinpoints.statistics.ui.chart.TimePeriod
 import com.example.lifeinpoints.statistics.ui.chart.ChartWithLegend
+import com.example.lifeinpoints.statistics.ui.chart.TimePeriod
 import com.example.lifeinpoints.statistics.ui.table.AdaptiveSmartCenteredTable
 import com.example.lifeinpoints.statistics.ui.table.AdaptiveYearTable
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -71,12 +71,12 @@ fun StatisticsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         "Statistics",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = calculateAdaptiveFontSize(screenHeight, 0.022f)
+                        //fontWeight = FontWeight.Bold,
+                        //fontSize = calculateAdaptiveFontSize(screenHeight, 0.022f)
                     )
                 }
             )
@@ -108,7 +108,7 @@ fun StatisticsScreen(
                 screenHeight = screenHeight,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = screenHeight * 0.02f, vertical = screenHeight * 0.01f)
+                    .padding(horizontal = screenHeight * 0.02f, /*vertical = screenHeight * 0.01f*/)
             )
 
             if (uiState.isLoading) {

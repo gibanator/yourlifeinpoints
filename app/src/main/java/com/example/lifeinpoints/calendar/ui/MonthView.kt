@@ -45,7 +45,8 @@ fun MonthCalendar(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
         repeat(weeksCount) { week ->
             Row(

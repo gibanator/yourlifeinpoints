@@ -73,7 +73,11 @@ fun DailyCheckupScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
         ) {
             WeekBarWithButtons(
                 days = uiState.currentWeek,

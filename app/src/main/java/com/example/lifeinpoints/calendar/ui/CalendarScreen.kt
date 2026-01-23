@@ -6,12 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -62,7 +61,8 @@ fun CalendarScreen(
                         else
                             calendarUiState.yearCursor.year.toString()
                     )
-                }
+                },
+                // modifier = Modifier.heightIn(max = 56.dp), если нужно поменять размер
             )
         }
     ) { padding ->
@@ -70,7 +70,11 @@ fun CalendarScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                )
         ) {
             val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
             CalendarModeSwitchCard(
@@ -91,17 +95,22 @@ fun CalendarScreen(
                 }
             )
             if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
-
-                val stats = computeMonthStats(monthUi.month, monthUi.days)
-
-                MonthCalendar (
-                    monthDays = monthUi.days,
-                    weeksCount = monthUi.weeksCount,
-                    onDateClick = toCertainDate
-                )
-                Spacer(Modifier.height(16.dp))
-
-                MonthStatsCard(stats = stats)
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        MonthCalendar(
+                            monthDays = monthUi.days,
+                            weeksCount = monthUi.weeksCount,
+                            onDateClick = toCertainDate
+                        )
+                    }
+                    item {
+                        val stats = computeMonthStats(monthUi.month, monthUi.days)
+                        MonthStatsCard(stats = stats)
+                    }
+                }
             }
             else {
                 YearCalendarView(
