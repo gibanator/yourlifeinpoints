@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +51,8 @@ fun CalendarScreen(
     val monthUi by vm.monthUi.collectAsStateWithLifecycle()
     val yearMonths by vm.yearUi.collectAsStateWithLifecycle()
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
     Scaffold(
         topBar = {
@@ -92,7 +95,11 @@ fun CalendarScreen(
                 onNext = {
                     if (isInMonthMode) vm.nextMonth()
                     else vm.nextYear()
-                }
+                },
+                screenHeight = screenHeight,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = screenHeight * 0.02f)
             )
             if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
                 LazyColumn(
@@ -131,11 +138,9 @@ private fun CalendarModeSwitchCard(
     onToggle: () -> Unit,
     onPrev: () -> Unit,
     onNext: () -> Unit,
+    screenHeight: Dp,
     modifier: Modifier = Modifier
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-
     val title = if (mode == CalendarUiState.Mode.MONTH) {
         selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
     } else {
@@ -149,12 +154,12 @@ private fun CalendarModeSwitchCard(
     ) {
         IconButton(
             onClick = onPrev,
-            modifier = modifier
+            modifier = Modifier.size(screenHeight * 0.05f)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                modifier = modifier
+                modifier = Modifier.size(screenHeight * 0.03f)
             )
         }
 

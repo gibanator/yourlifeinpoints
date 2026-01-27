@@ -80,7 +80,10 @@ class CategoryRepository @Inject constructor(
 
     // Остальные методы остаются без изменений...
     // Обновим метод addCategory - новые категории должны получать максимальный sortOrder
-    suspend fun addCategory(name: String): Result<Unit> {
+    suspend fun addCategory(
+        name: String,
+        createdAt: Long
+    ): Result<Unit> {
         return try {
             val existingCount = dao.countByName(name)
             if (existingCount > 0) {
@@ -88,16 +91,20 @@ class CategoryRepository @Inject constructor(
             } else {
                 val allCategories = dao.getAll()
 
-                // Находим максимальный sortOrder среди пользовательских категорий
+
                 val userCategories = allCategories.filter { !it.isSystem }
                 val maxUserSortOrder = userCategories.maxByOrNull { it.sortOrder }?.sortOrder ?: 4
+
 
                 val newCategory = CategoryEntity(
                     name = name.trim(),
                     color = getDefaultColor(allCategories.size),
-                    sortOrder = maxUserSortOrder + 1, // Новая категория получает sortOrder больше текущего максимума
-                    isSystem = false
+                    sortOrder = maxUserSortOrder + 1,
+                    isSystem = false,
+                    createdAt = createdAt
                 )
+
+
                 dao.insert(newCategory)
                 Result.success(Unit)
             }

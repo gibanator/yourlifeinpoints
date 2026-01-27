@@ -62,8 +62,8 @@ class CategoriesViewModel @Inject constructor(
     }
 
     // Остальные методы без изменений...
-    suspend fun addCategory(name: String): Result<Unit> {
-        return categoryRepository.addCategory(name)
+    suspend fun addCategory(name: String, createdAt: Long): Result<Unit> {
+        return categoryRepository.addCategory(name, createdAt)
     }
 
     suspend fun updateCategory(categoryId: Int, newName: String): Result<Unit> {

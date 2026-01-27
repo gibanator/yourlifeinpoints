@@ -16,6 +16,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +30,13 @@ fun AddCategoryScreen(
     var categoryName by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    var startMode by remember { mutableStateOf(CategoryStartMode.TODAY) }
+    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -48,7 +58,17 @@ fun AddCategoryScreen(
                                 errorMessage = null
 
                                 coroutineScope.launch {
-                                    val result = viewModel.addCategory(categoryName.trim())
+                                    val createdAtForVisibility = when (startMode) {
+                                        CategoryStartMode.TODAY -> LocalDate.now().toEpochMilliAtStartOfDay()
+                                        CategoryStartMode.PICK_DATE -> pickedDate.toEpochMilliAtStartOfDay()
+                                        CategoryStartMode.FROM_START -> 0L
+                                    }
+
+
+                                    val result = viewModel.addCategory(
+                                        categoryName.trim(),
+                                        createdAt = createdAtForVisibility
+                                    )
                                     isLoading = false
 
                                     if (result.isSuccess) {
@@ -125,6 +145,90 @@ fun AddCategoryScreen(
                     )
                 }
             }
+
+            Text(
+                text = "Category appears from",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = startMode == CategoryStartMode.TODAY,
+                        onClick = { startMode = CategoryStartMode.TODAY }
+                    )
+                    Text("Today")
+                }
+
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = startMode == CategoryStartMode.PICK_DATE,
+                        onClick = {
+                            startMode = CategoryStartMode.PICK_DATE
+                            showDatePicker = true
+                        }
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = {
+                            startMode = CategoryStartMode.PICK_DATE
+                            showDatePicker = true
+                        }
+                    ) {
+                        Text("Pick a date: $pickedDate")
+                    }
+                }
+
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = startMode == CategoryStartMode.FROM_START,
+                        onClick = { startMode = CategoryStartMode.FROM_START }
+                    )
+                    Text("From the start")
+                }
+            }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                val millis = datePickerState.selectedDateMillis
+                                if (millis != null) {
+                                    pickedDate = Instant.ofEpochMilli(millis)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate()
+                                }
+                                showDatePicker = false
+                            }
+                        ) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
         }
     }
+}
+
+
+private enum class CategoryStartMode {
+    TODAY,
+    PICK_DATE,
+    FROM_START
+}
+
+
+private fun LocalDate.toEpochMilliAtStartOfDay(zoneId: ZoneId = ZoneId.systemDefault()): Long {
+    return this.atStartOfDay(zoneId).toInstant().toEpochMilli()
 }

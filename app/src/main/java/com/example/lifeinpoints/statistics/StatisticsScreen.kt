@@ -86,6 +86,11 @@ fun StatisticsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                )
         ) {
             // Селектор периода
             AdaptivePeriodSelector(
