@@ -48,6 +48,7 @@ fun SettingsScreen(
     vm: SettingsViewModel
 ) {
     val currentTheme by vm.currentTheme.collectAsState()
+    val gameModeEnabled by vm.gameModeEnabled.collectAsState()
 
     Scaffold(
         topBar = {
@@ -99,6 +100,25 @@ fun SettingsScreen(
                 onCategoriesClick = onCategoriesClick,
                 onVisibilityClick = onVisibilityClick,
                 onTemplatesClick = onTemplatesClick
+            )
+
+            // Новая секция категорий
+            Text(
+                text = "Leveling",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            LevelSelectionCard(
+                isEnabled = gameModeEnabled,
+                onToggle = { vm.toggleGameMode() }
+            )
+
+            // Новая секция категорий
+            Text(
+                text = "",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -268,6 +288,63 @@ fun ThemeOption(
                 contentDescription = "Selected",
                 tint = MaterialTheme.colorScheme.primary
             )
+        }
+    }
+}
+@Composable
+fun LevelSelectionCard(
+    isEnabled: Boolean,
+    onToggle: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        GameModeCard(
+            isEnabled = isEnabled,
+            onToggle = onToggle
+        )
+    }
+}
+
+@Composable
+fun GameModeCard(
+    isEnabled: Boolean,
+    onToggle: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Game Mode",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "Enable leveling system with experience points",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (isEnabled) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "Enabled",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

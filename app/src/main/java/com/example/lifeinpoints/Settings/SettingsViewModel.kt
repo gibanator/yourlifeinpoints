@@ -27,9 +27,24 @@ class SettingsViewModel @Inject constructor(
             initialValue = ThemeType.SYSTEM
         )
 
+    // Добавьте состояние для Game Mode
+    private val _gameModeEnabled = MutableStateFlow(savedStateHandle.get<Boolean>("game_mode_enabled") ?: false)
+    val gameModeEnabled: StateFlow<Boolean> = _gameModeEnabled
+
     fun setTheme(theme: ThemeType) {
         viewModelScope.launch {
             repo.updateTheme(theme)
+        }
+    }
+
+    // Функция для переключения Game Mode
+    fun toggleGameMode() {
+        viewModelScope.launch {
+            val newValue = !_gameModeEnabled.value
+            _gameModeEnabled.value = newValue
+            savedStateHandle.set("game_mode_enabled", newValue)
+            // Здесь можно добавить сохранение в репозиторий, если нужно
+            // repo.updateGameMode(newValue)
         }
     }
 }
