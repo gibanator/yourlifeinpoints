@@ -9,6 +9,8 @@ import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
+import com.example.lifeinpoints.data.level.LevelRepository
+import com.example.lifeinpoints.level.LevelViewModel
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,12 +29,17 @@ class DailyCheckupViewModel @Inject constructor(
     private val dailyProgressRepo: DailyCategoryProgressRepository,
     private val dayCompletionRepo: DayCompletionRepository,
     private val commentTemplateRepo: CommentTemplateRepository,
+    private val levelRepository: LevelRepository, // Добавляем репозиторий уровней
     private val savedStateHandle: SavedStateHandle
-) : ViewModel()  {
+) : ViewModel() {
 
     private val id = hashCode()
     private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
+
+    // Для отслеживания повышения уровня
+    private val _levelUpEvent = MutableStateFlow<Int?>(null)
+    val levelUpEvent = _levelUpEvent.asStateFlow()
 
     init {
         // Инициализируем системные категории при создании ViewModel
@@ -44,10 +51,6 @@ class DailyCheckupViewModel @Inject constructor(
         val today = dateStr?.let(LocalDate::parse) ?: LocalDate.now()
 
         Log.d("VM", "init(), vmId=$id, dateArg=$dateStr, parsed=$today")
-//        viewModelScope.launch {
-//            Log.d("VM", "initStateForDay() from init, vmId=$id, day=$today")
-//            initStateForDay(today)
-//        }
 
         // Подписываемся на изменения видимых категорий
         viewModelScope.launch {
@@ -127,7 +130,6 @@ class DailyCheckupViewModel @Inject constructor(
                 templatesByCategory = templatesByCategory
             )
         }
-        Log.d("Categories", "${visibleCategories.forEach { it.id }}")
         savedStateHandle["selectedDay"] = selected.toString()
     }
 
@@ -200,11 +202,61 @@ class DailyCheckupViewModel @Inject constructor(
 
     fun toggleDayEnded() {
         viewModelScope.launch {
-            val newState = dayCompletionRepo.toggleDayCompletion(_uiState.value.selectedDate.toString())
+            val date = _uiState.value.selectedDate.toString()
+            val newState = dayCompletionRepo.toggleDayCompletion(date)
+
             _uiState.update {
                 it.copy(isDayEnded = newState)
             }
+
+            if (newState) {
+                // Обновляем последовательные дни и начисляем XP
+                levelRepository.updateConsecutiveDays(date, true)
+                calculateAndAddXp()
+            } else {
+                // Сбрасываем последовательные дни
+                levelRepository.updateConsecutiveDays(date, false)
+            }
+
             saveProgress()
+        }
+    }
+
+    private suspend fun calculateAndAddXp() {
+        val state = _uiState.value
+        val selectedCount = state.selectedCategories.size
+        val totalActive = state.allCategories.size
+
+        // Базовые XP за день по формуле: 100 * (m/n)
+        val dailyXp = if (totalActive > 0) {
+            (100.0 * selectedCount / totalActive).toInt()
+        } else {
+            0
+        }
+
+        // Получаем текущий прогресс для проверки последовательных дней
+        val progress = levelRepository.getOrCreateProgress()
+
+        // Бонус за 3+ последовательных дней (k = 50)
+        val bonusXp = if (progress.consecutiveDays >= 3) 50 else 0
+
+        // Общее количество XP
+        val totalXp = dailyXp + bonusXp
+
+        if (totalXp > 0) {
+            // Сохраняем старый уровень для проверки
+            val oldLevel = progress.currentLevel
+
+            // Начисляем XP
+            val updatedProgress = levelRepository.addXp(totalXp)
+
+            // Проверяем, повысился ли уровень
+            if (updatedProgress.currentLevel > oldLevel) {
+                // Триггерим событие повышения уровня
+                _levelUpEvent.value = updatedProgress.currentLevel
+            }
+
+            Log.d("XP", "Начислено XP: $totalXp (базовых: $dailyXp, бонус: $bonusXp)")
         }
     }
 
@@ -297,5 +349,10 @@ class DailyCheckupViewModel @Inject constructor(
                 incompletedIds = incompleted
             )
         }
+    }
+
+    // Метод для сброса события повышения уровня (вызывается после показа диалога)
+    fun levelUpEventConsumed() {
+        _levelUpEvent.value = null
     }
 }

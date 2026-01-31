@@ -1,3 +1,4 @@
+// com.example.lifeinpoints.data.category/CategoryDatabase.kt
 package com.example.lifeinpoints.data.category
 
 import androidx.room.Database
@@ -8,23 +9,28 @@ import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgress
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressEntity
 import com.example.lifeinpoints.data.daycompletion.DayCompletionDao
 import com.example.lifeinpoints.data.daycompletion.DayCompletionEntity
-
+import com.example.lifeinpoints.data.level.LevelProgressDao
+import com.example.lifeinpoints.data.level.LevelProgressEntity
+import com.example.lifeinpoints.data.level.SkillPointsDao
+import com.example.lifeinpoints.data.level.SkillPointsEntity
 
 @Database(
     entities = [
-        //UserEntity::class,                    // новая таблица
-        CategoryEntity::class,                // обновленная (добавлен user_id)
-        DailyCategoryProgressEntity::class,    // существующая
-        DayCompletionEntity::class,  // Добавляем новую сущность
-        CommentTemplateEntity::class
+        CategoryEntity::class,
+        DailyCategoryProgressEntity::class,
+        DayCompletionEntity::class,
+        CommentTemplateEntity::class,
+        LevelProgressEntity::class, // Добавляем новую сущность
+        SkillPointsEntity::class    // Добавляем сущность очков навыков
     ],
-    version = 12,
+    version = 13, // Увеличиваем версию
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {
-    //abstract fun userDao(): UserDao
     abstract fun categoryDao(): CategoryDao
-    abstract fun dailyProgressDao(): DailyCategoryProgressDao // новый DAO
-    abstract fun dayCompletionDao(): DayCompletionDao  // Добавляем новый DAO
+    abstract fun dailyProgressDao(): DailyCategoryProgressDao
+    abstract fun dayCompletionDao(): DayCompletionDao
     abstract fun commentTemplateDao(): CommentTemplateDao
+    abstract fun levelProgressDao(): LevelProgressDao // Добавляем DAO уровней
+    abstract fun skillPointsDao(): SkillPointsDao // Добавляем DAO очков навыков
 }
