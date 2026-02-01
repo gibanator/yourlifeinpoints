@@ -24,6 +24,7 @@ import com.example.lifeinpoints.calendar.CalendarViewModel
 import com.example.lifeinpoints.core.navigation.AppNavHost
 import com.example.lifeinpoints.core.ui.AppBottomBar
 import com.example.lifeinpoints.core.ui.theme.LifeInPointsTheme
+import com.example.lifeinpoints.level.LevelViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,7 +43,7 @@ fun AppWithTopAndBottomBar() {
     val navController = rememberNavController()
     val calendarVm: CalendarViewModel = hiltViewModel()
     val settingsVm: SettingsViewModel = hiltViewModel() // Добавляем SettingsViewModel
-
+    val levelVm: LevelViewModel = hiltViewModel()
     // Собираем состояние текущей темы
     val currentTheme by settingsVm.currentTheme.collectAsState()
 

@@ -2,17 +2,7 @@ package com.example.lifeinpoints.daily_checkup.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,20 +10,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.lifeinpoints.Settings.SettingsViewModel
+import com.example.lifeinpoints.level.LevelViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -49,13 +30,25 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
-    vm: DailyCheckupViewModel,
+    vm: DailyCheckupViewModel = hiltViewModel(),
     onNavigateToComments: () -> Unit
 ) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }
 
+    // Получаем ViewModel для уровней и настроек
+    val levelVm: LevelViewModel = hiltViewModel()
+    val settingsVm: SettingsViewModel = hiltViewModel()
 
+    // Состояния
+    val levelState by levelVm.levelState.collectAsState()
+    val gameModeEnabled by settingsVm.gameModeEnabled.collectAsState()
+
+    // Состояние для открытия экрана прокачки
+    var showSkillScreen by remember { mutableStateOf(false) }
+
+    // Состояние для скролла всего экрана
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -73,10 +66,13 @@ fun DailyCheckupScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .verticalScroll(scrollState) // Скролл всего экрана
                 .padding(
                     start = 16.dp,
                     end = 16.dp,
+                    //bottom = 16.dp // Добавили нижний отступ
                 ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             WeekBarWithButtons(
                 days = uiState.currentWeek,
@@ -84,7 +80,19 @@ fun DailyCheckupScreen(
                 toPrevWeek = vm::toPrevWeek,
                 toNextWeek = vm::toNextWeek,
             )
-            Spacer(Modifier.height(12.dp))
+
+            // Полоска XP (только если включен Game Mode)
+            if (gameModeEnabled) {
+                XpProgressBar(
+                    levelState = levelState,
+                    onClick = {
+                        showSkillScreen = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            // Карточка с категориями - теперь без внутреннего скролла
             CategoryListCard(
                 categories = uiState.orderedCategories,
                 selectedCategories = uiState.selectedCategories,
@@ -95,23 +103,106 @@ fun DailyCheckupScreen(
                 },
                 onToggleMultiplierMode = { vm.toggleMultiplierMode() },
                 onAddComment = onNavigateToComments,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(12.dp))
-            // Карточка блокировки выбора
+
             DayCompletionCard(
                 isDayEnded = uiState.isDayEnded,
                 onToggleDayEnded = {
                     vm.toggleDayEnded()
-                    vm.saveProgress() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
+                    vm.saveProgress()
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Диалог повышения уровня (если сработало событие)
+        val levelUpEvent by vm.levelUpEvent.collectAsState()
+        levelUpEvent?.let { newLevel ->
+            LevelUpDialog(
+                level = newLevel,
+                unspentSkillPoints = levelState.unspentSkillPoints,
+                onDismiss = { vm.levelUpEventConsumed() },
+                onGoToSkills = {
+                    vm.levelUpEventConsumed()
+                    showSkillScreen = true
+                }
+            )
+        }
+
+        // Экран прокачки навыков
+        if (showSkillScreen) {
+            SkillDistributionScreen(
+                levelState = levelState,
+                onClose = { showSkillScreen = false },
+                onSkillUpdated = { skillType, delta ->
+                    levelVm.updateSkill(skillType, delta)
+                },
+                onResetSkills = { levelVm.resetSkills() }
             )
         }
     }
+}
+
+@Composable
+fun LevelUpDialog(
+    level: Int,
+    unspentSkillPoints: Int,
+    onDismiss: () -> Unit,
+    onGoToSkills: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "🎉 Поздравляем!",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Вы достигли уровня $level!",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "Вы получили 5 очков навыков.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (unspentSkillPoints > 0) {
+                    Text(
+                        text = "Всего нераспределенных очков: $unspentSkillPoints",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Позже")
+                }
+
+                Button(
+                    onClick = {
+                        onGoToSkills()
+                        onDismiss()
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Распределить")
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -123,31 +214,27 @@ fun WeekBarWithButtons(
     toNextWeek: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Left button
-        IconButton(
-            onClick = toPrevWeek) {
+        IconButton(onClick = toPrevWeek) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous week")
         }
 
-        // Center week row
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
             days.forEach { day ->
-                val selected = day.isSelected
                 Box(
                     modifier = Modifier
-                        .weight(1f) // fixed circle size (safe for portrait/landscape)
+                        .weight(1f)
                         .aspectRatio(1f)
                         .clip(CircleShape)
                         .background(
-                            if (selected) MaterialTheme.colorScheme.primary
+                            if (day.isSelected) MaterialTheme.colorScheme.primary
                             else Color.Transparent
                         )
                         .clickable { onDaySelected(day.date) },
@@ -157,7 +244,7 @@ fun WeekBarWithButtons(
                         Text(
                             text = day.dayOfWeek,
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (selected)
+                            color = if (day.isSelected)
                                 MaterialTheme.colorScheme.onPrimary
                             else
                                 MaterialTheme.colorScheme.onSurface
@@ -166,7 +253,7 @@ fun WeekBarWithButtons(
                             text = day.dayOfMonth.toString(),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (selected)
+                            color = if (day.isSelected)
                                 MaterialTheme.colorScheme.onPrimary
                             else
                                 MaterialTheme.colorScheme.onSurface
@@ -176,7 +263,6 @@ fun WeekBarWithButtons(
             }
         }
 
-        // Right button
         IconButton(onClick = toNextWeek) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next week")
         }
@@ -200,32 +286,23 @@ fun CategoryListCard(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(8.dp)
-           ,
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Список категорий - теперь без внутреннего скролла
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Список категорий
                 categories.forEach { category ->
                     val isSelected = category.id in selectedCategories
-                    val id = category.id
-
                     CategoryRow(
                         category = category.name,
                         isSelected = isSelected,
                         isDayEnded = isDayEnded,
-                        onCategoryClick = { onCategoryClick(id) }
+                        onCategoryClick = { onCategoryClick(category.id) }
                     )
                 }
             }
-
-            // Добавляем пространство между списком категорий и кнопками
-            Spacer(modifier = Modifier.height(8.dp))
 
             // Ряд с двумя кнопками
             ActionButtonsRow(
@@ -235,9 +312,7 @@ fun CategoryListCard(
                 isMultiplierMode = isMultiplierMode,
                 onToggleMultiplierMode = onToggleMultiplierMode,
                 onAddComment = onAddComment,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -257,14 +332,10 @@ fun ActionButtonsRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Левая кнопка "Add comment"
         Card(
             modifier = Modifier
                 .weight(1f)
-                .clickable(
-                    //enabled = !isDayEnded,
-                    onClick = onAddComment
-                ),
+                .clickable(onClick = onAddComment),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
@@ -275,7 +346,7 @@ fun ActionButtonsRow(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 12.dp)
             ) {
                 Text(
                     text = "Add/Edit comments",
@@ -286,21 +357,18 @@ fun ActionButtonsRow(
             }
         }
 
-        // Правая кнопка с суммой выбранных категорий (теперь кликабельная)
         Card(
             modifier = Modifier
                 .weight(1f)
-                .clickable(
-                    onClick = onToggleMultiplierMode
-                ),
+                .clickable(onClick = onToggleMultiplierMode),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
                 containerColor = if (selectedCount > 0) {
                     if (isMultiplierMode) {
-                        Color(0xFF7E6DF8) // Более темный фиолетовый для режима умножения
+                        Color(0xFF7E6DF8)
                     } else {
-                        Color(0xFF7E6DF8) // Обычный фиолетовый
+                        Color(0xFF7E6DF8)
                     }
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
@@ -311,7 +379,7 @@ fun ActionButtonsRow(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 12.dp)
             ) {
                 Text(
                     text = "$selectedCount/$totalCount",
@@ -339,24 +407,22 @@ fun CategoryRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(60.dp),  // Фиксированная высота для каждой строки
+            .heightIn(min = 60.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Квадратная карточка с цифрой 0 или 1
         NumberCard(
             number = if (isSelected) "1" else "0",
             modifier = Modifier
-                .size(50.dp)  // Уменьшили размер
+                .size(50.dp)
                 .padding(end = 8.dp)
         )
 
-        // Основная карточка с контентом
         CategoryListItem(
             category = category,
             isSelected = isSelected,
             modifier = Modifier
                 .weight(1f)
-                .height(50.dp)  // Фиксированная высота
+                .heightIn(min = 50.dp)
                 .clickable(
                     enabled = !isDayEnded,
                     onClick = onCategoryClick
@@ -382,7 +448,7 @@ fun DayCompletionCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 16.dp)  // Уменьшили отступы
+                .padding(vertical = 16.dp, horizontal = 16.dp)
                 .clickable { onToggleDayEnded() },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -390,7 +456,7 @@ fun DayCompletionCard(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = if (isDayEnded) "Day completed!" else "End the day",
-                fontSize = 20.sp,  // Уменьшили размер шрифта
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = if (isDayEnded) Color.White else MaterialTheme.colorScheme.onSurface
@@ -412,7 +478,6 @@ fun CategoryListItem(
     }
 
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp), // закомментил потому что сильно мозолит глаза
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp)
@@ -420,17 +485,17 @@ fun CategoryListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),  // Уменьшили отступы
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = category,
-                fontSize = 18.sp,  // Уменьшили размер шрифта
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                maxLines = 2  // Ограничили количество строк
+                maxLines = 2
             )
         }
     }
@@ -448,11 +513,13 @@ fun NumberCard(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
         ) {
             Text(
                 text = number,
-                fontSize = 18.sp,  // Уменьшили размер шрифта
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
         }
