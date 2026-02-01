@@ -123,6 +123,11 @@ class LevelRepository @Inject constructor(
             progress.survival
         )
 
+        // Если все навыки равны 0, возвращаем "Новичок"
+        if (skills.all { it == 0 }) {
+            return "Новичок"
+        }
+
         var bestClass = "Новичок"
         var maxScore = 0
 

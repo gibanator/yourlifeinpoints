@@ -1,3 +1,4 @@
+// com.example.lifeinpoints.data.settings/SettingsRepository.kt
 package com.example.lifeinpoints.data.settings
 
 import android.content.Context
@@ -9,9 +10,17 @@ import javax.inject.Inject
 class SettingsRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    val currentTheme: Flow<ThemeType> = ThemePrefs.getTheme(context)
+    // Тема
+    val currentTheme: Flow<ThemeType> = SettingsPrefs.getTheme(context)
+
+    // Game Mode
+    val gameModeEnabled: Flow<Boolean> = SettingsPrefs.getGameMode(context)
 
     suspend fun updateTheme(theme: ThemeType) {
-        ThemePrefs.setTheme(context, theme)
+        SettingsPrefs.setTheme(context, theme)
+    }
+
+    suspend fun updateGameMode(enabled: Boolean) {
+        SettingsPrefs.setGameMode(context, enabled)
     }
 }

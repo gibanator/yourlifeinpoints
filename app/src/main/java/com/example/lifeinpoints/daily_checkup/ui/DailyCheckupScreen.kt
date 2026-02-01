@@ -20,6 +20,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,7 +35,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.lifeinpoints.Settings.SettingsViewModel
+import com.example.lifeinpoints.level.LevelViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -49,13 +56,22 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DailyCheckupScreen(
     modifier: Modifier = Modifier,
-    vm: DailyCheckupViewModel,
+    vm: DailyCheckupViewModel = hiltViewModel(),
     onNavigateToComments: () -> Unit
 ) {
     val uiState by vm.uiState.collectAsState()
     val formatter = remember { DateTimeFormatter.ofPattern("EEE d MMM yyyy") }
 
+    // Получаем ViewModel для уровней и настроек
+    val levelVm: LevelViewModel = hiltViewModel()
+    val settingsVm: SettingsViewModel = hiltViewModel()
 
+    // Состояния
+    val levelState by levelVm.levelState.collectAsState()
+    val gameModeEnabled by settingsVm.gameModeEnabled.collectAsState()
+
+    // Состояние для открытия экрана прокачки
+    var showSkillScreen by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -84,7 +100,21 @@ fun DailyCheckupScreen(
                 toPrevWeek = vm::toPrevWeek,
                 toNextWeek = vm::toNextWeek,
             )
+
             Spacer(Modifier.height(12.dp))
+
+            // Полоска XP (только если включен Game Mode)
+            if (gameModeEnabled) {
+                XpProgressBar(
+                    levelState = levelState,
+                    onClick = {
+                        showSkillScreen = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+
             CategoryListCard(
                 categories = uiState.orderedCategories,
                 selectedCategories = uiState.selectedCategories,
@@ -99,19 +129,108 @@ fun DailyCheckupScreen(
                     .fillMaxWidth()
                     .weight(1f)
             )
-            Spacer(Modifier.height(12.dp))
-            // Карточка блокировки выбора
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             DayCompletionCard(
                 isDayEnded = uiState.isDayEnded,
                 onToggleDayEnded = {
                     vm.toggleDayEnded()
-                    vm.saveProgress() },
+                    vm.saveProgress()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             )
         }
+
+        // Диалог повышения уровня (если сработало событие)
+        val levelUpEvent by vm.levelUpEvent.collectAsState()
+        levelUpEvent?.let { newLevel ->
+            LevelUpDialog(
+                level = newLevel,
+                unspentSkillPoints = levelState.unspentSkillPoints,
+                onDismiss = { vm.levelUpEventConsumed() },
+                onGoToSkills = {
+                    vm.levelUpEventConsumed()
+                    showSkillScreen = true
+                }
+            )
+        }
+
+        // Экран прокачки навыков
+        if (showSkillScreen) {
+            SkillDistributionScreen(
+                levelState = levelState,
+                onClose = { showSkillScreen = false },
+                onSkillUpdated = { skillType, delta ->
+                    levelVm.updateSkill(skillType, delta)
+                },
+                onResetSkills = { levelVm.resetSkills() }
+            )
+        }
     }
+}
+
+@Composable
+fun LevelUpDialog(
+    level: Int,
+    unspentSkillPoints: Int,
+    onDismiss: () -> Unit,
+    onGoToSkills: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "🎉 Поздравляем!",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Вы достигли уровня $level!",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "Вы получили 5 очков навыков.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (unspentSkillPoints > 0) {
+                    Text(
+                        text = "Всего нераспределенных очков: $unspentSkillPoints",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Позже")
+                }
+
+                Button(
+                    onClick = {
+                        onGoToSkills()
+                        onDismiss()
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Распределить")
+                }
+            }
+        }
+    )
 }
 
 @Composable
