@@ -1,14 +1,14 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.data.level.LevelConstants
 import com.example.lifeinpoints.level.LevelUiState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,8 +26,130 @@ fun SkillDistributionScreen(
     onSkillUpdated: (String, Int) -> Unit,
     onResetSkills: () -> Unit
 ) {
-    // Рассчитываем текущий класс на основе навыков
-    val currentClass = calculateClass(levelState)
+    // Вместо использования levelState напрямую, создаем локальные копии
+    var localUnspentPoints by remember { mutableIntStateOf(levelState.unspentSkillPoints) }
+    var localStrength by remember { mutableIntStateOf(levelState.strength) }
+    var localAgility by remember { mutableIntStateOf(levelState.agility) }
+    var localCharisma by remember { mutableIntStateOf(levelState.charisma) }
+    var localWill by remember { mutableIntStateOf(levelState.will) }
+    var localIntelligence by remember { mutableIntStateOf(levelState.intelligence) }
+    var localSurvival by remember { mutableIntStateOf(levelState.survival) }
+
+    // При изменении levelState извне, обновляем локальные значения
+    LaunchedEffect(levelState) {
+        localUnspentPoints = levelState.unspentSkillPoints
+        localStrength = levelState.strength
+        localAgility = levelState.agility
+        localCharisma = levelState.charisma
+        localWill = levelState.will
+        localIntelligence = levelState.intelligence
+        localSurvival = levelState.survival
+    }
+
+    // Рассчитываем текущий класс на основе локальных значений
+    val currentClass = calculateClass(
+        strength = localStrength,
+        agility = localAgility,
+        charisma = localCharisma,
+        will = localWill,
+        intelligence = localIntelligence,
+        survival = localSurvival
+    )
+
+    // Сохраняем состояние скролла
+    val listState = rememberLazyListState()
+
+    // Вычисляем, есть ли распределенные очки
+    val hasSpentPoints = localStrength + localAgility + localCharisma +
+            localWill + localIntelligence + localSurvival > 0
+
+    // Функция для обновления навыка
+    fun updateLocalSkill(skillType: String, delta: Int) {
+        when (skillType) {
+            "strength" -> {
+                if (delta > 0 && localUnspentPoints >= delta) {
+                    localStrength += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("strength", delta)
+                } else if (delta < 0 && localStrength >= -delta) {
+                    localStrength += delta
+                    localUnspentPoints -= delta // delta отрицательный, поэтому вычитаем отрицательное = прибавляем
+                    onSkillUpdated("strength", delta)
+                }
+            }
+            "agility" -> {
+                if (delta > 0 && localUnspentPoints >= delta) {
+                    localAgility += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("agility", delta)
+                } else if (delta < 0 && localAgility >= -delta) {
+                    localAgility += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("agility", delta)
+                }
+            }
+            "charisma" -> {
+                if (delta > 0 && localUnspentPoints >= delta) {
+                    localCharisma += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("charisma", delta)
+                } else if (delta < 0 && localCharisma >= -delta) {
+                    localCharisma += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("charisma", delta)
+                }
+            }
+            "will" -> {
+                if (delta > 0 && localUnspentPoints >= delta) {
+                    localWill += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("will", delta)
+                } else if (delta < 0 && localWill >= -delta) {
+                    localWill += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("will", delta)
+                }
+            }
+            "intelligence" -> {
+                if (delta > 0 && localUnspentPoints >= delta) {
+                    localIntelligence += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("intelligence", delta)
+                } else if (delta < 0 && localIntelligence >= -delta) {
+                    localIntelligence += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("intelligence", delta)
+                }
+            }
+            "survival" -> {
+                if (delta > 0 && localUnspentPoints >= delta) {
+                    localSurvival += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("survival", delta)
+                } else if (delta < 0 && localSurvival >= -delta) {
+                    localSurvival += delta
+                    localUnspentPoints -= delta
+                    onSkillUpdated("survival", delta)
+                }
+            }
+        }
+    }
+
+    // Функция для сброса всех очков
+    fun resetLocalSkills() {
+        val totalSpent = localStrength + localAgility + localCharisma +
+                localWill + localIntelligence + localSurvival
+        localUnspentPoints += totalSpent
+        localStrength = 0
+        localAgility = 0
+        localCharisma = 0
+        localWill = 0
+        localIntelligence = 0
+        localSurvival = 0
+
+        // Вызываем сброс в ViewModel
+        onResetSkills()
+    }
 
     ModalBottomSheet(
         onDismissRequest = onClose,
@@ -34,145 +157,152 @@ fun SkillDistributionScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 16.dp
     ) {
-        Column(
+        LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Заголовок
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "Распределение навыков",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Уровень ${levelState.currentLevel} • $currentClass",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Распределение навыков",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Уровень ${levelState.currentLevel} • $currentClass",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, contentDescription = "Закрыть")
+                    IconButton(onClick = onClose) {
+                        Icon(Icons.Default.Close, contentDescription = "Закрыть")
+                    }
                 }
             }
 
             // Нераспределенные очки
-            if (levelState.unspentSkillPoints > 0) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+            if (localUnspentPoints > 0) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     ) {
-                        Text(
-                            text = "Нераспределенные очки: ",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = levelState.unspentSkillPoints.toString(),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Нераспределенные очки: ",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = localUnspentPoints.toString(),
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
 
             // Список навыков
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                SkillRow(
-                    skillName = "Сила",
-                    skillValue = levelState.strength,
-                    onIncrease = { onSkillUpdated("strength", 1) },
-                    onDecrease = { onSkillUpdated("strength", -1) },
-                    canIncrease = levelState.unspentSkillPoints > 0,
-                    canDecrease = levelState.strength > 0
-                )
-
-                SkillRow(
-                    skillName = "Ловкость",
-                    skillValue = levelState.agility,
-                    onIncrease = { onSkillUpdated("agility", 1) },
-                    onDecrease = { onSkillUpdated("agility", -1) },
-                    canIncrease = levelState.unspentSkillPoints > 0,
-                    canDecrease = levelState.agility > 0
-                )
-
-                SkillRow(
-                    skillName = "Харизма",
-                    skillValue = levelState.charisma,
-                    onIncrease = { onSkillUpdated("charisma", 1) },
-                    onDecrease = { onSkillUpdated("charisma", -1) },
-                    canIncrease = levelState.unspentSkillPoints > 0,
-                    canDecrease = levelState.charisma > 0
-                )
-
-                SkillRow(
-                    skillName = "Воля",
-                    skillValue = levelState.will,
-                    onIncrease = { onSkillUpdated("will", 1) },
-                    onDecrease = { onSkillUpdated("will", -1) },
-                    canIncrease = levelState.unspentSkillPoints > 0,
-                    canDecrease = levelState.will > 0
-                )
-
-                SkillRow(
-                    skillName = "Интеллект",
-                    skillValue = levelState.intelligence,
-                    onIncrease = { onSkillUpdated("intelligence", 1) },
-                    onDecrease = { onSkillUpdated("intelligence", -1) },
-                    canIncrease = levelState.unspentSkillPoints > 0,
-                    canDecrease = levelState.intelligence > 0
-                )
-
-                SkillRow(
-                    skillName = "Выживание",
-                    skillValue = levelState.survival,
-                    onIncrease = { onSkillUpdated("survival", 1) },
-                    onDecrease = { onSkillUpdated("survival", -1) },
-                    canIncrease = levelState.unspentSkillPoints > 0,
-                    canDecrease = levelState.survival > 0
-                )
-            }
-
-            // Таблица классов
-            //ClassTable(currentClass = currentClass)
-
-            // Кнопка сброса
-            if (levelState.strength + levelState.agility + levelState.charisma +
-                levelState.will + levelState.intelligence + levelState.survival > 0) {
-                OutlinedButton(
-                    onClick = onResetSkills,
+            item {
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Сбросить все очки")
+                    SkillRow(
+                        skillName = "Сила",
+                        skillValue = localStrength,
+                        onIncrease = { updateLocalSkill("strength", 1) },
+                        onDecrease = { updateLocalSkill("strength", -1) },
+                        canIncrease = localUnspentPoints > 0,
+                        canDecrease = localStrength > 0
+                    )
+
+                    SkillRow(
+                        skillName = "Ловкость",
+                        skillValue = localAgility,
+                        onIncrease = { updateLocalSkill("agility", 1) },
+                        onDecrease = { updateLocalSkill("agility", -1) },
+                        canIncrease = localUnspentPoints > 0,
+                        canDecrease = localAgility > 0
+                    )
+
+                    SkillRow(
+                        skillName = "Харизма",
+                        skillValue = localCharisma,
+                        onIncrease = { updateLocalSkill("charisma", 1) },
+                        onDecrease = { updateLocalSkill("charisma", -1) },
+                        canIncrease = localUnspentPoints > 0,
+                        canDecrease = localCharisma > 0
+                    )
+
+                    SkillRow(
+                        skillName = "Воля",
+                        skillValue = localWill,
+                        onIncrease = { updateLocalSkill("will", 1) },
+                        onDecrease = { updateLocalSkill("will", -1) },
+                        canIncrease = localUnspentPoints > 0,
+                        canDecrease = localWill > 0
+                    )
+
+                    SkillRow(
+                        skillName = "Интеллект",
+                        skillValue = localIntelligence,
+                        onIncrease = { updateLocalSkill("intelligence", 1) },
+                        onDecrease = { updateLocalSkill("intelligence", -1) },
+                        canIncrease = localUnspentPoints > 0,
+                        canDecrease = localIntelligence > 0
+                    )
+
+                    SkillRow(
+                        skillName = "Выживание",
+                        skillValue = localSurvival,
+                        onIncrease = { updateLocalSkill("survival", 1) },
+                        onDecrease = { updateLocalSkill("survival", -1) },
+                        canIncrease = localUnspentPoints > 0,
+                        canDecrease = localSurvival > 0
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            // Кнопка сброса
+            if (hasSpentPoints) {
+                item {
+                    OutlinedButton(
+                        onClick = { resetLocalSkills() },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("Сбросить все очки")
+                    }
+                }
+            }
+
+            // Нижний отступ
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
         }
     }
 }
@@ -215,7 +345,11 @@ fun SkillRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconButton(
-                    onClick = onDecrease,
+                    onClick = {
+                        if (canDecrease) {
+                            onDecrease()
+                        }
+                    },
                     enabled = canDecrease,
                     modifier = Modifier.size(36.dp)
                 ) {
@@ -235,7 +369,11 @@ fun SkillRow(
                 )
 
                 IconButton(
-                    onClick = onIncrease,
+                    onClick = {
+                        if (canIncrease) {
+                            onIncrease()
+                        }
+                    },
                     enabled = canIncrease,
                     modifier = Modifier.size(36.dp)
                 ) {
@@ -250,94 +388,20 @@ fun SkillRow(
     }
 }
 
-/*
-@Composable
-fun ClassTable(currentClass: String) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Классы и множители",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
+private fun calculateClass(
+    strength: Int,
+    agility: Int,
+    charisma: Int,
+    will: Int,
+    intelligence: Int,
+    survival: Int
+): String {
+    val skills = listOf(strength, agility, charisma, will, intelligence, survival)
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // Заголовок таблицы
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Класс", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    Text("С", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    Text("Л", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    Text("Х", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    Text("В", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    Text("И", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    Text("Вы", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                }
-
-                // Данные классов
-                LevelConstants.CLASS_MULTIPLIERS.forEach { (className, multipliers) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = if (className == currentClass) "★ $className" else className,
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = if (className == currentClass) FontWeight.Bold else FontWeight.Normal,
-                            color = if (className == currentClass) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface
-                        )
-
-                        multipliers.forEach { multiplier ->
-                            Text(
-                                text = "×$multiplier",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = when (multiplier) {
-                                    3 -> MaterialTheme.colorScheme.primary
-                                    2 -> MaterialTheme.colorScheme.secondary
-                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Text(
-            text = "Ваш текущий класс: $currentClass",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+    // Если все навыки равны 0, возвращаем "Новичок"
+    if (skills.all { it == 0 }) {
+        return "Новичок"
     }
-}
-
- */
-
-private fun calculateClass(levelState: LevelUiState): String {
-    val skills = listOf(
-        levelState.strength,
-        levelState.agility,
-        levelState.charisma,
-        levelState.will,
-        levelState.intelligence,
-        levelState.survival
-    )
 
     var bestClass = "Новичок"
     var maxScore = 0

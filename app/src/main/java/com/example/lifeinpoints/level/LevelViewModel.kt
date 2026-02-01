@@ -73,19 +73,14 @@ class LevelViewModel @Inject constructor(
         }
     }
 
-    fun updateSkill(skillType: String, delta: Int) {
+    fun updateSkill(skillType: String, delta: Int): Boolean {
         viewModelScope.launch {
-            val success = if (delta > 0) {
-                levelRepository.updateSkill(skillType, delta)
-            } else {
-                // Для уменьшения нужно "вернуть" очки
-                levelRepository.updateSkill(skillType, delta)
-            }
-
+            val success = levelRepository.updateSkill(skillType, delta)
             if (success) {
                 loadLevelProgress()
             }
         }
+        return true
     }
 
     fun resetSkills() {
