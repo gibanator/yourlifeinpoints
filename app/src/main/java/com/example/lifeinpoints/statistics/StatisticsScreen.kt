@@ -190,7 +190,7 @@ fun StatisticsScreen(
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(screenHeight * 0.02f))
+                                //Spacer(modifier = Modifier.height(screenHeight * 0.02f))
 
                                 // Сводная статистика
                                 when (uiState.viewType) {
