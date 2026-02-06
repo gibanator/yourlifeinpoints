@@ -21,8 +21,6 @@
 
     <!-- Languages -->
     <string name="language_setting_title">Язык</string>
-    <string name="language_system_title">Системный</string>
-    <string name="language_system_subtitle">Использовать язык устройства</string>
-    <string name="language_english_subtitle">Интерфейс на английском</string>
-    <string name="language_russian_subtitle">Интерфейс на русском</string>
+    <string name="settings_language_subtitle_system">Меняется в настройках Android</string>
+
 </resources>

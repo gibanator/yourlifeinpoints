@@ -20,12 +20,6 @@
     <string name="settings_page_navbar_item">Settings</string>
 
     <!-- Languages -->
-    <string name="language_english" translatable="false">English</string>
-    <string name="language_russian" translatable="false">Русский</string>
     <string name="language_setting_title">Language</string>
-    <string name="language_system_title">System</string>
-    <string name="language_system_subtitle">Use device language</string>
-    <string name="language_english_subtitle">English UI</string>
-    <string name="language_russian_subtitle">Русский интерфейс</string>
-
+    <string name="settings_language_subtitle_system">Change in Android settings</string>
 </resources>
