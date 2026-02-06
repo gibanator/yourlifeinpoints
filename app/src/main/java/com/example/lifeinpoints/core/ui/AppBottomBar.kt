@@ -1,5 +1,6 @@
 package com.example.lifeinpoints.core.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment  // Иконка для статистики
 import androidx.compose.material.icons.filled.DateRange
@@ -12,10 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.lifeinpoints.core.navigation.Routes
+import com.example.lifeinpoints.R
 
 @Composable
 fun AppBottomBar(
@@ -36,8 +39,8 @@ fun AppBottomBar(
                         }
                     }
                 },
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) }
+                icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+                label = { Text(stringResource(item.labelRes)) }
             )
         }
     }
@@ -46,12 +49,12 @@ fun AppBottomBar(
 data class BottomNavItem(
     val route: String,
     val icon: ImageVector,
-    val label: String
+    @get:StringRes val labelRes: Int
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Routes.DailyCheckupWithArgs, Icons.Default.Home, "Main"),
-    BottomNavItem(Routes.Calendar, Icons.Default.DateRange, "Calendar"),
-    BottomNavItem(Routes.Statistics, Icons.Default.Assessment, "Statistics"),
-    BottomNavItem(Routes.Settings, Icons.Default.Settings, "Settings")
+    BottomNavItem(Routes.DailyCheckupWithArgs, Icons.Default.Home, R.string.main_page_navbar_item),
+    BottomNavItem(Routes.Calendar, Icons.Default.DateRange, R.string.calendar_page_navbar_item),
+    BottomNavItem(Routes.Statistics, Icons.Default.Assessment, R.string.statistics_page_navbar_item),
+    BottomNavItem(Routes.Settings, Icons.Default.Settings, R.string.settings_page_navbar_item)
 )

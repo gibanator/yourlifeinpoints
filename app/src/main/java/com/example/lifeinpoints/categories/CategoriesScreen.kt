@@ -47,10 +47,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
+import com.example.lifeinpoints.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,7 +74,7 @@ fun CategoriesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Categories") },
+                title = { Text(stringResource(R.string.categories_management_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -242,7 +244,7 @@ fun CategoryCard(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Edit") },
+                            text = { Text(stringResource(R.string.edit)) },
                             onClick = {
                                 showMenu = false
                                 onEdit()
@@ -252,7 +254,7 @@ fun CategoryCard(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Delete") },
+                            text = { Text(stringResource(R.string.delete)) },
                             onClick = {
                                 showMenu = false
                                 onDelete()

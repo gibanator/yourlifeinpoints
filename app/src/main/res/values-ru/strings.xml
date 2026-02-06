@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="category_networking">Нетворкинг</string>
+    <string name="category_education">Образование</string>
+    <string name="category_work">Работа</string>
+    <string name="category_health">Здоровье</string>
+    <string name="category_personal_life">Личная жизнь</string>
+
+    <!-- Miscellaneous -->
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
+    <string name="text_word">Текст</string>
+
+    <!-- Menu Items -->
+    <string name="main_page_navbar_item">Сегодня</string>
+    <string name="calendar_page_navbar_item">Календарь</string>
+    <string name="statistics_page_navbar_item">Статистика</string>
+    <string name="settings_page_navbar_item">Настройки</string>
+
+    <!-- Languages -->
+    <string name="language_setting_title">Язык</string>
+    <string name="language_system_title">Системный</string>
+    <string name="language_system_subtitle">Использовать язык устройства</string>
+    <string name="language_english_subtitle">Интерфейс на английском</string>
+    <string name="language_russian_subtitle">Интерфейс на русском</string>
+</resources>

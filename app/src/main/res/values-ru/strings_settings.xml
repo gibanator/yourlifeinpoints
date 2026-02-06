@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Groups -->
+    <string name="settings_title">Настройки</string>
+    <string name="theme_setting_title">Тема</string>
+    <string name="content_section_title">Контент</string>
+    <string name="leveling_section_title">Левелинг</string>
+    <string name="theme_system_title">По умолчанию</string>
+
+    <!-- Theming -->
+    <string name="theme_system_subtitle">Согласно системе</string>
+    <string name="theme_light_title">Светлая</string>
+    <string name="theme_light_subtitle">Всегда использовать светлую тему</string>
+    <string name="theme_dark_title">Темная</string>
+    <string name="theme_dark_subtitle">Всегда использовать темную тему</string>
+
+    <!-- Content -->
+    <string name="categories_management_title">Категории</string>
+    <string name="categories_management_subtitle">"Добавление, редактирование и удаление категорий "</string>
+    <string name="categories_visibility_title">Видимость категорий</string>
+    <string name="categories_visibility_subtitle">Выберите, какие категории отображаются на основном экране</string>
+    <string name="comment_management_title">Управление шаблонами комментариев</string>
+    <string name="comment_management_subtitle">Добавление, редактирование и удаление частых шаблонов комментариев</string>
+
+    <!-- Game Mode -->
+    <string name="gamemode_tumbler_title">Игровой режим</string>
+    <string name="gamemode_tumbler_subtitle">Включить систему прокачки с очками опыта</string>
+
+    <!-- Categories Settings Pages -->
+    <string name="categories_visibility_page_title">Управление видимостью категорий</string>
+    <string name="categories_visibility_annotation_text">Выберите, какие категории будут отображаться на основном экране. Вы можете скрыть как системные категории, так и категории, созданные.</string>
+    <string name="system_category_annotation_text">Системная категория</string>
+
+    <string name="category_add_screen_title">Добавление категории</string>
+    <string name="category_name_field_title">Название категории</string>
+    <string name="category_name_placeholder_text">Введите название категории…</string>
+    <string name="category_add_tips_subtitle">Советы для создания категорий:</string>
+    <string name="category_add_tips_text">• Выбирайте понятные названия\n• Избегайте дублирующихся категорий\n• Используйте короткие и запоминающиеся названия</string>
+    <string name="category_entrance_time_subtitle">Категория отображается с</string>
+    <string name="category_entrance_today_option">Сегодня</string>
+    <string name="category_entrance_selective_option">Определенной даты:</string>
+    <string name="category_entrance_start_option">Начала</string>
+    <string name="category_edit_page_title">Редактирование категории</string>
+
+    <!-- Comment Template Pages -->
+    <string name="comment_templates_page_title">Шаблоны комментариев</string>
+    <string name="comment_template_annotation_text">Задайте до 5 быстрых комментариев для этой категории</string>
+    <string name="template">Шаблон</string>
+    <string name="empty">Пусто</string>
+    <string name="comment_template_text_placeholder">Введите текст шаблона:</string>
+    <string name="empty_tip">Подсказка: оставьте поле пустым, чтобы очистить этот слот</string>
+</resources>

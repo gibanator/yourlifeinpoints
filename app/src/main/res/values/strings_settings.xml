@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Groups -->
+    <string name="settings_title">Settings</string>
+    <string name="theme_setting_title">Theme</string>
+    <string name="content_section_title">Content</string>
+    <string name="leveling_section_title">Leveling</string>
+
+    <!-- Theming -->
+    <string name="theme_system_title">System Default</string>
+    <string name="theme_system_subtitle">Follow system theme</string>
+    <string name="theme_light_title">Light</string>
+    <string name="theme_light_subtitle">Always use light theme</string>
+    <string name="theme_dark_title">Dark</string>
+    <string name="theme_dark_subtitle">Always use dark theme</string>
+
+    <!-- Content Settings Group -->
+    <string name="categories_management_title">Categories</string>
+    <string name="categories_management_subtitle">Manage your activity categories</string>
+    <string name="categories_visibility_title">Visible Categories</string>
+    <string name="categories_visibility_subtitle">Choose what categories appear on main screen</string>
+    <string name="comment_management_title">Manage Comment Templates</string>
+    <string name="comment_management_subtitle">Add, edit or delete often-used comments for easy filling</string>
+
+    <!-- Game Mode -->
+    <string name="gamemode_tumbler_title">Game Mode</string>
+    <string name="gamemode_tumbler_subtitle">Enable leveling system with experience points</string>
+
+    <!-- Categories Settings Pages -->
+    <string name="categories_visibility_page_title">Manage Visible Categories</string>
+    <string name="categories_visibility_annotation_text">Toggle which categories appear on the main screen. You can hide both system and user categories.</string>
+    <string name="system_category_annotation_text">System Category</string>
+
+    <string name="category_add_screen_title">Add New Category</string>
+    <string name="category_name_field_title">Category Name</string>
+    <string name="category_name_placeholder_text">Enter category name…</string>
+    <string name="category_add_tips_subtitle">Tips for creating categories:</string>
+    <string name="category_add_tips_text">• Choose clear, descriptive names\n• Make categories specific and actionable\n• Avoid duplicate categories\n• Keep names short and memorable</string>
+    <string name="category_entrance_time_subtitle">Category appears from</string>
+    <string name="category_entrance_today_option">Today</string>
+    <string name="category_entrance_selective_option">Pick a date:</string>
+    <string name="category_entrance_start_option">The start</string>
+    <string name="category_edit_page_title">Edit Category</string>
+
+    <!-- Comment Template Pages -->
+    <string name="comment_templates_page_title">Comment Templates</string>
+    <string name="comment_template_annotation_text">Set up to 5 quick comments for this category</string>
+    <string name="template">Template</string>
+    <string name="empty">Empty</string>
+    <string name="comment_template_text_placeholder">Enter template text:</string>
+    <string name="empty_tip">Tip: leave the box empty to clear this slot</string>
+</resources>

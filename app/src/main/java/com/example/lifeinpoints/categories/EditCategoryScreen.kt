@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import com.example.lifeinpoints.R
 
 // com.example.lifeinpoints.categories/EditCategoryScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +60,7 @@ fun EditCategoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Category") },
+                title = { Text(stringResource(R.string.category_edit_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -155,8 +157,8 @@ fun EditCategoryScreen(
                             categoryName = it
                             errorMessage = null
                         },
-                        label = { Text("Category Name") },
-                        placeholder = { Text("Enter category name...") },
+                        label = { Text(stringResource(R.string.category_name_field_title)) },
+                        placeholder = { Text(stringResource(R.string.category_name_placeholder_text)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

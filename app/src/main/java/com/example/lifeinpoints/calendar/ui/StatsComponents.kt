@@ -21,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.lifeinpoints.R
 
 @Composable
 fun MonthStatsCard(
@@ -53,7 +55,7 @@ fun MonthStatsCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Successful days:",
+                    text = stringResource(R.string.successful_days),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -67,12 +69,12 @@ fun MonthStatsCard(
         Spacer(Modifier.height(18.dp))
 
         Text(
-            text = "Current Streak: ${stats.currentStreak} days",
+            text = "${stringResource(R.string.streak_current)} ${stats.currentStreak} ${stringResource(R.string.days)}",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "Best Streak: ${stats.bestStreak} days",
+            text = "${stringResource(R.string.streak_best)} ${stats.bestStreak} ${stringResource(R.string.days)}",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )

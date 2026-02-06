@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="to_today_button_text">К сегодняшнему дню</string>
+
+    <string name="comments_button_text">Комментарии</string>
+    <string name="end_day_button_text">Завершить день</string>
+    <string name="day_ended_button_text">День завершен!</string>
+
+    <string name="comment_placeholder_text">Введите комментарий…</string>
+</resources>

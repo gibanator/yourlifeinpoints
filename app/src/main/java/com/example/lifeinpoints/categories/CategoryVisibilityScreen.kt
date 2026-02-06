@@ -10,11 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.statistics.StatisticsViewModel
 import kotlinx.coroutines.launch
+import com.example.lifeinpoints.R
 
 // com.example.lifeinpoints.categories/CategoryVisibilityScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +32,7 @@ fun CategoryVisibilityScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Manage Visible Categories") },
+                title = { Text(stringResource(R.string.categories_visibility_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -56,12 +58,12 @@ fun CategoryVisibilityScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Visible Categories",
+                        text = stringResource(R.string.categories_visibility_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Toggle which categories appear on the main screen. You can hide both system and user categories.",
+                        text = stringResource(R.string.categories_visibility_annotation_text),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 8.dp)
                     )
@@ -123,7 +125,7 @@ fun CategoryVisibilityItem(
                 )
                 if (category.isStatic) {
                     Text(
-                        text = "System category",
+                        text = stringResource(R.string.system_category_annotation_text),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

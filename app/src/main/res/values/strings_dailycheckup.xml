@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="to_today_button_text">To today</string>
+
+    <string name="comments_button_text">Add/Edit comments</string>
+    <string name="end_day_button_text">End the day</string>
+    <string name="day_ended_button_text">Day completed!</string>
+
+    <string name="comment_placeholder_text">Add your commentary…</string>
+</resources>

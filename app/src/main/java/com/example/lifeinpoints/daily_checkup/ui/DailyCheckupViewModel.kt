@@ -14,12 +14,16 @@ import com.example.lifeinpoints.level.LevelViewModel
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
+import java.time.temporal.Temporal
+import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 import javax.inject.Inject
 
@@ -40,6 +44,8 @@ class DailyCheckupViewModel @Inject constructor(
     // Для отслеживания повышения уровня
     private val _levelUpEvent = MutableStateFlow<Int?>(null)
     val levelUpEvent = _levelUpEvent.asStateFlow()
+
+    private var initJob: Job? = null
 
     init {
         // Инициализируем системные категории при создании ViewModel
@@ -134,6 +140,19 @@ class DailyCheckupViewModel @Inject constructor(
     }
 
     /**
+     * Race condition safe function to load a day
+     *
+     * @param date Date
+     */
+    private fun loadDay(date: LocalDate) {
+        initJob?.cancel()
+        initJob = viewModelScope.launch {
+            initStateForDay(date)
+            savedStateHandle["selectedDay"] = date.toString()
+        }
+    }
+
+    /**
      * Helper function to map week in LocalDate representation to suitable for UI
      *
      * @param dates Week list of days
@@ -151,7 +170,9 @@ class DailyCheckupViewModel @Inject constructor(
 
     fun toPrevWeek() {
         val old = _uiState.value.selectedDate
-        val newSelected = old.minusWeeks(1)
+        val newSelected = old
+            .minusWeeks(1)
+            .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
 
         _uiState.update {
             it.copy(
@@ -167,7 +188,9 @@ class DailyCheckupViewModel @Inject constructor(
 
     fun toNextWeek() {
         val old = _uiState.value.selectedDate
-        val newSelected = old.plusWeeks(1)
+        val newSelected = old
+            .plusWeeks(1)
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
         _uiState.update {
             it.copy(
@@ -315,6 +338,33 @@ class DailyCheckupViewModel @Inject constructor(
         viewModelScope.launch {
             initStateForDay(day)
         }
+    }
+
+
+    fun nextDay() {
+        val newSelected = _uiState.value.selectedDate.plusDays(1)
+
+        _uiState.update {
+            it.copy(
+                selectedDate = newSelected,
+                currentWeek = mapToUi(weekDatesOf(newSelected), newSelected)
+            )
+        }
+
+        loadDay(newSelected)
+    }
+
+    fun prevDay() {
+        val newSelected = _uiState.value.selectedDate.minusDays(1)
+
+        _uiState.update {
+            it.copy(
+                selectedDate = newSelected,
+                currentWeek = mapToUi(weekDatesOf(newSelected), newSelected)
+            )
+        }
+
+        loadDay(newSelected)
     }
 
     fun goToToday() {

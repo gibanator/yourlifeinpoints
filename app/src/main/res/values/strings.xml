@@ -1,8 +1,31 @@
 <resources>
-    <string name="app_name">LifeInPoints</string>
-    <string name="category1">Networking</string>
-    <string name="category2">Education</string>
-    <string name="category3">Work</string>
-    <string name="category4">Health</string>
-    <string name="category5">Personal live</string>
+    <string name="app_name" translatable="false">LifeInPoints</string>
+    <string name="category_networking">Networking</string>
+    <string name="category_education">Education</string>
+    <string name="category_work">Work</string>
+    <string name="category_health">Health</string>
+    <string name="category_personal_life">Personal Life</string>
+
+    <!-- Miscellaneous -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="text_word">Text</string>
+
+    <!-- Menu Items -->
+    <string name="main_page_navbar_item">Main</string>
+    <string name="calendar_page_navbar_item">Calendar</string>
+    <string name="statistics_page_navbar_item">Statistics</string>
+    <string name="settings_page_navbar_item">Settings</string>
+
+    <!-- Languages -->
+    <string name="language_english" translatable="false">English</string>
+    <string name="language_russian" translatable="false">Русский</string>
+    <string name="language_setting_title">Language</string>
+    <string name="language_system_title">System</string>
+    <string name="language_system_subtitle">Use device language</string>
+    <string name="language_english_subtitle">English UI</string>
+    <string name="language_russian_subtitle">Русский интерфейс</string>
+
 </resources>

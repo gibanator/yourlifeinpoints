@@ -12,9 +12,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.lifeinpoints.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +42,7 @@ fun EditCommentTemplatesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(categoryName ?: "Comment templates") },
+                title = { Text(categoryName ?: stringResource(R.string.comment_templates_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -58,7 +60,7 @@ fun EditCommentTemplatesScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Set up to 5 quick comments for this category.",
+                text = stringResource(R.string.comment_template_annotation_text),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -86,14 +88,14 @@ fun EditCommentTemplatesScreen(
         editingPosition?.let { pos ->
             AlertDialog(
                 onDismissRequest = { editingPosition = null },
-                title = { Text("Template ${pos + 1}") },
+                title = { Text("${stringResource(R.string.template)} ${pos + 1}") },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = editorText,
                             onValueChange = { editorText = it },
-                            label = { Text("Text") },
-                            placeholder = { Text("Enter template text...") },
+                            label = { Text(stringResource(R.string.text_word)) },
+                            placeholder = { Text(stringResource(R.string.comment_template_text_placeholder)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = false,
                             minLines = 2,
@@ -102,7 +104,7 @@ fun EditCommentTemplatesScreen(
                             )
                         )
                         Text(
-                            text = "Tip: leaving it empty will clear this slot.",
+                            text = stringResource(R.string.empty_tip),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -145,12 +147,12 @@ private fun TemplateSlotCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Template ${index + 1}",
+                    text = "${stringResource(R.string.template)} ${index + 1}",
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = text.ifBlank { "Empty" },
+                    text = text.ifBlank { stringResource(R.string.empty) },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="streak_current">Текущая серия:</string>
+    <string name="streak_best">Лучшая серия:</string>
+    <string name="days">дней</string>
+    <string name="successful_days">Успешных дней:</string>
+
+    <string name="month">Месяц</string>
+    <string name="year">Год</string>
+    <string name="week">Неделя</string>
+</resources>

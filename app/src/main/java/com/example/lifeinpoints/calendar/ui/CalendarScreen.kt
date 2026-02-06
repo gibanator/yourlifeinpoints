@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,6 +42,7 @@ import com.example.lifeinpoints.calendar.CalendarViewModel
 import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import com.example.lifeinpoints.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,8 +155,14 @@ private fun CalendarModeSwitchCard(
 ) {
     val title = if (mode == CalendarUiState.Mode.MONTH) {
         selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
+            .replaceFirstChar { it.uppercase() }
     } else {
         year.toString()
+    }
+    val period_name = if (mode == CalendarUiState.Mode.MONTH) {
+        stringResource(R.string.month)
+    } else {
+        stringResource(R.string.year)
     }
 
     Row(
@@ -180,7 +188,7 @@ private fun CalendarModeSwitchCard(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "$title • ${mode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "$title • $period_name",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),

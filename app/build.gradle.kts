@@ -39,9 +39,13 @@ android {
     buildFeatures {
         compose = true
     }
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
+    implementation(libs.androidx.appcompat)
     ksp(libs.room.compiler)
 
     implementation(libs.androidx.core.ktx)

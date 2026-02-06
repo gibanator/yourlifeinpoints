@@ -1,9 +1,21 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
-import android.R.attr.layoutDirection
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,20 +23,42 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsViewModel
 import com.example.lifeinpoints.level.LevelViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -52,13 +86,28 @@ fun DailyCheckupScreen(
     // Состояние для скролла всего экрана
     val scrollState = rememberScrollState()
 
+    val pagerState = rememberPagerState(initialPage = 1, pageCount = { 3 })
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.isScrollInProgress }
+            .distinctUntilChanged()
+            .filter { !it } // when swipe ends
+            .collect {
+                when (pagerState.currentPage) {
+                    0 -> vm.prevDay()
+                    2 -> vm.nextDay()
+                }
+                pagerState.scrollToPage(1)
+            }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(uiState.selectedDate.format(formatter)) },
                 actions = {
                     OutlinedButton(onClick = { vm.goToToday() }) {
-                        Text("To today")
+                        Text(stringResource(R.string.to_today_button_text))
                     }
                 }
             )
@@ -74,7 +123,6 @@ fun DailyCheckupScreen(
                     // no bottom padding
                 )
                 .fillMaxSize()
-                .verticalScroll(scrollState) // Скролл всего экрана
                 .padding(
                     start = 16.dp,
                     end = 16.dp,
@@ -100,30 +148,42 @@ fun DailyCheckupScreen(
                 )
             }
 
-            // Карточка с категориями - теперь без внутреннего скролла
-            CategoryListCard(
-                categories = uiState.orderedCategories,
-                selectedCategories = uiState.selectedCategories,
-                isDayEnded = uiState.isDayEnded,
-                isMultiplierMode = uiState.isMultiplierMode,
-                onCategoryClick = { id ->
-                    vm.toggleCategory(id)
-                },
-                onToggleMultiplierMode = { vm.toggleMultiplierMode() },
-                onAddComment = onNavigateToComments,
-                modifier = Modifier.fillMaxWidth()
-            )
+            HorizontalPager(pagerState) {_ ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
 
-            DayCompletionCard(
-                isDayEnded = uiState.isDayEnded,
-                onToggleDayEnded = {
-                    vm.toggleDayEnded()
-                    vm.saveProgress()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp)
-            )
+                    // Карточка с категориями - теперь без внутреннего скролла
+                    CategoryListCard(
+                        categories = uiState.orderedCategories,
+                        selectedCategories = uiState.selectedCategories,
+                        isDayEnded = uiState.isDayEnded,
+                        isMultiplierMode = uiState.isMultiplierMode,
+                        onCategoryClick = { id ->
+                            vm.toggleCategory(id)
+                        },
+                        onToggleMultiplierMode = { vm.toggleMultiplierMode() },
+                        onAddComment = onNavigateToComments,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DayCompletionCard(
+                        isDayEnded = uiState.isDayEnded,
+                        onToggleDayEnded = {
+                            vm.toggleDayEnded()
+                            vm.saveProgress()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp)
+                    )
+                }
+            }
+
         }
 
         // Диалог повышения уровня (если сработало событие)
@@ -359,7 +419,7 @@ fun ActionButtonsRow(
                     .padding(vertical = 8.dp)
             ) {
                 Text(
-                    text = "Add/Edit comments",
+                    text = stringResource(R.string.comments_button_text),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -465,7 +525,9 @@ fun DayCompletionCard(
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = if (isDayEnded) "Day completed!" else "End the day",
+                text = if (isDayEnded)
+                    stringResource(R.string.day_ended_button_text)
+                else stringResource(R.string.end_day_button_text),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,

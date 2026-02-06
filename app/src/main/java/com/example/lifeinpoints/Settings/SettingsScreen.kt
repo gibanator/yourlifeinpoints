@@ -1,6 +1,5 @@
 package com.example.lifeinpoints.Settings
 
-import android.R.attr.layoutDirection
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,29 +11,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.theme.ThemeType
 
 
@@ -53,7 +60,9 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = {
+                    Text(text = stringResource(R.string.settings_title))
+                        },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -79,7 +88,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Theme",
+                text = stringResource(R.string.theme_setting_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -91,7 +100,7 @@ fun SettingsScreen(
 
             // Новая секция категорий
             Text(
-                text = "Content",
+                text = stringResource(R.string.content_section_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -104,7 +113,7 @@ fun SettingsScreen(
 
             // Новая секция категорий
             Text(
-                text = "Leveling",
+                text = stringResource(R.string.leveling_section_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -149,12 +158,12 @@ fun CategoriesCard(
             ) {
                 Column {
                     Text(
-                        text = "Categories",
+                        text = stringResource(R.string.categories_management_title),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "Manage your activity categories",
+                        text = stringResource(R.string.categories_management_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -175,12 +184,12 @@ fun CategoriesCard(
             ) {
                 Column {
                     Text(
-                        text = "Visible Categories",
+                        text = stringResource(R.string.categories_visibility_title),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "Choose which categories appear on main screen",
+                        text = stringResource(R.string.categories_visibility_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -200,12 +209,12 @@ fun CategoriesCard(
             ) {
                 Column {
                     Text(
-                        text = "Manage comment templates for categories",
+                        text = stringResource(R.string.comment_management_title),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "Add, edit or delete often-used comments for easy filling",
+                        text = stringResource(R.string.comment_management_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -226,8 +235,8 @@ fun ThemeSelectionCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             ThemeOption(
-                title = "System Default",
-                subtitle = "Follow system theme",
+                title = stringResource(R.string.theme_system_title),
+                subtitle = stringResource(R.string.theme_system_subtitle),
                 isSelected = currentTheme == ThemeType.SYSTEM,
                 onClick = { onThemeSelected(ThemeType.SYSTEM)
                 Log.d("Theme", "Changed theme to system") }
@@ -236,8 +245,8 @@ fun ThemeSelectionCard(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             ThemeOption(
-                title = "Light",
-                subtitle = "Always use light theme",
+                title = stringResource(R.string.theme_light_title),
+                subtitle = stringResource(R.string.theme_light_subtitle),
                 isSelected = currentTheme == ThemeType.LIGHT,
                 onClick = { onThemeSelected(ThemeType.LIGHT) }
             )
@@ -245,8 +254,8 @@ fun ThemeSelectionCard(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             ThemeOption(
-                title = "Dark",
-                subtitle = "Always use dark theme",
+                title = stringResource(R.string.theme_dark_title),
+                subtitle = stringResource(R.string.theme_dark_subtitle),
                 isSelected = currentTheme == ThemeType.DARK,
                 onClick = { onThemeSelected(ThemeType.DARK) }
             )
@@ -327,12 +336,12 @@ fun GameModeCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Game Mode",
+                    text = stringResource(R.string.gamemode_tumbler_title),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "Enable leveling system with experience points",
+                    text = stringResource(R.string.gamemode_tumbler_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

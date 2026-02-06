@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import com.example.lifeinpoints.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +46,7 @@ fun AddCategoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Category") },
+                title = { Text(stringResource(R.string.category_add_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -105,8 +107,8 @@ fun AddCategoryScreen(
                     categoryName = it
                     errorMessage = null
                 },
-                label = { Text("Category Name") },
-                placeholder = { Text("Enter category name...") },
+                label = { Text(stringResource(R.string.category_name_field_title)) },
+                placeholder = { Text(stringResource(R.string.category_name_placeholder_text)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -132,22 +134,19 @@ fun AddCategoryScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Tips for creating categories:",
+                        text = stringResource(R.string.category_add_tips_subtitle),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "• Choose clear, descriptive names\n" +
-                                "• Make categories specific and actionable\n" +
-                                "• Avoid duplicate categories\n" +
-                                "• Keep names short and memorable",
+                        text = stringResource(R.string.category_add_tips_text),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
             Text(
-                text = "Category appears from",
+                text = stringResource(R.string.category_entrance_time_subtitle),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -161,7 +160,7 @@ fun AddCategoryScreen(
                         selected = startMode == CategoryStartMode.TODAY,
                         onClick = { startMode = CategoryStartMode.TODAY }
                     )
-                    Text("Today")
+                    Text(stringResource(R.string.category_entrance_today_option))
                 }
 
 
@@ -180,7 +179,7 @@ fun AddCategoryScreen(
                             showDatePicker = true
                         }
                     ) {
-                        Text("Pick a date: $pickedDate")
+                        Text("${stringResource(R.string.category_entrance_selective_option)} $pickedDate")
                     }
                 }
 
@@ -190,7 +189,7 @@ fun AddCategoryScreen(
                         selected = startMode == CategoryStartMode.FROM_START,
                         onClick = { startMode = CategoryStartMode.FROM_START }
                     )
-                    Text("From the start")
+                    Text(stringResource(R.string.category_entrance_start_option))
                 }
             }
 
@@ -211,7 +210,7 @@ fun AddCategoryScreen(
                         ) { Text("OK") }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                        TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
                     }
                 ) {
                     DatePicker(state = datePickerState)
