@@ -18,6 +18,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -46,6 +49,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.hilt.common)
     ksp(libs.room.compiler)
 
     implementation(libs.androidx.core.ktx)
@@ -63,6 +67,9 @@ dependencies {
     implementation(libs.androidx.contentpager)
     implementation(libs.room.runtime)
     implementation(libs.androidx.datastore)
+    // WorkManager для уведомлений по расписанию
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     //implementation(libs.androidx.room.common.jvm)
     //implementation(libs.androidx.room.runtime.android)
     ksp(libs.hilt.compiler)
@@ -101,6 +108,4 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-pager:0.32.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.32.0")
-
-
 }

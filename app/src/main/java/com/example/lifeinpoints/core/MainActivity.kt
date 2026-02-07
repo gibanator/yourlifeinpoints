@@ -1,22 +1,23 @@
 package com.example.lifeinpoints.core
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.lifeinpoints.Settings.SettingsViewModel
@@ -24,14 +25,48 @@ import com.example.lifeinpoints.calendar.CalendarViewModel
 import com.example.lifeinpoints.core.navigation.AppNavHost
 import com.example.lifeinpoints.core.ui.AppBottomBar
 import com.example.lifeinpoints.core.ui.theme.LifeInPointsTheme
-import com.example.lifeinpoints.level.LevelViewModel
+import com.example.lifeinpoints.notifications.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    // Используем строковую константу вместо Manifest.permission
+    private val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        android.Manifest.permission.POST_NOTIFICATIONS
+    } else {
+        // Для старых версий не требуется разрешение
+        null
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        // Обрабатываем результат запроса разрешения
+        if (isGranted) {
+            // Разрешение дано
+            println("Notification permission granted")
+        } else {
+            // Разрешение не дано
+            println("Notification permission denied")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Создаём канал уведомлений
+        val notificationHelper = NotificationHelper(this)
+        notificationHelper.createNotificationChannel()
+
+        // Запрашиваем разрешение на уведомления для Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermission?.let { permission ->
+                requestPermissionLauncher.launch(permission)
+            }
+        }
+
         setContent {
             AppWithTopAndBottomBar()
         }
@@ -42,39 +77,31 @@ class MainActivity : ComponentActivity() {
 fun AppWithTopAndBottomBar() {
     val navController = rememberNavController()
     val calendarVm: CalendarViewModel = hiltViewModel()
-    val settingsVm: SettingsViewModel = hiltViewModel() // Добавляем SettingsViewModel
-    val levelVm: LevelViewModel = hiltViewModel()
-    // Собираем состояние текущей темы
+    val settingsVm: SettingsViewModel = hiltViewModel()
     val currentTheme by settingsVm.currentTheme.collectAsState()
 
-    // Оборачиваем всё в нашу тему с выбранным типом
+    val context = LocalContext.current
+    val notificationHelper = remember { NotificationHelper(context) }
+
     LifeInPointsTheme(themeType = currentTheme) {
         Scaffold(
             bottomBar = {
                 AppBottomBar(navController = navController)
             }
-        ) { padding ->
+        ) { paddingValues ->
             val layoutDirection = LocalLayoutDirection.current
 
             AppNavHost(
                 navController = navController,
-                modifier = Modifier.padding(
-                    start = padding.calculateStartPadding(layoutDirection),
-                    end = padding.calculateEndPadding(layoutDirection),
-                    bottom = padding.calculateBottomPadding()
-                ),
-                //modifier = Modifier.consumeWindowInsets(padding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = paddingValues.calculateStartPadding(layoutDirection),
+                        end = paddingValues.calculateEndPadding(layoutDirection),
+                        bottom = paddingValues.calculateBottomPadding()
+                    ),
                 settingsVm = settingsVm
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewAppWithTopAndBottomBar() {
-    // Для превью используем системную тему или любую другую по умолчанию
-    LifeInPointsTheme {
-        AppWithTopAndBottomBar()
     }
 }
