@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -122,12 +123,7 @@ fun DailyCheckupScreen(
                     end = paddingValues.calculateEndPadding(layoutDirection)
                     // no bottom padding
                 )
-                .fillMaxSize()
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    //bottom = 16.dp // Добавили нижний отступ
-                ),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             WeekBarWithButtons(
@@ -137,7 +133,11 @@ fun DailyCheckupScreen(
                 toNextWeek = vm::toNextWeek,
             )
 
-            HorizontalPager(pagerState) {_ ->
+            HorizontalPager(
+                state = pagerState,
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                pageSpacing = 12.dp
+            ) {_ ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -176,7 +176,7 @@ fun DailyCheckupScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 12.dp)
+                            .padding(bottom = 24.dp)
                     )
                 }
             }
@@ -506,7 +506,7 @@ fun DayCompletionCard(
 ) {
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isDayEnded) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surfaceVariant
