@@ -137,26 +137,23 @@ fun DailyCheckupScreen(
                 toNextWeek = vm::toNextWeek,
             )
 
-            // Полоска XP (только если включен Game Mode)
-            if (gameModeEnabled) {
-                XpProgressBar(
-                    levelState = levelState,
-                    onClick = {
-                        showSkillScreen = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
             HorizontalPager(pagerState) {_ ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(horizontal = 16.dp),
+                        .verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-
+                    // Полоска XP (только если включен Game Mode)
+                    if (gameModeEnabled) {
+                        XpProgressBar(
+                            levelState = levelState,
+                            onClick = {
+                                showSkillScreen = true
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                     // Карточка с категориями - теперь без внутреннего скролла
                     CategoryListCard(
                         categories = uiState.orderedCategories,
