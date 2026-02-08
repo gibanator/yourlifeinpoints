@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,7 +27,9 @@ import com.example.lifeinpoints.core.navigation.AppNavHost
 import com.example.lifeinpoints.core.ui.AppBottomBar
 import com.example.lifeinpoints.core.ui.theme.LifeInPointsTheme
 import com.example.lifeinpoints.notifications.NotificationHelper
+import com.example.lifeinpoints.notifications.NotificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -78,10 +81,18 @@ fun AppWithTopAndBottomBar() {
     val navController = rememberNavController()
     val calendarVm: CalendarViewModel = hiltViewModel()
     val settingsVm: SettingsViewModel = hiltViewModel()
+    val notificationVm: NotificationViewModel = hiltViewModel() // Добавляем ViewModel уведомлений
     val currentTheme by settingsVm.currentTheme.collectAsState()
 
     val context = LocalContext.current
     val notificationHelper = remember { NotificationHelper(context) }
+
+    // Проверяем и планируем уведомления при запуске приложения
+    LaunchedEffect(Unit) {
+        // Даём небольшую задержку, чтобы приложение успело инициализироваться
+        delay(1000)
+        notificationVm.checkNotificationStatus()
+    }
 
     LifeInPointsTheme(themeType = currentTheme) {
         Scaffold(

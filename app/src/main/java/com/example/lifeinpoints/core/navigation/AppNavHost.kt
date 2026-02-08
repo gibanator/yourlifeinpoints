@@ -19,6 +19,7 @@ import com.example.lifeinpoints.categories.EditCategoryScreen
 import com.example.lifeinpoints.categories.comment_templates.EditCommentTemplatesScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
+import com.example.lifeinpoints.notifications.NotificationSettingsScreen
 import com.example.lifeinpoints.statistics.StatisticsScreen  // Импортируем новый экран
 import com.example.lifeinpoints.statistics.StatisticsViewModel
 import java.time.LocalDate
@@ -177,6 +178,31 @@ fun AppNavHost(
                 onOpenCategoryTemplates = { categoryId ->
                     navController.navigate("edit_templates/$categoryId")
                 }
+            )
+        }
+
+        // Настройки уведомлений
+        composable("notification_settings") {
+            NotificationSettingsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Обновляем маршрут настроек, передавая navController
+        composable(Routes.Settings) {
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onCategoriesClick = {
+                    navController.navigate("categories")
+                },
+                onVisibilityClick = {
+                    navController.navigate("category_visibility")
+                },
+                onTemplatesClick = {
+                    navController.navigate("comment_templates")
+                },
+                navController = navController, // Передаем navController
+                vm = settingsVm
             )
         }
     }

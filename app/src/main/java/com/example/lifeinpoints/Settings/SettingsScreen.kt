@@ -15,6 +15,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -41,6 +42,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.theme.ThemeType
 
@@ -52,6 +54,7 @@ fun SettingsScreen(
     onCategoriesClick: () -> Unit = {}, // Новый параметр для навигации
     onVisibilityClick: () -> Unit = {},
     onTemplatesClick: () -> Unit = {},
+    navController: NavController? = null, // Добавляем navController для навигации
     vm: SettingsViewModel
 ) {
     val currentTheme by vm.currentTheme.collectAsState()
@@ -123,11 +126,63 @@ fun SettingsScreen(
                 onToggle = { vm.toggleGameMode() }
             )
 
+            // Новая секция уведомлений
+            Text(
+                text = "Reminders",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            NotificationSettingsCard(
+                onNotificationSettingsClick = {
+                    navController?.navigate("notification_settings")
+                }
+            )
+
             // Новая секция категорий
             Text(
                 text = "",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+// Новая карточка для уведомлений
+@Composable
+fun NotificationSettingsCard(
+    onNotificationSettingsClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onNotificationSettingsClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = "Daily Reminders",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "Set up daily notifications to build consistent habits",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "Notification settings",
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
