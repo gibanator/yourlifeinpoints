@@ -25,12 +25,15 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
+import com.example.lifeinpoints.R
 
 @Composable
 fun ChartWithLegend(
@@ -53,6 +56,9 @@ fun ChartWithLegend(
     val chartHeight = screenHeight * 0.35f
     val padding = screenWidth * 0.02f
     val legendSpacing = screenHeight * 0.02f
+
+    val dayNamesShort = stringArrayResource(R.array.day_names_short)
+    val monthNamesShort = stringArrayResource(R.array.month_names_short)
 
     Column(
         modifier = Modifier
@@ -82,7 +88,7 @@ fun ChartWithLegend(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Нет данных для отображения",
+                    text = stringResource(R.string.piechart_nodata),
                     style = TextStyle(
                         fontSize = calculateResponsiveFontSize(screenHeight, 0.02f),
                         color = Color.Gray
@@ -110,13 +116,17 @@ fun ChartWithLegend(
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
                                 barCornerRadius = barCornerRadius,
-                                showDataLabels = showDataLabels
+                                showDataLabels = showDataLabels,
+                                dayNamesShort = dayNamesShort,
+                                monthNamesShort = monthNamesShort
                             )
                             ChartType.LINE -> drawLineChart(
                                 data = timeSeriesData,
                                 timePeriod = timePeriod,
                                 showGrid = showGrid,
-                                showDataLabels = showDataLabels
+                                showDataLabels = showDataLabels,
+                                dayNamesShort = dayNamesShort,
+                                monthNamesShort = monthNamesShort
                             )
                             else -> drawVerticalTimeSeriesChart(
                                 data = timeSeriesData,
@@ -124,7 +134,9 @@ fun ChartWithLegend(
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
                                 barCornerRadius = barCornerRadius,
-                                showDataLabels = showDataLabels
+                                showDataLabels = showDataLabels,
+                                dayNamesShort = dayNamesShort,
+                                monthNamesShort = monthNamesShort
                             )
                         }
                     } else {
@@ -171,7 +183,9 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
     showGrid: Boolean,
     barSpacingRatio: Float,
     barCornerRadius: Float,
-    showDataLabels: Boolean
+    showDataLabels: Boolean,
+    dayNamesShort: Array<String>,
+    monthNamesShort: Array<String>
 ) {
     if (data.isEmpty()) return
 
@@ -266,15 +280,8 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
 
         val label = when (timePeriod) {
             TimePeriod.DAY -> (index + 1).toString()
-            TimePeriod.WEEK -> {
-                val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-                dayNames.getOrNull(index) ?: (index + 1).toString()
-            }
-            TimePeriod.MONTH -> {
-                val monthAbbr = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-                monthAbbr.getOrNull(index) ?: (index + 1).toString()
-            }
+            TimePeriod.WEEK -> dayNamesShort.getOrNull(index) ?: (index + 1).toString()
+            TimePeriod.MONTH -> monthNamesShort.getOrNull(index) ?: (index + 1).toString()
             TimePeriod.YEAR -> (index + 1).toString()
         }
 
@@ -297,7 +304,9 @@ private fun DrawScope.drawLineChart(
     data: List<TimeSeriesData>,
     timePeriod: TimePeriod,
     showGrid: Boolean,
-    showDataLabels: Boolean
+    showDataLabels: Boolean,
+    dayNamesShort: Array<String>,
+    monthNamesShort: Array<String>
 ) {
     if (data.isEmpty() || data.size < 2) return
 
@@ -407,15 +416,8 @@ private fun DrawScope.drawLineChart(
         val x = leftPadding + (chartWidth * index / (itemCount - 1).coerceAtLeast(1))
         val label = when (timePeriod) {
             TimePeriod.DAY -> (index + 1).toString()
-            TimePeriod.WEEK -> {
-                val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-                dayNames.getOrNull(index) ?: (index + 1).toString()
-            }
-            TimePeriod.MONTH -> {
-                val monthAbbr = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-                monthAbbr.getOrNull(index) ?: (index + 1).toString()
-            }
+            TimePeriod.WEEK -> dayNamesShort.getOrNull(index) ?: (index + 1).toString()
+            TimePeriod.MONTH -> monthNamesShort.getOrNull(index) ?: (index + 1).toString()
             TimePeriod.YEAR -> (index + 1).toString()
         }
 

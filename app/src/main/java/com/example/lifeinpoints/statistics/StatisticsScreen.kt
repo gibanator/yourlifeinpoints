@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -34,12 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.statistics.ui.AdaptiveMonthSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveWeekSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveYearSummaryStatsCard
@@ -77,7 +77,7 @@ fun StatisticsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Statistics",
+                        stringResource(R.string.statistics_page_title),
                         //fontWeight = FontWeight.Bold,
                         //fontSize = calculateAdaptiveFontSize(screenHeight, 0.022f)
                     )
@@ -237,9 +237,9 @@ fun StatisticsScreen(
                                         .fillMaxWidth()
                                         .padding(screenHeight * 0.02f),
                                     title = when (uiState.viewType) {
-                                        ViewType.MONTH -> "Категории за месяц"
-                                        ViewType.WEEK -> "Категории за неделю"
-                                        ViewType.YEAR -> "Категории за год"
+                                        ViewType.MONTH -> stringResource(R.string.piechart_title_month)
+                                        ViewType.WEEK -> stringResource(R.string.piechart_title_week)
+                                        ViewType.YEAR -> stringResource(R.string.piechart_title_year)
                                     },
                                     innerRadiusRatio = 0.6f,
                                     showLegend = true,
@@ -276,9 +276,9 @@ fun StatisticsScreen(
                                                 vertical = screenHeight * 0.01f
                                             ),
                                         title = when (uiState.viewType) {
-                                            ViewType.MONTH -> "Points by days"
-                                            ViewType.WEEK -> "Points by week days"
-                                            ViewType.YEAR -> "Points by months"
+                                            ViewType.MONTH -> stringResource(R.string.piechart_title_month)
+                                            ViewType.WEEK -> stringResource(R.string.piechart_title_week)
+                                            ViewType.YEAR -> stringResource(R.string.piechart_title_year)
                                         },
                                         chartType = ChartType.VERTICAL_BAR,
                                         timePeriod = when (uiState.viewType) {
@@ -300,9 +300,9 @@ fun StatisticsScreen(
                                     ) {
                                         Text(
                                             text = if (uiState.selectedCategoryIds.isEmpty()) {
-                                                "Select categories to display chart"
+                                                stringResource(R.string.chart_category_selection_annotation)
                                             } else {
-                                                "No data for selected categories"
+                                                stringResource(R.string.chart_no_data_annotation)
                                             },
                                             fontSize = calculateAdaptiveFontSize(screenHeight, 0.018f),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -354,7 +354,7 @@ fun AdaptivePeriodSelector(
     screenHeight: Dp,
     modifier: Modifier = Modifier
 ) {
-    val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    val monthFormatter = DateTimeFormatter.ofPattern("LLLL yyyy")
 
     Row(
         modifier = modifier,
@@ -380,14 +380,19 @@ fun AdaptivePeriodSelector(
                 .padding(horizontal = screenHeight * 0.01f),
             contentAlignment = Alignment.Center
         ) {
-            val periodText = when (uiState.viewType) {
-                ViewType.MONTH -> uiState.currentMonth.format(monthFormatter)
-                ViewType.WEEK -> uiState.weekSummary.weekRange
-                ViewType.YEAR -> uiState.currentYear.toString()
+            val (periodText, periodName) = when (uiState.viewType) {
+                ViewType.MONTH -> uiState.currentMonth.format(monthFormatter) to
+                        stringResource(R.string.month)
+
+                ViewType.WEEK -> uiState.weekSummary.weekRange to
+                        stringResource(R.string.week)
+
+                ViewType.YEAR -> uiState.currentYear.toString() to
+                        stringResource(R.string.year)
             }
 
             Text(
-                text = "$periodText • ${uiState.viewType.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "$periodText • $periodName",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),
