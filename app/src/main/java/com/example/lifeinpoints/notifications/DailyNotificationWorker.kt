@@ -1,4 +1,4 @@
-// com/example/lifeinpoints/notifications/DailyNotificationWorker.kt
+// com/example/lifeinpoints/notifications/DailyNotificationWorker.kt (обновляем)
 package com.example.lifeinpoints.notifications
 
 import android.content.Context
@@ -17,6 +17,7 @@ class DailyNotificationWorker(
         const val WORK_NAME = "daily_checkup_notification_work"
         const val KEY_TITLE = "notification_title"
         const val KEY_MESSAGE = "notification_message"
+        const val KEY_DATE = "notification_date"
     }
 
     override suspend fun doWork(): Result {
@@ -24,9 +25,11 @@ class DailyNotificationWorker(
             try {
                 // Получаем данные для уведомления
                 val title = inputData.getString(KEY_TITLE)
-                    ?: "Daily Checkup Reminder"
+                    ?: "Daily Checkup Time! ⏰"
                 val message = inputData.getString(KEY_MESSAGE)
-                    ?: "Don't forget to complete your daily checkup!"
+                    ?: "Complete your daily categories to track your progress. Every day counts! 💪"
+                val date = inputData.getString(KEY_DATE)
+                    ?: java.time.LocalDate.now().toString()
 
                 // Показываем уведомление
                 val notificationHelper = NotificationHelper(applicationContext)
@@ -35,7 +38,7 @@ class DailyNotificationWorker(
                 Result.success()
             } catch (e: Exception) {
                 e.printStackTrace()
-                Result.retry() // Пробуем снова при следующем запуске
+                Result.retry()
             }
         }
     }
