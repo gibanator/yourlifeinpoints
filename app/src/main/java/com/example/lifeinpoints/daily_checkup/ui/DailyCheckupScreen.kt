@@ -54,7 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsViewModel
 import com.example.lifeinpoints.level.LevelViewModel
@@ -136,7 +136,7 @@ fun DailyCheckupScreen(
             HorizontalPager(
                 state = pagerState,
                 contentPadding = PaddingValues(horizontal = 16.dp),
-                pageSpacing = 12.dp
+                pageSpacing = 16.dp
             ) {_ ->
                 Column(
                     modifier = Modifier
@@ -176,7 +176,7 @@ fun DailyCheckupScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 24.dp)
+                            .padding(bottom = 24.dp,) //start = 12.dp, end = 12.dp)
                     )
                 }
             }
