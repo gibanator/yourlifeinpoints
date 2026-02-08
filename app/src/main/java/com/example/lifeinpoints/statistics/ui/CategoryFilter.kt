@@ -16,17 +16,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.statistics.CategoryStats
 
 @Composable
@@ -54,7 +53,7 @@ fun CategoryFilter(
         ) {
             // Select All button
             ControlButton(
-                text = "Select All",
+                text = stringResource(R.string.chart_selectall_button),
                 isActive = selectedCategoryIds.size == categories.size,
                 onClick = onSelectAll,
                 screenHeight = screenHeight,
@@ -66,7 +65,7 @@ fun CategoryFilter(
 
             // Deselect All button
             ControlButton(
-                text = "Deselect All",
+                text = stringResource(R.string.chart_deselectall_button),
                 isActive = selectedCategoryIds.isEmpty(),
                 onClick = onDeselectAll,
                 screenHeight = screenHeight,

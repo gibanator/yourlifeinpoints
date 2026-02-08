@@ -391,7 +391,7 @@ class StatisticsViewModel @Inject constructor(
         for (i in 0..6) {
             val date = weekStart.plusDays(i.toLong())
             val dateString = date.toString()
-            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
             val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
 
             if (isDayCompleted) {
@@ -437,7 +437,7 @@ class StatisticsViewModel @Inject constructor(
 
         for (monthNumber in 1..12) {
             val yearMonth = YearMonth.of(year.value, monthNumber)
-            val monthName = yearMonth.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+            val monthName = yearMonth.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
 
             val categorySums = mutableMapOf<Int, Int>()
             categoryIds.forEach { categoryId ->
