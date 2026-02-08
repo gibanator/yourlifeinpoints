@@ -1,2 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="statistics_page_title">Статистика</string>
+
+    <string name="day_col_name">День</string>
+    <string name="total_col_name">Общ</string>
+
+    <!-- Summary card -->
+    <string name="summary_title">- Итоги</string>
+    <string name="week_summary_title">Итоги недели</string>
+    <string name="summary_days">Дней</string>
+    <string name="summary_months">Месяцев</string>
+    <string name="summary_completed">пройдено</string>
+    <string name="summary_average">В среднем</string>
+    <string name="summary_perday">за день</string>
+    <string name="summary_permonth">за месяц</string>
+    <string name="summary_bestday">Лучший день</string>
+    <string name="summary_bestmonth">Лучший месяц</string>
+    <string name="summary_categories">категорий</string>
+
+    <!-- Pie Chart -->
+    <string name="piechart_title_month">Категории за месяц</string>
+    <string name="piechart_title_year">Категории за год</string>
+    <string name="piechart_title_week">Категории за неделю</string>
+    <string name="piechart_nodata">Нет данных для отображения</string>
+
+    <!-- Chart -->
+    <string name="chart_category_selection_annotation">Выберите категории для отображения графика</string>
+    <string name="chart_no_data_annotation">Нет данных для отображения</string>
+    <string name="chart_selectall_button">Выбрать все</string>
+    <string name="chart_deselectall_button">Очистить все</string>
+</resources>

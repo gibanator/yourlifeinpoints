@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,14 +30,15 @@ import androidx.compose.ui.unit.sp
 import com.example.lifeinpoints.statistics.CategoryStats
 import com.example.lifeinpoints.statistics.DayStatistics
 import com.example.lifeinpoints.statistics.MonthStatistics
+import com.example.lifeinpoints.R
 
 @Composable
 fun AdaptiveSmartCenteredTable(
     data: List<DayStatistics>,
     categories: List<CategoryStats>,
     isWeekMode: Boolean,
-    isYearMode: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isYearMode: Boolean = false
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -118,7 +120,7 @@ fun AdaptiveYearTable(
                 ) {
                     // Колонка месяца
                     AdaptiveTableHeaderCell(
-                        text = "Month",
+                        text = stringResource(R.string.month),
                         isVisible = true,
                         screenHeight = screenHeight,
                         modifier = Modifier
@@ -128,7 +130,7 @@ fun AdaptiveYearTable(
 
                     // Колонка суммы
                     AdaptiveTableHeaderCell(
-                        text = "Total",
+                        text = stringResource(R.string.total_col_name),
                         screenHeight = screenHeight,
                         modifier = Modifier
                             .height(screenHeight * 0.045f)
@@ -184,9 +186,9 @@ private fun AdaptiveTableHeaderRow(
     ) {
         // Первая колонка: день недели или число месяца
         val firstColumnText = when {
-            isYearMode -> "Month"
-            isWeekMode -> "Day"
-            else -> "Day"
+            isYearMode -> stringResource(R.string.month)
+            isWeekMode -> stringResource(R.string.day_col_name)
+            else -> stringResource(R.string.day_col_name)
         }
 
         AdaptiveTableHeaderCell(
@@ -200,7 +202,7 @@ private fun AdaptiveTableHeaderRow(
 
         // Вторая колонка: сумма
         AdaptiveTableHeaderCell(
-            text = "Total",
+            text = stringResource(R.string.total_col_name),
             screenHeight = screenHeight,
             modifier = Modifier
                 .height(screenHeight * 0.045f)
@@ -236,7 +238,7 @@ private fun AdaptiveTableRow(
     ) {
         // Первая колонка: день недели + число или просто число
         val dayText = if (isWeekMode) {
-            "${dayData.dayOfWeek ?: ""}\n${dayData.day}"
+            "${dayData.dayOfWeek ?: ""} ${dayData.day}"
         } else {
             dayData.day.toString()
         }

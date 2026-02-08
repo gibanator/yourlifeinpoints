@@ -12,12 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.statistics.SummaryStats
 import com.example.lifeinpoints.statistics.WeekSummaryStats
 import com.example.lifeinpoints.statistics.YearSummaryStats
@@ -41,7 +42,7 @@ fun AdaptiveMonthSummaryStatsCard(
     modifier: Modifier = Modifier
 ) {
     // Форматтер для отображения месяца и года (например: "January 2024")
-    val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    val monthFormatter = DateTimeFormatter.ofPattern("LLLL yyyy")
 
     // Карточка с тенями и цветом фона
     Card(
@@ -56,7 +57,7 @@ fun AdaptiveMonthSummaryStatsCard(
         ) {
             // Заголовок карточки с названием месяца
             Text(
-                text = "${currentMonth.format(monthFormatter)} Summary", // "January 2024 Summary"
+                text = "${currentMonth.format(monthFormatter)} ${stringResource(R.string.summary_title)}", // "January 2024 Summary"
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f) // Адаптивный размер шрифта
                 ),
@@ -71,25 +72,25 @@ fun AdaptiveMonthSummaryStatsCard(
             ) {
                 // Метрика 1: Количество завершенных дней
                 AdaptiveSummaryItem(
-                    title = "Days",
+                    title = stringResource(R.string.summary_days),
                     value = "${summary.completedDays}/${summary.totalDays}", // "15/31"
-                    subtitle = "completed", // Подпись
+                    subtitle = stringResource(R.string.summary_completed), // Подпись
                     screenHeight = screenHeight
                 )
 
                 // Метрика 2: Среднее количество категорий в день
                 AdaptiveSummaryItem(
-                    title = "Average",
+                    title = stringResource(R.string.summary_average),
                     value = "%.1f".format(summary.averagePerDay), // "3.5" (один знак после запятой)
-                    subtitle = "per day",
+                    subtitle = stringResource(R.string.summary_perday),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 3: Лучший день месяца
                 AdaptiveSummaryItem(
-                    title = "Best Day",
+                    title = stringResource(R.string.summary_bestday),
                     value = if (summary.bestDay > 0) "#${summary.bestDay}" else "-", // "#15" или "-"
-                    subtitle = "${summary.bestDayCount} categories", // "5 categories"
+                    subtitle = "${summary.bestDayCount} ${stringResource(R.string.summary_categories)}", // "5 categories"
                     screenHeight = screenHeight
                 )
             }
@@ -123,7 +124,7 @@ fun AdaptiveWeekSummaryStatsCard(
         ) {
             // Заголовок карточки
             Text(
-                text = "Week Summary",
+                text = stringResource(R.string.week_summary_title),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),
@@ -137,25 +138,25 @@ fun AdaptiveWeekSummaryStatsCard(
             ) {
                 // Метрика 1: Количество завершенных дней
                 AdaptiveSummaryItem(
-                    title = "Days",
+                    title = stringResource(R.string.summary_days),
                     value = "${summary.completedDays}/${summary.totalDays}", // "5/7"
-                    subtitle = "completed",
+                    subtitle = stringResource(R.string.summary_completed),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 2: Среднее количество категорий в день
                 AdaptiveSummaryItem(
-                    title = "Average",
+                    title = stringResource(R.string.summary_average),
                     value = "%.1f".format(summary.averagePerDay),
-                    subtitle = "per day",
+                    subtitle = stringResource(R.string.summary_perday),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 3: Лучший день недели
                 AdaptiveSummaryItem(
-                    title = "Best Day",
+                    title = stringResource(R.string.summary_bestday),
                     value = summary.bestDay, // Название дня недели (например: "Mon")
-                    subtitle = "${summary.bestDayCount} categories",
+                    subtitle = "${summary.bestDayCount} ${stringResource(R.string.summary_categories)}",
                     screenHeight = screenHeight
                 )
             }
@@ -189,7 +190,7 @@ fun AdaptiveYearSummaryStatsCard(
         ) {
             // Заголовок карточки с годом
             Text(
-                text = "${summary.year} Summary", // "2024 Summary"
+                text = "${summary.year} ${stringResource(R.string.summary_title)}", // "2024 Summary"
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),
@@ -203,25 +204,25 @@ fun AdaptiveYearSummaryStatsCard(
             ) {
                 // Метрика 1: Количество завершенных месяцев
                 AdaptiveSummaryItem(
-                    title = "Months",
+                    title = stringResource(R.string.summary_months),
                     value = "${summary.completedMonths}/${summary.totalMonths}", // "8/12"
-                    subtitle = "completed",
+                    subtitle = stringResource(R.string.summary_completed),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 2: Среднее количество категорий в месяц
                 AdaptiveSummaryItem(
-                    title = "Average",
+                    title = stringResource(R.string.summary_average),
                     value = "%.1f".format(summary.averagePerMonth),
-                    subtitle = "per month",
+                    subtitle = stringResource(R.string.summary_permonth),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 3: Лучший месяц года
                 AdaptiveSummaryItem(
-                    title = "Best Month",
+                    title = stringResource(R.string.summary_bestmonth),
                     value = summary.bestMonth, // Название месяца (например: "Jan")
-                    subtitle = "${summary.bestMonthCount} categories",
+                    subtitle = "${summary.bestMonthCount} ${stringResource(R.string.summary_categories)}",
                     screenHeight = screenHeight
                 )
             }

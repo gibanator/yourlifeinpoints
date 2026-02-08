@@ -1,2 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="statistics_page_title">Statistics</string>
+
+    <string name="day_col_name">Day</string>
+    <string name="total_col_name">Total</string>
+
+    <!-- Summary card -->
+    <string name="summary_title">Summary</string>
+    <string name="week_summary_title">Week Summary</string>
+    <string name="summary_days">Days</string>
+    <string name="summary_months">Months</string>
+    <string name="summary_completed">completed</string>
+    <string name="summary_average">Average</string>
+    <string name="summary_perday">per day</string>
+    <string name="summary_permonth">per month</string>
+    <string name="summary_bestday">Best Day</string>
+    <string name="summary_bestmonth">Best Month</string>
+    <string name="summary_categories">categories</string>
+
+    <!-- Pie Chart -->
+    <string name="piechart_title_month">Categories for Month</string>
+    <string name="piechart_title_year">Categories for Year</string>
+    <string name="piechart_title_week">Categories for Week</string>
+    <string name="piechart_nodata">No data to display</string>
+
+    <!-- Chart -->
+    <string name="chart_category_selection_annotation">Select categories to display chart</string>
+    <string name="chart_no_data_annotation">No data for selected categories</string>
+    <string name="chart_selectall_button">Select All</string>
+    <string name="chart_deselectall_button">Deselect All</string>
+</resources>

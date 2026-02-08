@@ -21,8 +21,32 @@
 
     <!-- Languages -->
     <string name="language_setting_title">Язык</string>
-    <string name="language_system_title">Системный</string>
-    <string name="language_system_subtitle">Использовать язык устройства</string>
-    <string name="language_english_subtitle">Интерфейс на английском</string>
-    <string name="language_russian_subtitle">Интерфейс на русском</string>
+    <string name="settings_language_subtitle_system">Меняется в настройках Android</string>
+
+    <!-- Weekdays -->
+    <string-array name="day_names_short">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+        <item>Вс</item>
+    </string-array>
+
+    <!-- Short month names -->
+    <string-array name="month_names_short">
+        <item>Янв</item>
+        <item>Фев</item>
+        <item>Мар</item>
+        <item>Апр</item>
+        <item>Май</item>
+        <item>Июн</item>
+        <item>Июл</item>
+        <item>Авг</item>
+        <item>Сен</item>
+        <item>Окт</item>
+        <item>Ноя</item>
+        <item>Дек</item>
+    </string-array>
 </resources>
