@@ -7,9 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.level.LevelUiState
+import kotlin.math.roundToInt
 
 @Composable
 fun XpProgressBar(
@@ -22,6 +25,10 @@ fun XpProgressBar(
     } else {
         0f
     }
+    val percent = (progress * 100).roundToInt()
+
+    val className = stringResource(classLabelRes(levelState.playerClassKey))
+    val showClassBadge = levelState.playerClassKey != "NOVICE"
 
     Card(
         modifier = modifier
@@ -46,7 +53,7 @@ fun XpProgressBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Уровень ${levelState.currentLevel}",
+                        text = stringResource(R.string.level_label, levelState.currentLevel),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -55,9 +62,9 @@ fun XpProgressBar(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     // Иконка или бейдж класса
-                    if (levelState.playerClass != "Новичок") {
+                    if (levelState.playerClassKey != "Новичок") {
                         Text(
-                            text = "• ${levelState.playerClass}",
+                            text = stringResource(R.string.level_class_bullet, className),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Medium
@@ -72,7 +79,7 @@ fun XpProgressBar(
                         contentColor = Color.White
                     ) {
                         Text(
-                            text = "${levelState.unspentSkillPoints} points",
+                            text = stringResource(R.string.unspent_points_badge, levelState.unspentSkillPoints),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -87,12 +94,16 @@ fun XpProgressBar(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "X.P.: ${levelState.currentXp}/${levelState.xpToNextLevel}",
+                        text = stringResource(
+                            R.string.xp_progress_label,
+                            levelState.currentXp,
+                            levelState.xpToNextLevel
+                        ),
                         style = MaterialTheme.typography.bodySmall
                     )
 
                     Text(
-                        text = "${(progress * 100).toInt()}%",
+                        text = stringResource(R.string.percent_label, percent),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -113,7 +124,7 @@ fun XpProgressBar(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Full x.p.: ${levelState.totalXp}",
+                    text = stringResource(R.string.total_xp_label, levelState.totalXp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -121,7 +132,7 @@ fun XpProgressBar(
                 // Последовательные дни
                 if (levelState.consecutiveDays > 0) {
                     Text(
-                        text = "${levelState.consecutiveDays} дн. подряд",
+                        text = stringResource(R.string.consecutive_days_label, levelState.consecutiveDays),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )

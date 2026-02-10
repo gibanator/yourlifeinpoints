@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="class_novice">Новичок</string>
+    <string name="class_swordsman">Мечник</string>
+    <string name="class_paladin">Паладин</string>
+    <string name="class_cyborg">Киборг</string>
+    <string name="class_berserker">Берсерк</string>
+    <string name="class_reaper">Жнец</string>
+    <string name="class_herbalist">Травник</string>
+    <string name="class_bard">Бард</string>
+    <string name="class_monk">Монах</string>
+    <string name="class_engineer">Инженер</string>
+    <string name="class_netrunner">Нетраннер</string>
+    <string name="class_marksman">Стрелок</string>
+    <string name="class_general">Генерал</string>
+</resources>

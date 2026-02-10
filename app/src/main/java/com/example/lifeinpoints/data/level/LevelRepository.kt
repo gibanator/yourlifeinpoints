@@ -104,16 +104,16 @@ class LevelRepository @Inject constructor(
         return resetProgress
     }
 
-    suspend fun getClass(): String {
+    suspend fun getClassKey(): String {
         val progress = getOrCreateProgress()
-        return calculateClass(progress)
+        return calculateClassKey(progress)
     }
 
     private fun getRequiredXpForLevel(level: Int): Int {
         return LevelConstants.getRequiredXpForLevel(level)
     }
 
-    private fun calculateClass(progress: LevelProgressEntity): String {
+    private fun calculateClassKey(progress: LevelProgressEntity): String {
         val skills = listOf(
             progress.strength,
             progress.agility,
@@ -123,25 +123,19 @@ class LevelRepository @Inject constructor(
             progress.survival
         )
 
-        // Если все навыки равны 0, возвращаем "Новичок"
-        if (skills.all { it == 0 }) {
-            return "Новичок"
-        }
+        if (skills.all { it == 0 }) return "NOVICE"
 
-        var bestClass = "Новичок"
-        var maxScore = 0
+        var bestKey = "NOVICE"
+        var maxScore = Int.MIN_VALUE
 
-        LevelConstants.CLASS_MULTIPLIERS.forEach { (className, multipliers) ->
-            val score = skills.zip(multipliers).sumOf { (skill, multiplier) ->
-                skill * multiplier
-            }
+        LevelConstants.CLASS_MULTIPLIERS.forEach { (classKey, multipliers) ->
+            val score = skills.zip(multipliers).sumOf { (skill, mult) -> skill * mult }
             if (score > maxScore) {
                 maxScore = score
-                bestClass = className
+                bestKey = classKey
             }
         }
-
-        return bestClass
+        return bestKey
     }
 
     suspend fun updateConsecutiveDays(date: String, isDayCompleted: Boolean): LevelProgressEntity {

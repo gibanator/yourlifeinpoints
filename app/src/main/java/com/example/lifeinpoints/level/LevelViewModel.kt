@@ -30,7 +30,7 @@ class LevelViewModel @Inject constructor(
         viewModelScope.launch {
             levelRepository.observeProgress().collect { progress ->
                 if (progress != null) {
-                    val playerClass = levelRepository.getClass()
+                    val playerClass = levelRepository.getClassKey()
 
                     _levelState.update {
                         LevelUiState(
@@ -45,7 +45,7 @@ class LevelViewModel @Inject constructor(
                             intelligence = progress.intelligence,
                             survival = progress.survival,
                             consecutiveDays = progress.consecutiveDays,
-                            playerClass = playerClass,
+                            playerClassKey = playerClass,
                             xpToNextLevel = getRequiredXpForLevel(progress.currentLevel + 1)
                         )
                     }
@@ -121,7 +121,7 @@ data class LevelUiState(
     val intelligence: Int = 0,
     val survival: Int = 0,
     val consecutiveDays: Int = 0,
-    val playerClass: String = "Новичок",
+    val playerClassKey: String = "NOVICE",
     val xpToNextLevel: Int = 100 // XP для достижения 1 уровня
 )
 

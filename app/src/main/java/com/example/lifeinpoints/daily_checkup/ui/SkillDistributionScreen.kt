@@ -11,11 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.data.level.LevelConstants
 import com.example.lifeinpoints.level.LevelUiState
+import com.example.lifeinpoints.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,10 @@ fun SkillDistributionScreen(
     var localIntelligence by remember { mutableIntStateOf(levelState.intelligence) }
     var localSurvival by remember { mutableIntStateOf(levelState.survival) }
 
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
     // При изменении levelState извне, обновляем локальные значения
     LaunchedEffect(levelState) {
         localUnspentPoints = levelState.unspentSkillPoints
@@ -47,7 +53,7 @@ fun SkillDistributionScreen(
     }
 
     // Рассчитываем текущий класс на основе локальных значений
-    val currentClass = calculateClass(
+    val currentClassKey = calculateClass(
         strength = localStrength,
         agility = localAgility,
         charisma = localCharisma,
@@ -55,6 +61,7 @@ fun SkillDistributionScreen(
         intelligence = localIntelligence,
         survival = localSurvival
     )
+    val currentClass = stringResource(classLabelRes(currentClassKey))
 
     // Сохраняем состояние скролла
     val listState = rememberLazyListState()
@@ -153,7 +160,7 @@ fun SkillDistributionScreen(
 
     ModalBottomSheet(
         onDismissRequest = onClose,
-        sheetState = rememberModalBottomSheetState(),
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 16.dp
     ) {
@@ -173,19 +180,26 @@ fun SkillDistributionScreen(
                 ) {
                     Column {
                         Text(
-                            text = "Распределение навыков",
+                            text = stringResource(R.string.skill_distribution_title),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Уровень ${levelState.currentLevel} • $currentClass",
+                            text = stringResource(
+                                R.string.skill_distribution_subtitle,
+                                levelState.currentLevel,
+                                currentClass
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Default.Close, contentDescription = "Закрыть")
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.cd_close)
+                        )
                     }
                 }
             }
@@ -208,7 +222,7 @@ fun SkillDistributionScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Нераспределенные очки: ",
+                                text = stringResource(R.string.unspent_points_label),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
@@ -229,7 +243,7 @@ fun SkillDistributionScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     SkillRow(
-                        skillName = "Сила",
+                        skillName = stringResource(R.string.skill_strength),
                         skillValue = localStrength,
                         onIncrease = { updateLocalSkill("strength", 1) },
                         onDecrease = { updateLocalSkill("strength", -1) },
@@ -238,7 +252,7 @@ fun SkillDistributionScreen(
                     )
 
                     SkillRow(
-                        skillName = "Ловкость",
+                        skillName = stringResource(R.string.skill_agility),
                         skillValue = localAgility,
                         onIncrease = { updateLocalSkill("agility", 1) },
                         onDecrease = { updateLocalSkill("agility", -1) },
@@ -247,7 +261,7 @@ fun SkillDistributionScreen(
                     )
 
                     SkillRow(
-                        skillName = "Харизма",
+                        skillName = stringResource(R.string.skill_charisma),
                         skillValue = localCharisma,
                         onIncrease = { updateLocalSkill("charisma", 1) },
                         onDecrease = { updateLocalSkill("charisma", -1) },
@@ -256,7 +270,7 @@ fun SkillDistributionScreen(
                     )
 
                     SkillRow(
-                        skillName = "Воля",
+                        skillName = stringResource(R.string.skill_will),
                         skillValue = localWill,
                         onIncrease = { updateLocalSkill("will", 1) },
                         onDecrease = { updateLocalSkill("will", -1) },
@@ -265,7 +279,7 @@ fun SkillDistributionScreen(
                     )
 
                     SkillRow(
-                        skillName = "Интеллект",
+                        skillName = stringResource(R.string.skill_intelligence),
                         skillValue = localIntelligence,
                         onIncrease = { updateLocalSkill("intelligence", 1) },
                         onDecrease = { updateLocalSkill("intelligence", -1) },
@@ -274,7 +288,7 @@ fun SkillDistributionScreen(
                     )
 
                     SkillRow(
-                        skillName = "Выживание",
+                        skillName = stringResource(R.string.skill_survival),
                         skillValue = localSurvival,
                         onIncrease = { updateLocalSkill("survival", 1) },
                         onDecrease = { updateLocalSkill("survival", -1) },
@@ -294,7 +308,7 @@ fun SkillDistributionScreen(
                             contentColor = MaterialTheme.colorScheme.error
                         )
                     ) {
-                        Text("Сбросить все очки")
+                        Text(stringResource(R.string.reset_all_points))
                     }
                 }
             }
@@ -334,7 +348,7 @@ fun SkillRow(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "Текущее значение: $skillValue",
+                    text = stringResource(R.string.current_value, skillValue),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -355,7 +369,7 @@ fun SkillRow(
                 ) {
                     Icon(
                         Icons.Default.Remove,
-                        contentDescription = "Уменьшить",
+                        contentDescription = stringResource(R.string.cd_decrease),
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -379,7 +393,7 @@ fun SkillRow(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "Увеличить",
+                        contentDescription = stringResource(R.string.cd_increase),
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -400,10 +414,10 @@ private fun calculateClass(
 
     // Если все навыки равны 0, возвращаем "Новичок"
     if (skills.all { it == 0 }) {
-        return "Новичок"
+        return "NOVICE"
     }
 
-    var bestClass = "Новичок"
+    var bestClass = "NOVICE"
     var maxScore = 0
 
     LevelConstants.CLASS_MULTIPLIERS.forEach { (className, multipliers) ->

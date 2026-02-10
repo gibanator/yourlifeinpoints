@@ -7,18 +7,18 @@ object LevelConstants {
 
     // Таблица множителей для классов
     val CLASS_MULTIPLIERS = mapOf(
-        "Мечник" to listOf(3, 3, 1, 2, 1, 2),
-        "Паладин" to listOf(3, 1, 2, 3, 1, 2),
-        "Киборг" to listOf(2, 1, 1, 2, 3, 3),
-        "Берсерк" to listOf(3, 2, 1, 2, 1, 3),
-        "Жнец" to listOf(2, 2, 1, 3, 1, 3),
-        "Травник" to listOf(1, 2, 1, 2, 3, 3),
-        "Бард" to listOf(1, 2, 3, 2, 3, 1),
-        "Монах" to listOf(2, 3, 1, 3, 1, 2),
-        "Инженер" to listOf(1, 3, 1, 2, 3, 2),
-        "Нетраннер" to listOf(1, 3, 2, 2, 3, 1),
-        "Стрелок" to listOf(1, 3, 1, 2, 2, 3),
-        "Генерал" to listOf(1, 1, 3, 2, 3, 2)
+        "SWORDSMAN" to listOf(3, 3, 1, 2, 1, 2),
+        "PALADIN" to listOf(3, 1, 2, 3, 1, 2),
+        "CYBORG" to listOf(2, 1, 1, 2, 3, 3),
+        "BERSERKER" to listOf(3, 2, 1, 2, 1, 3),
+        "REAPER" to listOf(2, 2, 1, 3, 1, 3),
+        "HERBALIST" to listOf(1, 2, 1, 2, 3, 3),
+        "BARD" to listOf(1, 2, 3, 2, 3, 1),
+        "MONK" to listOf(2, 3, 1, 3, 1, 2),
+        "ENGINEER" to listOf(1, 3, 1, 2, 3, 2),
+        "NETRUNNER" to listOf(1, 3, 2, 2, 3, 1),
+        "MARKSMAN" to listOf(1, 3, 1, 2, 2, 3),
+        "GENERAL" to listOf(1, 1, 3, 2, 3, 2)
     )
 
     fun getRequiredXpForLevel(level: Int): Int {
