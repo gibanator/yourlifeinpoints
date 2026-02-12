@@ -36,16 +36,22 @@ private val LightColorScheme = lightColorScheme(
 
 // Theme.kt
 // LifeInPointsTheme.kt
+// com/example/lifeinpoints/core/ui/theme/Theme.kt
 @Composable
 fun LifeInPointsTheme(
     themeType: ThemeType = ThemeType.SYSTEM,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    if (themeType == ThemeType.STONE) {
+    // 🪨 Каменные темы (острые углы, кастомная типографика)
+    if (themeType.isStoneTheme) {
         CompositionLocalProvider(LocalThemeType provides themeType) {
             MaterialTheme(
-                colorScheme = stoneColorScheme(),
+                colorScheme = when (themeType) {
+                    ThemeType.DARK_STONE -> darkStoneColorScheme()
+                    ThemeType.LIGHT_STONE -> lightStoneColorScheme()
+                    else -> error("Unreachable")
+                },
                 typography = StoneTypography,
                 shapes = StoneShapes,
                 content = content
@@ -54,12 +60,13 @@ fun LifeInPointsTheme(
         return
     }
 
+    // Стандартные темы (SYSTEM/LIGHT/DARK) — без изменений
     val systemDarkTheme = isSystemInDarkTheme()
     val useDarkTheme = when (themeType) {
         ThemeType.SYSTEM -> systemDarkTheme
-        ThemeType.LIGHT -> false
-        ThemeType.DARK -> true
-        ThemeType.STONE -> false
+        ThemeType.LIGHT  -> false
+        ThemeType.DARK   -> true
+        else -> false // каменные уже отфильтрованы
     }
 
     val colorScheme = when {
@@ -68,7 +75,7 @@ fun LifeInPointsTheme(
             if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         useDarkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else         -> LightColorScheme
     }
 
     CompositionLocalProvider(LocalThemeType provides themeType) {

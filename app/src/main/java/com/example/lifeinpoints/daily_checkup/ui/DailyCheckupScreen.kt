@@ -68,6 +68,7 @@ import java.time.format.DateTimeFormatter
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.StoneCardBackground
 import com.example.lifeinpoints.core.ui.theme.ThemeType
+import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -357,8 +358,8 @@ fun CategoryListCard(
     modifier: Modifier = Modifier
 ) {
 
-    val isStoneTheme = LocalThemeType.current == ThemeType.STONE
-    val containerColor = if (isStoneTheme) {
+    val isStone = LocalThemeType.current.isStoneTheme
+    val containerColor = if (isStone) {
         StoneCardBackground   // специальный светлый цвет
     } else {
         MaterialTheme.colorScheme.surfaceVariant

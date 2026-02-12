@@ -319,12 +319,20 @@ fun ThemeSelectionCard(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            // Новая опция — каменная тема
             ThemeOption(
-                title = "Stone",
+                title = "Dark Stone",
                 subtitle = "Dark stone with carved text",
-                isSelected = currentTheme == ThemeType.STONE,
-                onClick = { onThemeSelected(ThemeType.STONE) }
+                isSelected = currentTheme == ThemeType.DARK_STONE,
+                onClick = { onThemeSelected(ThemeType.DARK_STONE) }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            ThemeOption(
+                title = "Light Stone",
+                subtitle = "Light stone with carved text",
+                isSelected = currentTheme == ThemeType.LIGHT_STONE,
+                onClick = { onThemeSelected(ThemeType.LIGHT_STONE) }
             )
         }
     }

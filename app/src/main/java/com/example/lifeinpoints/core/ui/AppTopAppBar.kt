@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.ThemeType
+import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 
+// com/example/lifeinpoints/core/ui/AppTopAppBar.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopAppBar(
@@ -21,7 +23,7 @@ fun AppTopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors()
 ) {
-    val isStone = LocalThemeType.current == ThemeType.STONE
+    val isStone = LocalThemeType.current.isStoneTheme
 
     val finalColors = if (isStone) {
         TopAppBarDefaults.topAppBarColors(
@@ -32,7 +34,7 @@ fun AppTopAppBar(
             actionIconContentColor = MaterialTheme.colorScheme.onBackground
         )
     } else {
-        colors // используем переданные цвета или стандартные
+        colors
     }
 
     TopAppBar(

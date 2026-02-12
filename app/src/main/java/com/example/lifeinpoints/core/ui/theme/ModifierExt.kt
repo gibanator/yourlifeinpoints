@@ -7,12 +7,13 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.runtime.Composable
 
+// com/example/lifeinpoints/core/ui/theme/ModifierExt.kt
 @Composable
 fun Modifier.clipByTheme(
-    stoneShape: Shape = RectangleShape, // для каменной темы
-    defaultShape: Shape                // для остальных
+    stoneShape: Shape = RectangleShape,
+    defaultShape: Shape
 ): Modifier {
-    val isStone = LocalThemeType.current == ThemeType.STONE
+    val isStone = LocalThemeType.current.isStoneTheme
     return this.then(
         if (isStone) Modifier.clip(stoneShape)
         else Modifier.clip(defaultShape)

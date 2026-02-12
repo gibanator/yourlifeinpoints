@@ -43,6 +43,7 @@ import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.ThemeType
+import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 import com.example.lifeinpoints.statistics.ui.AdaptiveMonthSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveWeekSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveYearSummaryStatsCard
@@ -65,7 +66,7 @@ import java.time.format.DateTimeFormatter
 fun StatisticsScreen(
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
-    val isStoneTheme = LocalThemeType.current == ThemeType.STONE
+    val isStone = LocalThemeType.current.isStoneTheme
     val uiState by viewModel.uiState.collectAsState()
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp

@@ -20,13 +20,15 @@ object SettingsPrefs {
     private val GAME_MODE_KEY = booleanPreferencesKey("game_mode_enabled")
 
     // Theme
+    // com/example/lifeinpoints/data/settings/ThemePrefs.kt
     fun getTheme(context: Context): Flow<ThemeType> =
         context.dataStore.data.map { prefs ->
             val value = prefs[THEME_KEY]
             when (value) {
                 "LIGHT" -> ThemeType.LIGHT
                 "DARK" -> ThemeType.DARK
-                "STONE" -> ThemeType.STONE
+                "DARK_STONE" -> ThemeType.DARK_STONE
+                "LIGHT_STONE" -> ThemeType.LIGHT_STONE
                 "SYSTEM", null -> ThemeType.SYSTEM
                 else -> ThemeType.SYSTEM
             }

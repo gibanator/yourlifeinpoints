@@ -17,10 +17,10 @@ val StoneOutline = Color(0xFF6B6B6B)
 
 // 🆕 Новые цвета для каменной темы
 val StoneCardBackground = Color(0xFF4A4A4A)  // светлее стандартного surface
-val StoneGold = Color(0xFFDAA520)            // золотой для выделения
+
 
 @Composable
-fun stoneColorScheme() = darkColorScheme(
+fun darkStoneColorScheme() = darkColorScheme(
     primary = StoneGold,                    // 🟡 золотой – основной акцент
     onPrimary = StoneDarkGrey,
     primaryContainer = StoneGold.copy(alpha = 0.2f),
