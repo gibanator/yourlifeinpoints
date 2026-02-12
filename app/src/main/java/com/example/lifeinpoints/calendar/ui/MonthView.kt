@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.calendar.DayInMonth
 import com.example.lifeinpoints.util.allDatesOfMonthView
 import com.example.lifeinpoints.util.contains
+import com.example.lifeinpoints.util.pastelIfNeeded
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -60,7 +61,8 @@ fun MonthCalendar(
                         DayInMonth.CompletionCategory.PARTIAL -> MaterialTheme.colorScheme.errorContainer
                         DayInMonth.CompletionCategory.NONE -> Color(0xFFFF9800)
                         DayInMonth.CompletionCategory.FUTURE -> Color.LightGray
-                    }
+                    }.pastelIfNeeded()
+
                     Box(Modifier.weight(1f)
                         .aspectRatio(1f)
                         .padding(5.dp)
@@ -179,7 +181,7 @@ fun CalendarDayCell(
             )
         }
 
-        if (date != null && fillColor != null) {
+        if (date != null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

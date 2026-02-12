@@ -25,10 +25,10 @@
     <string name="level_class_bullet">• %1$s</string>
 
     <plurals name="unspent_points_badge">
-        <item quantity="one">%d очко</item>
-        <item quantity="few">%d очка</item>
-        <item quantity="many">%d очков</item>
-        <item quantity="other">%d очка</item>
+        <item quantity="one">%d очко доступно</item>
+        <item quantity="few">%d очка доступно</item>
+        <item quantity="many">%d очков доступно</item>
+        <item quantity="other">%d очка доступно</item>
     </plurals>
 
     <string name="xp_progress_label">Опыт: %1$d/%2$d</string>

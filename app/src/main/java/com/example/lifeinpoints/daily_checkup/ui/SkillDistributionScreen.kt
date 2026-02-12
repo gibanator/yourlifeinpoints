@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.data.level.LevelConstants
@@ -196,40 +198,36 @@ fun SkillDistributionScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Заголовок
+            // Заголовок
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.skill_distribution_title),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
+                Column(modifier = Modifier.fillMaxWidth()) {
 
-                            if (localUnspentPoints > 0) {
-                                Badge(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                ) {
-                                    Text(
-                                        text = pluralStringResource(
-                                            id = R.plurals.unspent_points_badge,
-                                            count = localUnspentPoints,
-                                            localUnspentPoints
-                                        ),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            }
+                    // 1-я строка: заголовок + крестик
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.skill_distribution_title),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        IconButton(onClick = onClose) {
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
                         }
+                    }
 
+                    Spacer(Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = stringResource(
                                 R.string.skill_distribution_subtitle,
@@ -237,15 +235,29 @@ fun SkillDistributionScreen(
                                 currentClass
                             ),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    }
 
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = stringResource(R.string.cd_close)
-                        )
+                        if (localUnspentPoints > 0) {
+                            Spacer(Modifier.width(8.dp))
+                            Badge(
+                                modifier = Modifier.wrapContentWidth(),
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ) {
+                                Text(
+                                    text = pluralStringResource(
+                                        R.plurals.unspent_points_badge, // типа: "%d очко/очка/очков"
+                                        localUnspentPoints,
+                                        localUnspentPoints
+                                    ),
+                                    maxLines = 1,
+                                    softWrap = false
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.example.lifeinpoints.util.pastelIfNeeded
 import kotlin.math.min
 
 /**
@@ -78,6 +79,12 @@ fun PieChartWithLegend(
     val chartHeight = screenHeight * 0.35f // 35% высоты экрана под диаграмму
     val padding = screenWidth * 0.04f // 4% от ширины экрана для отступов
     val legendSpacing = screenHeight * 0.02f // 2% высоты экрана между диаграммой и легендой
+
+    val themedData = remember(data) {
+        data
+    }.map { item ->
+        item.copy(color = item.color.pastelIfNeeded()) // <-- это можно, мы в @Composable
+    }
 
     // Суммируем все значения для расчета процентов
     val total = data.fold(0f) { acc, item -> acc + item.value }
@@ -135,7 +142,7 @@ fun PieChartWithLegend(
                     var startAngle = -90f // Начинаем с верхней точки (12 часов)
 
                     // Отрисовываем каждый сегмент диаграммы
-                    data.forEach { item ->
+                    themedData.forEach { item ->
                         val sweepAngle = (item.value / total) * 360f
 
                         drawPieSegment(
@@ -156,7 +163,7 @@ fun PieChartWithLegend(
             if (showLegend) {
                 Spacer(modifier = Modifier.height(legendSpacing))
                 AdaptiveLegend(
-                    data = data,
+                    data = themedData,
                     total = total,
                     screenWidth = screenWidth,
                     screenHeight = screenHeight,
@@ -422,6 +429,7 @@ private fun calculateOptimalLegendType(
  * @param startAngle Начальный угол сегмента (в градусах)
  * @param sweepAngle Угол развертки сегмента (в градусах)
  */
+
 private fun DrawScope.drawPieSegment(
     color: Color,
     center: Offset,

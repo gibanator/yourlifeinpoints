@@ -50,6 +50,7 @@ android {
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.compose.ui.text)
     ksp(libs.room.compiler)
 
     implementation(libs.androidx.core.ktx)

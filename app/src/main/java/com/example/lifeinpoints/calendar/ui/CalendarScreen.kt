@@ -22,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,13 +36,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.calendar.CalendarUiState
 import com.example.lifeinpoints.calendar.CalendarViewModel
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import com.example.lifeinpoints.R
-import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,10 +84,11 @@ fun CalendarScreen(
                     end = paddingValues.calculateEndPadding(layoutDirection)
                     // no bottom padding
                 )
-                /*.padding(
+                .padding(
                     start = 16.dp,
                     end = 16.dp,
-                )*/
+                    bottom = 16.dp
+                )
         ) {
             val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
             CalendarModeSwitchCard(

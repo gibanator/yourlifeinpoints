@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.calendar.DayInMonth
 import com.example.lifeinpoints.calendar.MonthUi
+import com.example.lifeinpoints.util.pastelIfNeeded
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -105,7 +106,7 @@ fun CompactMonthCalendar(
                         DayInMonth.CompletionCategory.PARTIAL -> MaterialTheme.colorScheme.errorContainer
                         DayInMonth.CompletionCategory.NONE -> Color(0xFFFF9800)
                         DayInMonth.CompletionCategory.FUTURE -> Color.LightGray
-                    }
+                    }.pastelIfNeeded()
 
                     Box(
                         Modifier

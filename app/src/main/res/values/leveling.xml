@@ -26,8 +26,8 @@
     <string name="level_class_bullet">• %1$s</string>
 
     <plurals name="unspent_points_badge">
-        <item quantity="one">%d point</item>
-        <item quantity="other">%d points</item>
+        <item quantity="one">%d point available</item>
+        <item quantity="other">%d points available</item>
     </plurals>
 
     <string name="xp_progress_label">XP: %1$d/%2$d</string>
