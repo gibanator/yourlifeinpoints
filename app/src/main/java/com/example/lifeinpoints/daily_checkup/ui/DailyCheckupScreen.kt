@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,11 +58,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsViewModel
+import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.theme.clipByTheme
 import com.example.lifeinpoints.level.LevelViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import com.example.lifeinpoints.core.ui.theme.LocalThemeType
+import com.example.lifeinpoints.core.ui.theme.StoneCardBackground
+import com.example.lifeinpoints.core.ui.theme.ThemeType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +110,7 @@ fun DailyCheckupScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text(uiState.selectedDate.format(formatter)) },
                 actions = {
                     OutlinedButton(onClick = { vm.goToToday() }) {
@@ -299,7 +305,10 @@ fun WeekBarWithButtons(
                     modifier = Modifier
                         .weight(1f)
                         .aspectRatio(1f)
-                        .clip(CircleShape)
+                        .clipByTheme(
+                            stoneShape = RectangleShape, // квадрат (острые углы)
+                            defaultShape = CircleShape  // круг для всех остальных тем
+                        )
                         .background(
                             if (day.isSelected) MaterialTheme.colorScheme.primary
                             else Color.Transparent
@@ -347,10 +356,18 @@ fun CategoryListCard(
     onAddComment: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val isStoneTheme = LocalThemeType.current == ThemeType.STONE
+    val containerColor = if (isStoneTheme) {
+        StoneCardBackground   // специальный светлый цвет
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.small
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -404,7 +421,7 @@ fun ActionButtonsRow(
                 .weight(1f)
                 .clickable(onClick = onAddComment),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
@@ -429,14 +446,10 @@ fun ActionButtonsRow(
                 .weight(1f)
                 .clickable(onClick = onToggleMultiplierMode),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(
                 containerColor = if (selectedCount > 0) {
-                    if (isMultiplierMode) {
-                        Color(0xFF7E6DF8)
-                    } else {
-                        Color(0xFF7E6DF8)
-                    }
+                    MaterialTheme.colorScheme.primary   // золотой
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 }
@@ -507,9 +520,9 @@ fun DayCompletionCard(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
-            containerColor = if (isDayEnded) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (isDayEnded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Row(
@@ -541,7 +554,7 @@ fun CategoryListItem(
     isSelected: Boolean = false,
 ) {
     val cardColor = if (isSelected) {
-        Color(0xFF7E6DF8)
+        MaterialTheme.colorScheme.primary   // золотой в Stone, фиолетовый в остальных
     } else {
         MaterialTheme.colorScheme.surface
     }
@@ -549,7 +562,7 @@ fun CategoryListItem(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = MaterialTheme.shapes.small
     ) {
         Row(
             modifier = Modifier
@@ -578,7 +591,7 @@ fun NumberCard(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = MaterialTheme.shapes.small
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -589,7 +602,8 @@ fun NumberCard(
             Text(
                 text = number,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary   // золотой
             )
         }
     }

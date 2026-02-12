@@ -10,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -41,11 +42,24 @@ fun LifeInPointsTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    if (themeType == ThemeType.STONE) {
+        CompositionLocalProvider(LocalThemeType provides themeType) {
+            MaterialTheme(
+                colorScheme = stoneColorScheme(),
+                typography = StoneTypography,
+                shapes = StoneShapes,
+                content = content
+            )
+        }
+        return
+    }
+
     val systemDarkTheme = isSystemInDarkTheme()
     val useDarkTheme = when (themeType) {
         ThemeType.SYSTEM -> systemDarkTheme
         ThemeType.LIGHT -> false
         ThemeType.DARK -> true
+        ThemeType.STONE -> false
     }
 
     val colorScheme = when {
@@ -57,9 +71,12 @@ fun LifeInPointsTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(LocalThemeType provides themeType) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            shapes = AppShapes,
+            content = content
+        )
+    }
 }

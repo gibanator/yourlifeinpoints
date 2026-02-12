@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 // com.example.lifeinpoints.categories/EditCategoryScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +60,7 @@ fun EditCategoryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text(stringResource(R.string.category_edit_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

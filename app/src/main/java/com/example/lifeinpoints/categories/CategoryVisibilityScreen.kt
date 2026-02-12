@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.statistics.StatisticsViewModel
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 // com.example.lifeinpoints.categories/CategoryVisibilityScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +32,7 @@ fun CategoryVisibilityScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text(stringResource(R.string.categories_visibility_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

@@ -43,6 +43,7 @@ import com.example.lifeinpoints.statistics.ui.calculateAdaptiveFontSize
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +62,7 @@ fun CalendarScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = {
                     Text(
                         if (calendarUiState.mode == CalendarUiState.Mode.MONTH)
@@ -84,10 +85,10 @@ fun CalendarScreen(
                     end = paddingValues.calculateEndPadding(layoutDirection)
                     // no bottom padding
                 )
-                .padding(
+                /*.padding(
                     start = 16.dp,
                     end = 16.dp,
-                )
+                )*/
         ) {
             val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
             CalendarModeSwitchCard(

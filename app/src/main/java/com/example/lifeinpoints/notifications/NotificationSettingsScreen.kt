@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
@@ -43,7 +44,7 @@ fun NotificationSettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text("Notification Settings") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

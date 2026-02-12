@@ -26,6 +26,7 @@ object SettingsPrefs {
             when (value) {
                 "LIGHT" -> ThemeType.LIGHT
                 "DARK" -> ThemeType.DARK
+                "STONE" -> ThemeType.STONE
                 "SYSTEM", null -> ThemeType.SYSTEM
                 else -> ThemeType.SYSTEM
             }

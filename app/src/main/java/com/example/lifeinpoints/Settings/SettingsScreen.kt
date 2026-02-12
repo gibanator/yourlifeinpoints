@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.theme.ThemeType
 
 
@@ -56,7 +57,7 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = {
                     Text(text = stringResource(R.string.settings_title))
                         },
@@ -314,6 +315,16 @@ fun ThemeSelectionCard(
                 subtitle = stringResource(R.string.theme_dark_subtitle),
                 isSelected = currentTheme == ThemeType.DARK,
                 onClick = { onThemeSelected(ThemeType.DARK) }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            // Новая опция — каменная тема
+            ThemeOption(
+                title = "Stone",
+                subtitle = "Dark stone with carved text",
+                isSelected = currentTheme == ThemeType.STONE,
+                onClick = { onThemeSelected(ThemeType.STONE) }
             )
         }
     }
