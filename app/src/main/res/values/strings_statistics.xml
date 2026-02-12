@@ -6,8 +6,16 @@
     <string name="total_col_name">Total</string>
 
     <!-- Summary card -->
-    <string name="summary_title">Summary</string>
+    <plurals name="summary_categories_count">
+        <item quantity="one">%d category</item>
+        <item quantity="other">%d categories</item>
+    </plurals>
+
+    <string name="month_summary_title">%1$s Summary</string>
+    <string name="year_summary_title">%1$d Summary</string>
+    <string name="summary_day_number">#%1$d</string>
     <string name="week_summary_title">Week Summary</string>
+
     <string name="summary_days">Days</string>
     <string name="summary_months">Months</string>
     <string name="summary_completed">completed</string>
@@ -16,7 +24,6 @@
     <string name="summary_permonth">per month</string>
     <string name="summary_bestday">Best Day</string>
     <string name="summary_bestmonth">Best Month</string>
-    <string name="summary_categories">categories</string>
 
     <!-- Pie Chart -->
     <string name="piechart_title_month">Categories for Month</string>

@@ -25,7 +25,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -123,7 +122,7 @@ fun SettingsScreen(
 
             // Новая секция уведомлений
             Text(
-                text = "Reminders",
+                text = stringResource(R.string.notification_settings_section_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -169,21 +168,25 @@ fun NotificationSettingsCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 12.dp)
+            ) {
                 Text(
-                    text = "Daily Reminders",
+                    text = stringResource(R.string.notification_settings_card_title),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "Set up daily notifications to build consistent habits",
+                    text = stringResource(R.string.notification_settings_card_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Notification settings",
+                contentDescription = stringResource(R.string.cd_notification_settings),
                 tint = MaterialTheme.colorScheme.primary
             )
         }

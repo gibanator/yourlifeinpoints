@@ -8,6 +8,7 @@
 
     <!-- Miscellaneous -->
     <string name="save">Save</string>
+    <string name="set">Set</string>
     <string name="cancel">Cancel</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
@@ -49,4 +50,6 @@
         <item>Nov</item>
         <item>Dec</item>
     </string-array>
+    <string name="notif_daily_title">Daily Checkup Time! ⏰</string>
+    <string name="notif_daily_message">Complete your daily categories to track your progress. Every day counts! 💪</string>
 </resources>

@@ -32,11 +32,7 @@ class NotificationScheduler(private val context: Context) {
 
         // Создаём данные для передачи в Worker
         val inputData = Data.Builder()
-            .putString(DailyNotificationWorker.KEY_TITLE, "Daily Checkup Time! ⏰")
-            .putString(
-                DailyNotificationWorker.KEY_MESSAGE,
-                "Complete your daily categories to track your progress. Every day counts! 💪"
-            )
+            .putString(DailyNotificationWorker.KEY_DATE, java.time.LocalDate.now().toString())
             .build()
 
         // Рассчитываем время до первого уведомления

@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import androidx.work.Data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.lifeinpoints.R
 
 class DailyNotificationWorker(
     context: Context,
@@ -15,23 +16,18 @@ class DailyNotificationWorker(
 
     companion object {
         const val WORK_NAME = "daily_checkup_notification_work"
-        const val KEY_TITLE = "notification_title"
-        const val KEY_MESSAGE = "notification_message"
         const val KEY_DATE = "notification_date"
     }
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                // Получаем данные для уведомления
-                val title = inputData.getString(KEY_TITLE)
-                    ?: "Daily Checkup Time! ⏰"
-                val message = inputData.getString(KEY_MESSAGE)
-                    ?: "Complete your daily categories to track your progress. Every day counts! 💪"
                 val date = inputData.getString(KEY_DATE)
                     ?: java.time.LocalDate.now().toString()
 
-                // Показываем уведомление
+                val title = applicationContext.getString(R.string.notif_daily_title)
+                val message = applicationContext.getString(R.string.notif_daily_message)
+
                 val notificationHelper = NotificationHelper(applicationContext)
                 notificationHelper.showDailyCheckupNotification(title, message)
 

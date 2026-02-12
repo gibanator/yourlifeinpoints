@@ -24,7 +24,12 @@
     <string name="level_label">Уровень %1$d</string>
     <string name="level_class_bullet">• %1$s</string>
 
-    <string name="unspent_points_badge">%1$d очков</string>
+    <plurals name="unspent_points_badge">
+        <item quantity="one">%d очко</item>
+        <item quantity="few">%d очка</item>
+        <item quantity="many">%d очков</item>
+        <item quantity="other">%d очка</item>
+    </plurals>
 
     <string name="xp_progress_label">Опыт: %1$d/%2$d</string>
     <string name="percent_label">%1$d%%</string>
