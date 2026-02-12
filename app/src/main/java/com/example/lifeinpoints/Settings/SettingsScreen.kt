@@ -298,8 +298,10 @@ fun ThemeSelectionCard(
                 title = stringResource(R.string.theme_system_title),
                 subtitle = stringResource(R.string.theme_system_subtitle),
                 isSelected = currentTheme == ThemeType.SYSTEM,
-                onClick = { onThemeSelected(ThemeType.SYSTEM)
-                Log.d("Theme", "Changed theme to system") }
+                onClick = {
+                    onThemeSelected(ThemeType.SYSTEM)
+                    Log.d("Theme", "Changed theme to system")
+                }
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -323,19 +325,19 @@ fun ThemeSelectionCard(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             ThemeOption(
-                title = "Dark Stone",
-                subtitle = "Dark stone with carved text",
-                isSelected = currentTheme == ThemeType.DARK_STONE,
-                onClick = { onThemeSelected(ThemeType.DARK_STONE) }
+                title = stringResource(R.string.theme_light_stone_title),
+                subtitle = stringResource(R.string.theme_light_stone_subtitle),
+                isSelected = currentTheme == ThemeType.LIGHT_STONE,
+                onClick = { onThemeSelected(ThemeType.LIGHT_STONE) }
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             ThemeOption(
-                title = "Light Stone",
-                subtitle = "Light stone with carved text",
-                isSelected = currentTheme == ThemeType.LIGHT_STONE,
-                onClick = { onThemeSelected(ThemeType.LIGHT_STONE) }
+                title = stringResource(R.string.theme_dark_stone_title),
+                subtitle = stringResource(R.string.theme_dark_stone_subtitle),
+                isSelected = currentTheme == ThemeType.DARK_STONE,
+                onClick = { onThemeSelected(ThemeType.DARK_STONE) }
             )
         }
     }

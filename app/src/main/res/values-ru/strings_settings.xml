@@ -13,6 +13,10 @@
     <string name="theme_light_subtitle">Всегда использовать светлую тему</string>
     <string name="theme_dark_title">Темная</string>
     <string name="theme_dark_subtitle">Всегда использовать темную тему</string>
+    <string name="theme_dark_stone_title">Тёмный камень</string>
+    <string name="theme_dark_stone_subtitle">Тёмный камень с резным текстом</string>
+    <string name="theme_light_stone_title">Светлый камень</string>
+    <string name="theme_light_stone_subtitle">Светлый камень с резным текстом</string>
 
     <!-- Content -->
     <string name="categories_management_title">Категории</string>
