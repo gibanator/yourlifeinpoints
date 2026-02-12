@@ -13,6 +13,10 @@
     <string name="theme_light_subtitle">Always use light theme</string>
     <string name="theme_dark_title">Dark</string>
     <string name="theme_dark_subtitle">Always use dark theme</string>
+    <string name="theme_dark_stone_title">Dark Stone</string>
+    <string name="theme_dark_stone_subtitle">Dark stone with carved text</string>
+    <string name="theme_light_stone_title">Light Stone</string>
+    <string name="theme_light_stone_subtitle">Light stone with carved text</string>
 
     <!-- Content Settings Group -->
     <string name="categories_management_title">Categories</string>
