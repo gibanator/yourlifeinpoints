@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +74,7 @@ fun CategoriesScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text(stringResource(R.string.categories_management_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

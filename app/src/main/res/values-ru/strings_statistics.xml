@@ -6,8 +6,18 @@
     <string name="total_col_name">Общ</string>
 
     <!-- Summary card -->
-    <string name="summary_title">- Итоги</string>
+    <plurals name="summary_categories_count">
+        <item quantity="one">%d категория</item>
+        <item quantity="few">%d категории</item>
+        <item quantity="many">%d категорий</item>
+        <item quantity="other">%d категории</item>
+    </plurals>
+
+    <string name="month_summary_title">Сводка за %1$s</string>
+    <string name="year_summary_title">Сводка за %1$d</string>
+    <string name="summary_day_number">#%1$d</string>
     <string name="week_summary_title">Итоги недели</string>
+
     <string name="summary_days">Дней</string>
     <string name="summary_months">Месяцев</string>
     <string name="summary_completed">пройдено</string>
@@ -16,7 +26,6 @@
     <string name="summary_permonth">за месяц</string>
     <string name="summary_bestday">Лучший день</string>
     <string name="summary_bestmonth">Лучший месяц</string>
-    <string name="summary_categories">категорий</string>
 
     <!-- Pie Chart -->
     <string name="piechart_title_month">Категории за месяц</string>

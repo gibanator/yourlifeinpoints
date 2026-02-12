@@ -49,4 +49,36 @@
     <string name="empty">Empty</string>
     <string name="comment_template_text_placeholder">Enter template text:</string>
     <string name="empty_tip">Tip: leave the box empty to clear this slot</string>
+
+    <!-- Reminders Section-->
+    <string name="notification_settings_section_title">Reminders</string>
+    <string name="notification_settings_card_title">Daily Reminders</string>
+    <string name="notification_settings_card_subtitle">Set up daily notifications to build consistent habits</string>
+    <string name="cd_notification_settings">Notification settings</string>
+
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_daily_reminders_title">Daily Reminders</string>
+    <string name="notification_daily_reminders_desc">Set a daily reminder to complete your checkup. We\'ll notify you at the specified time every day to help you build a consistent habit.</string>
+
+    <string name="notification_daily_reminders_label">Daily reminders</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+
+    <string name="notification_reminder_time_label">Reminder time</string>
+
+    <string name="notification_tips_title">Tips for effective reminders:</string>
+    <string name="notification_tips_body">• Set reminders for times when you\'re usually free\n• Choose consistent times to build habits\n• Evening reminders help you reflect on the day\n• Morning reminders help you plan ahead</string>
+
+    <string name="notification_test_title">Test Notification</string>
+    <string name="notification_test_desc">Tap the button below to test if notifications are working correctly.</string>
+    <string name="notification_test_button">Test Notification Now</string>
+
+    <string name="notification_test_notif_title">Test Notification 🧪</string>
+    <string name="notification_test_notif_message">This is a test notification to check if everything is working!</string>
+
+    <string name="change">Change</string>
+    <string name="select_time">Select time</string>
+    <string name="hour">Hour</string>
+    <string name="minute">Minute</string>
+    <string name="selected_time">Selected: %1$s</string>
 </resources>

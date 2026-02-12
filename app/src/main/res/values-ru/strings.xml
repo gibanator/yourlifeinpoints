@@ -8,6 +8,7 @@
 
     <!-- Miscellaneous -->
     <string name="save">Сохранить</string>
+    <string name="set">Установить</string>
     <string name="cancel">Отмена</string>
     <string name="edit">Редактировать</string>
     <string name="delete">Удалить</string>
@@ -49,4 +50,6 @@
         <item>Ноя</item>
         <item>Дек</item>
     </string-array>
+    <string name="notif_daily_title">Время ежедневной проверки! ⏰</string>
+    <string name="notif_daily_message">Отметьте категории за сегодня. Каждый день имеет значение! 💪</string>
 </resources>

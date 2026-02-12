@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Основной фон и поверхности – делаем одинаковыми для единства -->
+    <color name="morrowind_background">#2B1B0E</color>
+    <color name="morrowind_surface">#2B1B0E</color>   <!-- было #3E2C1B, теперь как фон -->
+
+    <!-- Карточки и акцентные поверхности – чуть светлее/темнее для контраста -->
+    <color name="morrowind_surface_variant">#3E2C1B</color>  <!-- бывший surface -->
+    <color name="morrowind_surface_container">#4A3825</color> <!-- ещё один вариант, если нужен -->
+
+    <!-- Остальные цвета оставляем или корректируем -->
+    <color name="morrowind_primary">#C89A6B</color>
+    <color name="morrowind_onPrimary">#2B1B0E</color>
+    <color name="morrowind_secondary">#8B5A2B</color>
+    <color name="morrowind_tertiary">#5D3A1A</color>
+    <color name="morrowind_onBackground">#E6D5B8</color>
+    <color name="morrowind_onSurface">#F0E6D2</color>
+    <color name="morrowind_error">#A64242</color>
+    <color name="morrowind_outline">#8B7355</color>
+</resources>

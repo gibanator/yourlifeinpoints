@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -79,7 +80,11 @@ fun XpProgressBar(
                         contentColor = Color.White
                     ) {
                         Text(
-                            text = stringResource(R.string.unspent_points_badge, levelState.unspentSkillPoints),
+                            text = pluralStringResource(
+                                id = R.plurals.unspent_points_badge,
+                                count = levelState.unspentSkillPoints,
+                                levelState.unspentSkillPoints
+                            ),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }

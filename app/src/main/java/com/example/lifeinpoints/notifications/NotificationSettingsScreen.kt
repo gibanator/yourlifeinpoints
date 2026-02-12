@@ -1,8 +1,6 @@
 // com/example/lifeinpoints/notifications/NotificationSettingsScreen.kt
 package com.example.lifeinpoints.notifications
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Schedule
@@ -21,12 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,13 +39,20 @@ fun NotificationSettingsScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
+    val timeText = remember(hour, minute) {
+        LocalTime.of(hour, minute).format(DateTimeFormatter.ofPattern("HH:mm"))
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Notification Settings") },
+            AppTopAppBar(
+                title = { Text(stringResource(R.string.notification_settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "back"
+                        )
                     }
                 }
             )
@@ -73,12 +78,12 @@ fun NotificationSettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Daily Reminders",
+                        text = stringResource(R.string.notification_daily_reminders_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Set a daily reminder to complete your checkup. We'll notify you at the specified time every day to help you build a consistent habit.",
+                        text = stringResource(R.string.notification_daily_reminders_desc),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -110,12 +115,14 @@ fun NotificationSettingsScreen(
                             )
                             Column {
                                 Text(
-                                    text = "Daily reminders",
+                                    text = stringResource(R.string.notification_daily_reminders_label),
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = if (isEnabled) "Enabled" else "Disabled",
+                                    text = stringResource(
+                                        if (isEnabled) R.string.enabled else R.string.disabled
+                                    ),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -143,12 +150,12 @@ fun NotificationSettingsScreen(
                             )
                             Column {
                                 Text(
-                                    text = "Reminder time",
+                                    text = stringResource(R.string.notification_reminder_time_label),
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = String.format("%02d:%02d", hour, minute),
+                                    text = timeText,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
@@ -174,15 +181,12 @@ fun NotificationSettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Tips for effective reminders:",
+                        text = stringResource(R.string.notification_tips_title),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "• Set reminders for times when you're usually free\n" +
-                                "• Choose consistent times to build habits\n" +
-                                "• Evening reminders help you reflect on the day\n" +
-                                "• Morning reminders help you plan ahead",
+                        text = stringResource(R.string.notification_tips_body),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -198,25 +202,25 @@ fun NotificationSettingsScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                text = "Test Notification",
+                                text = stringResource(R.string.notification_test_title),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Tap the button below to test if notifications are working correctly.",
+                                text = stringResource(R.string.notification_test_desc),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Button(
                                 onClick = {
                                     val notificationHelper = NotificationHelper(context)
                                     notificationHelper.showDailyCheckupNotification(
-                                        "Test Notification 🧪",
-                                        "This is a test notification to check if everything is working!"
+                                        context.getString(R.string.notification_test_notif_title),
+                                        context.getString(R.string.notification_test_notif_message)
                                     )
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Test Notification Now")
+                                Text(stringResource(R.string.notification_test_button))
                             }
                         }
                     }
@@ -244,13 +248,17 @@ fun TimePickerButton(
         },
         enabled = true
     ) {
-        Text("Change")
+        Text(stringResource(R.string.change))
     }
 
     if (showTimePicker) {
+        val selectedTimeText = remember(currentHour, currentMinute) {
+            LocalTime.of(currentHour, currentMinute).format(DateTimeFormatter.ofPattern("HH:mm"))
+        }
+
         AlertDialog(
             onDismissRequest = { showTimePicker = false },
-            title = { Text("Select time") },
+            title = { Text(stringResource(R.string.select_time)) },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -263,7 +271,7 @@ fun TimePickerButton(
                         // Часы
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Hour",
+                                text = stringResource(R.string.hour),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             HourMinutePicker(
@@ -278,7 +286,7 @@ fun TimePickerButton(
                         // Минуты
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Minute",
+                                text = stringResource(R.string.minute),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             HourMinutePicker(
@@ -291,7 +299,7 @@ fun TimePickerButton(
                     }
 
                     Text(
-                        text = "Selected: ${String.format("%02d:%02d", currentHour, currentMinute)}",
+                        text = stringResource(R.string.selected_time, selectedTimeText),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -304,12 +312,12 @@ fun TimePickerButton(
                         showTimePicker = false
                     }
                 ) {
-                    Text("Set")
+                    Text(stringResource(R.string.set))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -336,16 +344,16 @@ fun HourMinutePicker(
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowDropUp,
-                contentDescription = "Increase"
+                contentDescription = stringResource(R.string.cd_increase)
             )
         }
 
         // Отображаемое значение
         Text(
-            text = String.format("%02d", value),
+            text = "%02d".format(value),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.width(48.dp),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
 
         // Кнопка вниз
@@ -360,7 +368,7 @@ fun HourMinutePicker(
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = "Decrease"
+                contentDescription = stringResource(R.string.cd_decrease)
             )
         }
     }

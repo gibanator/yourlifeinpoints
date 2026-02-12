@@ -21,6 +21,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +46,7 @@ fun AddCategoryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text(stringResource(R.string.category_add_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

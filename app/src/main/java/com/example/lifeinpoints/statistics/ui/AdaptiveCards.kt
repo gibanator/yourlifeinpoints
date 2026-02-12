@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,6 +25,7 @@ import com.example.lifeinpoints.statistics.WeekSummaryStats
 import com.example.lifeinpoints.statistics.YearSummaryStats
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * Адаптивная карточка с краткой статистикой за месяц.
@@ -42,7 +44,8 @@ fun AdaptiveMonthSummaryStatsCard(
     modifier: Modifier = Modifier
 ) {
     // Форматтер для отображения месяца и года (например: "January 2024")
-    val monthFormatter = DateTimeFormatter.ofPattern("LLLL yyyy")
+    val monthFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", Locale.getDefault())
+    val monthText = currentMonth.format(monthFormatter)
 
     // Карточка с тенями и цветом фона
     Card(
@@ -57,7 +60,7 @@ fun AdaptiveMonthSummaryStatsCard(
         ) {
             // Заголовок карточки с названием месяца
             Text(
-                text = "${currentMonth.format(monthFormatter)} ${stringResource(R.string.summary_title)}", // "January 2024 Summary"
+                text = stringResource(R.string.month_summary_title, monthText), // "January 2024 Summary"
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f) // Адаптивный размер шрифта
                 ),
@@ -81,16 +84,22 @@ fun AdaptiveMonthSummaryStatsCard(
                 // Метрика 2: Среднее количество категорий в день
                 AdaptiveSummaryItem(
                     title = stringResource(R.string.summary_average),
-                    value = "%.1f".format(summary.averagePerDay), // "3.5" (один знак после запятой)
+                    value = String.format(Locale.getDefault(), "%.1f", summary.averagePerDay), // "3.5"
                     subtitle = stringResource(R.string.summary_perday),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 3: Лучший день месяца
+                val bestDaySubtitle = pluralStringResource(
+                    id = R.plurals.summary_categories_count,
+                    count = summary.bestDayCount,
+                    summary.bestDayCount
+                )
+
                 AdaptiveSummaryItem(
                     title = stringResource(R.string.summary_bestday),
-                    value = if (summary.bestDay > 0) "#${summary.bestDay}" else "-", // "#15" или "-"
-                    subtitle = "${summary.bestDayCount} ${stringResource(R.string.summary_categories)}", // "5 categories"
+                    value = if (summary.bestDay > 0) stringResource(R.string.summary_day_number, summary.bestDay) else "—", // "#15" или "—"
+                    subtitle = bestDaySubtitle, // "5 categories" / "5 категорий"
                     screenHeight = screenHeight
                 )
             }
@@ -147,16 +156,22 @@ fun AdaptiveWeekSummaryStatsCard(
                 // Метрика 2: Среднее количество категорий в день
                 AdaptiveSummaryItem(
                     title = stringResource(R.string.summary_average),
-                    value = "%.1f".format(summary.averagePerDay),
+                    value = String.format(Locale.getDefault(), "%.1f", summary.averagePerDay),
                     subtitle = stringResource(R.string.summary_perday),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 3: Лучший день недели
+                val bestDaySubtitle = pluralStringResource(
+                    id = R.plurals.summary_categories_count,
+                    count = summary.bestDayCount,
+                    summary.bestDayCount
+                )
+
                 AdaptiveSummaryItem(
                     title = stringResource(R.string.summary_bestday),
                     value = summary.bestDay, // Название дня недели (например: "Mon")
-                    subtitle = "${summary.bestDayCount} ${stringResource(R.string.summary_categories)}",
+                    subtitle = bestDaySubtitle,
                     screenHeight = screenHeight
                 )
             }
@@ -190,7 +205,7 @@ fun AdaptiveYearSummaryStatsCard(
         ) {
             // Заголовок карточки с годом
             Text(
-                text = "${summary.year} ${stringResource(R.string.summary_title)}", // "2024 Summary"
+                text = stringResource(R.string.year_summary_title, summary.year), // "2024 Summary"
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),
@@ -213,16 +228,22 @@ fun AdaptiveYearSummaryStatsCard(
                 // Метрика 2: Среднее количество категорий в месяц
                 AdaptiveSummaryItem(
                     title = stringResource(R.string.summary_average),
-                    value = "%.1f".format(summary.averagePerMonth),
+                    value = String.format(Locale.getDefault(), "%.1f", summary.averagePerMonth),
                     subtitle = stringResource(R.string.summary_permonth),
                     screenHeight = screenHeight
                 )
 
                 // Метрика 3: Лучший месяц года
+                val bestMonthSubtitle = pluralStringResource(
+                    id = R.plurals.summary_categories_count,
+                    count = summary.bestMonthCount,
+                    summary.bestMonthCount
+                )
+
                 AdaptiveSummaryItem(
                     title = stringResource(R.string.summary_bestmonth),
                     value = summary.bestMonth, // Название месяца (например: "Jan")
-                    subtitle = "${summary.bestMonthCount} ${stringResource(R.string.summary_categories)}",
+                    subtitle = bestMonthSubtitle,
                     screenHeight = screenHeight
                 )
             }

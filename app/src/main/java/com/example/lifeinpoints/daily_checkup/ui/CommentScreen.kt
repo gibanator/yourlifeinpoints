@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,12 +38,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.format.DateTimeFormatter
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +59,7 @@ fun CommentScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = { Text(uiState.selectedDate.format(formatter)) },
                 navigationIcon = {
                     IconButton(onClick = { vm.commitCommentsAndLeave(onBack) }) {
@@ -65,12 +69,16 @@ fun CommentScreen(
             )
         }
     ) { paddingValues ->
+        val layoutDirection = LocalLayoutDirection.current
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = paddingValues.calculateStartPadding(layoutDirection),
+                    end = paddingValues.calculateEndPadding(layoutDirection))
                 .verticalScroll(scrollState)
-                .padding(8.dp),
+            .fillMaxSize(),
+
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             uiState.orderedCategories.forEachIndexed { index, category ->
@@ -111,8 +119,8 @@ fun OneComment(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
 ) {
-    val cardColor = if (isSelected) Color(0xFF7E6DF8) else MaterialTheme.colorScheme.surface
-    val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+    val cardColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
 
     var menuOpen by remember { mutableStateOf(false) }
     val menuItems = remember(templates) { templates.filter { it.isNotBlank() } }
@@ -120,7 +128,7 @@ fun OneComment(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(

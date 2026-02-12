@@ -49,4 +49,37 @@
     <string name="empty">Пусто</string>
     <string name="comment_template_text_placeholder">Введите текст шаблона:</string>
     <string name="empty_tip">Подсказка: оставьте поле пустым, чтобы очистить этот слот</string>
+
+    <!-- Reminders Section-->
+    <string name="notification_settings_section_title">Напоминания</string>
+    <string name="notification_settings_card_title">Ежедневные напоминания</string>
+    <string name="notification_settings_card_subtitle">Настройте ежедневные уведомления, чтобы выработать привычку</string>
+    <string name="cd_notification_settings">Настройки уведомлений</string>
+
+    <string name="notification_settings_title">Настройки уведомлений</string>
+    <string name="notification_daily_reminders_title">Ежедневные напоминания</string>
+    <string name="notification_daily_reminders_desc">Настройте ежедневное напоминание, чтобы завершать чек-ап. Мы будем уведомлять вас каждый день в указанное время, чтобы помочь выработать привычку.</string>
+
+    <string name="notification_daily_reminders_label">Ежедневные напоминания</string>
+    <string name="enabled">Включено</string>
+    <string name="disabled">Выключено</string>
+
+    <string name="notification_reminder_time_label">Время напоминания</string>
+
+    <string name="notification_tips_title">Советы для напоминаний:</string>
+    <string name="notification_tips_body">• Ставьте напоминания на время, когда вы обычно свободны\n• Выбирайте одно и то же время, чтобы сформировать привычку\n• Вечерние напоминания помогают подвести итоги дня\n• Утренние напоминания помогают спланировать день</string>
+
+    <string name="notification_test_title">Тест уведомления</string>
+    <string name="notification_test_desc">Нажмите кнопку ниже, чтобы проверить, что уведомления работают корректно.</string>
+    <string name="notification_test_button">Проверить сейчас</string>
+
+    <string name="notification_test_notif_title">Тестовое уведомление 🧪</string>
+    <string name="notification_test_notif_message">Это тестовое уведомление, чтобы убедиться, что всё работает!</string>
+
+    <string name="change">Изменить</string>
+    <string name="select_time">Выберите время</string>
+    <string name="hour">Часы</string>
+    <string name="minute">Минуты</string>
+    <string name="selected_time">Выбрано: %1$s</string>
+
 </resources>

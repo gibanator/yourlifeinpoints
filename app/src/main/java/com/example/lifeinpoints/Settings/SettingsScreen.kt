@@ -25,7 +25,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.theme.ThemeType
 
 
@@ -56,7 +56,7 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppTopAppBar(
                 title = {
                     Text(text = stringResource(R.string.settings_title))
                         },
@@ -122,7 +122,7 @@ fun SettingsScreen(
 
             // Новая секция уведомлений
             Text(
-                text = "Reminders",
+                text = stringResource(R.string.notification_settings_section_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -168,21 +168,25 @@ fun NotificationSettingsCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 12.dp)
+            ) {
                 Text(
-                    text = "Daily Reminders",
+                    text = stringResource(R.string.notification_settings_card_title),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "Set up daily notifications to build consistent habits",
+                    text = stringResource(R.string.notification_settings_card_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Notification settings",
+                contentDescription = stringResource(R.string.cd_notification_settings),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
@@ -314,6 +318,24 @@ fun ThemeSelectionCard(
                 subtitle = stringResource(R.string.theme_dark_subtitle),
                 isSelected = currentTheme == ThemeType.DARK,
                 onClick = { onThemeSelected(ThemeType.DARK) }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            ThemeOption(
+                title = "Dark Stone",
+                subtitle = "Dark stone with carved text",
+                isSelected = currentTheme == ThemeType.DARK_STONE,
+                onClick = { onThemeSelected(ThemeType.DARK_STONE) }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            ThemeOption(
+                title = "Light Stone",
+                subtitle = "Light stone with carved text",
+                isSelected = currentTheme == ThemeType.LIGHT_STONE,
+                onClick = { onThemeSelected(ThemeType.LIGHT_STONE) }
             )
         }
     }

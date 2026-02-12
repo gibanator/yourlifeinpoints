@@ -25,7 +25,10 @@
     <string name="level_label">Level %1$d</string>
     <string name="level_class_bullet">• %1$s</string>
 
-    <string name="unspent_points_badge">%1$d points</string>
+    <plurals name="unspent_points_badge">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
 
     <string name="xp_progress_label">XP: %1$d/%2$d</string>
     <string name="percent_label">%1$d%%</string>
