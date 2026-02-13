@@ -86,8 +86,9 @@ fun CalendarScreen(
                 )
                 .padding(
                     start = 16.dp,
-                    end = 16.dp,
-                )
+                    end = 16.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
             CalendarModeSwitchCard(
@@ -114,9 +115,8 @@ fun CalendarScreen(
             if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding( bottom = 10.dp ),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     item {
                         MonthCalendar(
@@ -127,7 +127,11 @@ fun CalendarScreen(
                     }
                     item {
                         val stats = computeMonthStats(monthUi.month, monthUi.days)
-                        MonthStatsCard(stats = stats)
+                        MonthStatsCard(
+                            modifier = Modifier
+                                .padding(bottom = 24.dp),
+                            stats = stats
+                        )
                     }
                 }
             }

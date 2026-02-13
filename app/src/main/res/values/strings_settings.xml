@@ -46,6 +46,13 @@
     <string name="category_entrance_start_option">The start</string>
     <string name="category_edit_page_title">Edit Category</string>
 
+    <string name="delete_category_title">Delete category</string>
+    <string name="delete_category_message">
+    Are you sure you want to delete "%1$s"? This action cannot be undone.
+    </string>
+    <string name="delete_button">Delete</string>
+    <string name="cancel_button">Cancel</string>
+
     <!-- Comment Template Pages -->
     <string name="comment_templates_page_title">Comment Templates</string>
     <string name="comment_template_annotation_text">Set up to 5 quick comments for this category</string>

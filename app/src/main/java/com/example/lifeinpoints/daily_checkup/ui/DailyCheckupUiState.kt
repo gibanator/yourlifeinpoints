@@ -6,6 +6,8 @@ import java.time.LocalDate
 data class CategoryUi(
     val id: Int,
     val name: String,
+    val isSystem: Boolean,
+    val nameKey: String?
     // color etc
 )
 /**

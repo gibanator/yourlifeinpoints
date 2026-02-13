@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.statistics.CategoryStats
 
 @Composable
@@ -178,7 +179,11 @@ private fun CategoryChip(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = category.name,
+            text = categoryDisplayName(
+                category.name,
+                category.nameKey,
+                category.isSystem
+            ),
             style = MaterialTheme.typography.labelSmall,
             color = textColor,
             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,

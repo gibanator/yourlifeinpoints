@@ -111,8 +111,9 @@ class DailyCheckupViewModel @Inject constructor(
 
         // которые созданы не позже этой даты
         val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
-        val visibleCategories = categoryRepository.getVisibleCategoriesCreatedBefore(selectedDayMillis)
-            .map { CategoryUi(id = it.id, name = it.name) }
+        val visibleCategories = categoryRepository
+            .getVisibleCategoriesCreatedBefore(selectedDayMillis)
+            .map { CategoryUi(id = it.id, name = it.name, isSystem = it.isSystem, nameKey = it.nameKey) }
 
         val templatesByCategory: Map<Int, List<String>> =
             visibleCategories.associate { cat ->

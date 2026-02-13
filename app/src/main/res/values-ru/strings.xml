@@ -52,4 +52,11 @@
     </string-array>
     <string name="notif_daily_title">Время ежедневной проверки! ⏰</string>
     <string name="notif_daily_message">Отметьте категории за сегодня. Каждый день имеет значение! 💪</string>
+
+    <!-- System Categories -->
+    <string name="cat_networking">Нетворкинг</string>
+    <string name="cat_education">Обучение</string>
+    <string name="cat_work">Работа</string>
+    <string name="cat_health">Здоровье</string>
+    <string name="cat_personal_life">Личная жизнь</string>
 </resources>

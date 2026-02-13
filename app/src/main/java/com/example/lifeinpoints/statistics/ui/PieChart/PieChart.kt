@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.util.pastelIfNeeded
 import kotlin.math.min
 
@@ -342,7 +343,11 @@ private fun LegendItem(
         ) {
             // Название категории (максимум 2 строки)
             Text(
-                text = item.label,
+                text = categoryDisplayName(
+                    item.fallbackName,
+                    item.systemKey,
+                    item.isSystem
+                ),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = fontSize,
                     fontWeight = FontWeight.Normal
@@ -472,7 +477,10 @@ private fun calculateResponsiveFontSize(screenHeight: Dp, ratio: Float): TextUni
  * @param color Цвет сегмента на диаграмме
  */
 data class PieChartItem(
-    val label: String,
+    val fallbackName: String,
+    val systemKey: String?,
+    val isSystem: Boolean,
+
     val value: Float,
     val color: Color
 )

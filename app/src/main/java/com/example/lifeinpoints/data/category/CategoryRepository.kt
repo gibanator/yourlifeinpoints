@@ -14,50 +14,54 @@ class CategoryRepository @Inject constructor(
     // Системные категории, которые нельзя удалить/редактировать
     private val systemCategories = listOf(
         CategoryEntity(
-            id = 1,
-            name = "Networking",
-            color = "#FF6B6B",
-            sortOrder = 0,
-            isSystem = true,
-            isVisible = true,
-            createdAt = 0L
+            id=1,
+            name="",
+            nameKey="networking",
+            color="#FF6B6B",
+            sortOrder=0,
+            isSystem=true,
+            isVisible=true,
+            createdAt=0L
         ),
         CategoryEntity(
-            id = 2,
-            name = "Education",
-            color = "#4ECDC4",
-            sortOrder = 1,
-            isSystem = true,
-            isVisible = true,
-            createdAt = 0L
+            id=2,
+            name="",
+            nameKey="education",
+            color="#4ECDC4",
+            sortOrder=1,
+            isSystem=true,
+            isVisible=true,
+            createdAt=0L
         ),
         CategoryEntity(
-            id = 3,
-            name = "Work",
-            color = "#45B7D1",
-            sortOrder = 2,
-            isSystem = true,
-            isVisible = true,
-            createdAt = 0L
+            id=3,
+            name="",
+            nameKey="work",
+            color="#45B7D1",
+            sortOrder=2,
+            isSystem=true,
+            isVisible=true,
+            createdAt=0L),
+        CategoryEntity(
+            id=4,
+            name="",
+            nameKey="health",
+            color="#96CEB4",
+            sortOrder=3,
+            isSystem=true,
+            isVisible=true,
+            createdAt=0L
         ),
         CategoryEntity(
-            id = 4,
-            name = "Health",
-            color = "#96CEB4",
-            sortOrder = 3,
-            isSystem = true,
-            isVisible = true,
-            createdAt = 0L
+            id=5,
+            name="",
+            nameKey="personal_life",
+            color="#FFEAA7",
+            sortOrder=4,
+            isSystem=true,
+            isVisible=true,
+            createdAt=0L
         ),
-        CategoryEntity(
-            id = 5,
-            name = "Personal Life",
-            color = "#FFEAA7",
-            sortOrder = 4,
-            isSystem = true,
-            isVisible = true,
-            createdAt = 0L
-        )
     )
 
     // Инициализация системных категорий при первом запуске

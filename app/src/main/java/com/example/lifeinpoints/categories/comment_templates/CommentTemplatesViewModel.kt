@@ -17,7 +17,13 @@ class CommentTemplatesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _categoryName = MutableStateFlow<String?>(null)
+    private val _categoryNameKey = MutableStateFlow<String?>(null)
+    private val _isSystem = MutableStateFlow(false)
     val categoryName: StateFlow<String?> = _categoryName.asStateFlow()
+    val categoryNameKey: StateFlow<String?> = _categoryNameKey.asStateFlow()
+    val isSystem: StateFlow<Boolean> = _isSystem.asStateFlow()
+
+    private val _isEditing = MutableStateFlow(false)
 
     fun observeTemplates(categoryId: Int): Flow<List<CommentTemplateEntity>> {
         return templatesRepository.observeByCategory(categoryId.toLong())
@@ -25,7 +31,11 @@ class CommentTemplatesViewModel @Inject constructor(
 
     fun loadCategoryName(categoryId: Int) {
         viewModelScope.launch {
-            _categoryName.value = categoriesRepository.getById(categoryId)?.name
+            categoriesRepository.getById(categoryId)?.let { category ->
+                _categoryName.value = category.name
+                _categoryNameKey.value = category.nameKey
+                _isSystem.value = category.isSystem
+            }
         }
     }
 

@@ -528,7 +528,13 @@ class StatisticsViewModel @Inject constructor(
     ): List<CategoryStats> {
         return allCategories
             .filter { category -> category.id in relevantCategoryIds }
-            .map { category -> CategoryStats(category.id, category.name, category.isVisible) }
+            .map { category -> CategoryStats(
+                id = category.id,
+                name = category.name,
+                nameKey = category.nameKey,
+                isVisible = category.isVisible,
+                isSystem = category.isSystem
+            ) }
     }
 
     private fun filterMonthDataForRelevantCategories(
@@ -681,7 +687,9 @@ class StatisticsViewModel @Inject constructor(
         return categories.mapIndexed { index, category ->
             val count = categoryCounts[category.id] ?: 0
             PieChartItem(
-                label = category.name,
+                fallbackName = category.name,
+                systemKey = category.nameKey,
+                isSystem = category.isSystem,
                 value = count.toFloat(),
                 color = categoryColors.getOrElse(index) { Color.Gray }
             )
@@ -708,7 +716,9 @@ class StatisticsViewModel @Inject constructor(
         return categories.mapIndexed { index, category ->
             val count = categoryCounts[category.id] ?: 0
             PieChartItem(
-                label = category.name,
+                fallbackName = category.name,
+                systemKey = category.nameKey,
+                isSystem = category.isSystem,
                 value = count.toFloat(),
                 color = categoryColors.getOrElse(index) { Color.Gray }
             )
@@ -733,7 +743,9 @@ class StatisticsViewModel @Inject constructor(
         return categories.mapIndexed { index, category ->
             val count = categoryCounts[category.id] ?: 0
             PieChartItem(
-                label = category.name,
+                fallbackName = category.name,
+                systemKey = category.nameKey,
+                isSystem = category.isSystem,
                 value = count.toFloat(),
                 color = categoryColors.getOrElse(index) { Color.Gray }
             )

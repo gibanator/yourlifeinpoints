@@ -52,4 +52,11 @@
     </string-array>
     <string name="notif_daily_title">Daily Checkup Time! ⏰</string>
     <string name="notif_daily_message">Complete your daily categories to track your progress. Every day counts! 💪</string>
+
+    <!-- System Categories -->
+    <string name="cat_networking">Networking</string>
+    <string name="cat_education">Education</string>
+    <string name="cat_work">Work</string>
+    <string name="cat_health">Health</string>
+    <string name="cat_personal_life">Personal life</string>
 </resources>

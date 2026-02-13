@@ -27,6 +27,8 @@ data class CategoryEntity(
 
     val name: String,
 
+    val nameKey: String? = null,
+
     //val userId: Int, // связь с пользователем
 
     val color: String = "#6200EE", // цвет категории

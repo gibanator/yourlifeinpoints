@@ -55,6 +55,7 @@ import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppFloatingActionButton
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -224,7 +225,7 @@ fun CategoryCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = category.name,
+                text = categoryDisplayName(category.name, category.nameKey, isSystem = category.isStatic),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f)
             )
@@ -282,10 +283,25 @@ fun DeleteConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val categoryName = categoryDisplayName(
+        fallbackName = category.name,
+        systemKey = category.nameKey,
+        isSystem = category.isStatic
+    )
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete Category") },
-        text = { Text("Are you sure you want to delete \"${category.name}\"? This action cannot be undone.") },
+        title = {
+            Text(stringResource(R.string.delete_category_title))
+        },
+        text = {
+            Text(
+                stringResource(
+                    R.string.delete_category_message,
+                    categoryName
+                )
+            )
+        },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
@@ -293,12 +309,12 @@ fun DeleteConfirmationDialog(
                     contentColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Delete")
+                Text(stringResource(R.string.delete_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel_button))
             }
         }
     )

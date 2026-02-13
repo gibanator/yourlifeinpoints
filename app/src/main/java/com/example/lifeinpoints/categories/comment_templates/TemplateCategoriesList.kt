@@ -38,6 +38,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.categories.CategoriesViewModel
 import com.example.lifeinpoints.categories.CategoryUiItem
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -149,7 +150,11 @@ fun TemplateCategoryCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = category.name,
+                text = categoryDisplayName(
+                    category.name,
+                    category.nameKey,
+                    category.isStatic
+                ),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f)
             )

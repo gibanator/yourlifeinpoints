@@ -31,6 +31,7 @@ import com.example.lifeinpoints.statistics.CategoryStats
 import com.example.lifeinpoints.statistics.DayStatistics
 import com.example.lifeinpoints.statistics.MonthStatistics
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 @Composable
 fun AdaptiveSmartCenteredTable(
@@ -141,7 +142,11 @@ fun AdaptiveYearTable(
                     val categoryWeight = 0.4f
                     categories.forEach { category ->
                         AdaptiveTableHeaderCell(
-                            text = category.name.take(3),
+                            text = categoryDisplayName(
+                                category.name,
+                                category.nameKey,
+                                category.isVisible
+                            ).take(3),
                             isVisible = category.isVisible,
                             screenHeight = screenHeight,
                             modifier = Modifier
@@ -213,7 +218,11 @@ private fun AdaptiveTableHeaderRow(
         val categoryWeight = 0.4f
         categories.forEach { category ->
             AdaptiveTableHeaderCell(
-                text = category.name.take(3),
+                text = categoryDisplayName(
+                    category.name,
+                    category.nameKey,
+                    category.isVisible
+                ).take(3),
                 isVisible = category.isVisible,
                 screenHeight = screenHeight,
                 modifier = Modifier
