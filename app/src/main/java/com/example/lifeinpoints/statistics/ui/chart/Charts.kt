@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.theme.LocalThemeType
+import com.example.lifeinpoints.core.ui.theme.isStoneTheme
+import com.example.lifeinpoints.util.pastelIfNeeded
+import com.example.lifeinpoints.util.toPastel
 
 @Composable
 fun ChartWithLegend(
@@ -59,6 +63,9 @@ fun ChartWithLegend(
 
     val dayNamesShort = stringArrayResource(R.array.day_names_short)
     val monthNamesShort = stringArrayResource(R.array.month_names_short)
+
+    val themeType = LocalThemeType.current
+    val pastelEnabled = themeType.isStoneTheme
 
     Column(
         modifier = Modifier
@@ -126,7 +133,8 @@ fun ChartWithLegend(
                                 showGrid = showGrid,
                                 showDataLabels = showDataLabels,
                                 dayNamesShort = dayNamesShort,
-                                monthNamesShort = monthNamesShort
+                                monthNamesShort = monthNamesShort,
+                                isPastel = pastelEnabled
                             )
                             else -> drawVerticalTimeSeriesChart(
                                 data = timeSeriesData,
@@ -146,14 +154,16 @@ fun ChartWithLegend(
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
                                 barCornerRadius = barCornerRadius,
-                                showDataLabels = showDataLabels
+                                showDataLabels = showDataLabels,
+                                isPastel = pastelEnabled
                             )
                             else -> drawVerticalBarChart(
                                 data = data,
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
                                 barCornerRadius = barCornerRadius,
-                                showDataLabels = showDataLabels
+                                showDataLabels = showDataLabels,
+                                isPastel = pastelEnabled
                             )
                         }
                     }
@@ -169,6 +179,7 @@ fun ChartWithLegend(
                     Legend(
                         data = data,
                         screenHeight = screenHeight,
+                        isPastel = pastelEnabled,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -254,6 +265,7 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
         val barHeight = if (maxValue > 0) chartHeight * (item.value / maxValue) else 0f
         val y = topPadding + chartHeight - barHeight
 
+
         drawRoundRect(
             color = item.color ?: Color.Blue,
             topLeft = Offset(x, y),
@@ -306,7 +318,8 @@ private fun DrawScope.drawLineChart(
     showGrid: Boolean,
     showDataLabels: Boolean,
     dayNamesShort: Array<String>,
-    monthNamesShort: Array<String>
+    monthNamesShort: Array<String>,
+    isPastel: Boolean
 ) {
     if (data.isEmpty() || data.size < 2) return
 
@@ -376,8 +389,12 @@ private fun DrawScope.drawLineChart(
     }
 
     for (i in 0 until points.size - 1) {
+
+        val baseColor = data[i].color ?: Color.Blue
+        val finalColor = if (isPastel) baseColor.toPastel() else baseColor
+
         drawLine(
-            color = data[i].color ?: Color.Blue,
+            color = finalColor,
             start = points[i],
             end = points[i + 1],
             strokeWidth = 3f
@@ -385,8 +402,12 @@ private fun DrawScope.drawLineChart(
     }
 
     points.forEachIndexed { index, point ->
+
+        val baseColor = data[index].color ?: Color.Blue
+        val finalColor = if (isPastel) baseColor.toPastel() else baseColor
+
         drawCircle(
-            color = data[index].color ?: Color.Blue,
+            color = finalColor,
             radius = 5f,
             center = point
         )
@@ -441,7 +462,8 @@ private fun DrawScope.drawVerticalBarChart(
     showGrid: Boolean,
     barSpacingRatio: Float,
     barCornerRadius: Float,
-    showDataLabels: Boolean
+    showDataLabels: Boolean,
+    isPastel: Boolean
 ) {
     val maxValue = data.maxOfOrNull { it.value } ?: 0f
     val itemCount = data.size
@@ -508,8 +530,11 @@ private fun DrawScope.drawVerticalBarChart(
         val barHeight = if (maxValue > 0) chartHeight * (item.value / maxValue) else 0f
         val y = topPadding + chartHeight - barHeight
 
+        val baseColor = item.color
+        val finalColor = if (isPastel) baseColor.toPastel() else baseColor
+
         drawRoundRect(
-            color = item.color,
+            color = finalColor,
             topLeft = Offset(x, y),
             size = Size(barWidth, barHeight),
         )
@@ -552,6 +577,7 @@ private fun DrawScope.drawVerticalBarChart(
 private fun Legend(
     data: List<PieChartItem>,
     screenHeight: Dp,
+    isPastel: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -559,6 +585,7 @@ private fun Legend(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         data.forEach { item ->
+            val finalColor = if (isPastel) item.color.toPastel() else item.color
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -568,7 +595,7 @@ private fun Legend(
                 Box(
                     modifier = Modifier
                         .size(screenHeight * 0.02f)
-                        .background(item.color)
+                        .background(finalColor)
                 )
                 Text(
                     text = "${item.label}: ${if (item.value % 1 == 0f) item.value.toInt() else "%.1f".format(item.value)}",

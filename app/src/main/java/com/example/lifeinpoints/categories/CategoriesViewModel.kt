@@ -42,7 +42,8 @@ class CategoriesViewModel @Inject constructor(
                                     id = category.id,
                                     name = category.name,
                                     isStatic = category.isSystem,
-                                    isVisible = category.isVisible // Добавляем состояние видимости
+                                    isVisible = category.isVisible, // Добавляем состояние видимости
+                                    nameKey = category.nameKey
                                 )
                             },
                             isLoading = false,

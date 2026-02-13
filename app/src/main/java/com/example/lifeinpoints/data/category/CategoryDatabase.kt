@@ -23,7 +23,7 @@ import com.example.lifeinpoints.data.level.SkillPointsEntity
         LevelProgressEntity::class, // Добавляем новую сущность
         SkillPointsEntity::class    // Добавляем сущность очков навыков
     ],
-    version = 13, // Увеличиваем версию
+    version = 14, // Увеличиваем версию
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {

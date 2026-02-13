@@ -18,6 +18,7 @@ import com.example.lifeinpoints.statistics.StatisticsViewModel
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 // com.example.lifeinpoints.categories/CategoryVisibilityScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,7 +121,11 @@ fun CategoryVisibilityItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = category.name,
+                    text = categoryDisplayName(
+                        category.name,
+                        category.nameKey,
+                        category.isStatic
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )

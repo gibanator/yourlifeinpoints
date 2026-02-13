@@ -25,7 +25,11 @@ class CommentTemplatesViewModel @Inject constructor(
 
     fun loadCategoryName(categoryId: Int) {
         viewModelScope.launch {
-            _categoryName.value = categoriesRepository.getById(categoryId)?.name
+            _categoryName.value = categoriesRepository
+                .getById(categoryId)
+                ?.let { category ->
+                    category.name.takeIf { it.isNotBlank() } ?: category.nameKey
+                }
         }
     }
 

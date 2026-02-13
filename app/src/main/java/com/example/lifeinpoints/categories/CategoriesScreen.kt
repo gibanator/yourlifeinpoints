@@ -54,6 +54,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -223,7 +224,7 @@ fun CategoryCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = category.name,
+                text = categoryDisplayName(category.name, category.nameKey, isSystem = category.isStatic),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f)
             )
@@ -284,7 +285,7 @@ fun DeleteConfirmationDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Delete Category") },
-        text = { Text("Are you sure you want to delete \"${category.name}\"? This action cannot be undone.") },
+        text = { Text("Are you sure you want to delete \"${categoryDisplayName(category.name, category.nameKey, isSystem = category.isStatic)}\"? This action cannot be undone.") },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,

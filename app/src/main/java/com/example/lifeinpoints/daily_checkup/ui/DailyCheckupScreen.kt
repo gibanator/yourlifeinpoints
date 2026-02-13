@@ -59,6 +59,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsViewModel
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.StoneCardBackground
 import com.example.lifeinpoints.core.ui.theme.clipByTheme
@@ -182,7 +183,7 @@ fun DailyCheckupScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 24.dp,) //start = 12.dp, end = 12.dp)
+                            .padding(bottom = 24.dp) //start = 12.dp, end = 12.dp)
                     )
                 }
             }
@@ -380,7 +381,7 @@ fun CategoryListCard(
                 categories.forEach { category ->
                     val isSelected = category.id in selectedCategories
                     CategoryRow(
-                        category = category.name,
+                        category = categoryDisplayName(category.name, category.nameKey, category.isSystem),
                         isSelected = isSelected,
                         isDayEnded = isDayEnded,
                         onCategoryClick = { onCategoryClick(category.id) }

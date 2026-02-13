@@ -311,7 +311,7 @@ fun StatisticsScreen(
                                             },
                                             fontSize = calculateAdaptiveFontSize(screenHeight, 0.018f),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                            textAlign = TextAlign.Center
                                         )
                                     }
                                 }
