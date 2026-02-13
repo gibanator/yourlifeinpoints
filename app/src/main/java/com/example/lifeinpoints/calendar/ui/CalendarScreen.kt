@@ -87,7 +87,6 @@ fun CalendarScreen(
                 .padding(
                     start = 16.dp,
                     end = 16.dp,
-                    bottom = 16.dp
                 )
         ) {
             val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
