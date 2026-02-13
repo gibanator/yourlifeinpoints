@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 import com.example.lifeinpoints.util.pastelIfNeeded
@@ -557,7 +558,7 @@ private fun DrawScope.drawVerticalBarChart(
             }
         }
 
-        val label = item.label
+        val label = item.fallbackName
         drawContext.canvas.nativeCanvas.apply {
             drawText(
                 label,
@@ -586,6 +587,17 @@ private fun Legend(
     ) {
         data.forEach { item ->
             val finalColor = if (isPastel) item.color.toPastel() else item.color
+
+            val label = categoryDisplayName(
+                fallbackName = item.fallbackName,
+                systemKey = item.systemKey,
+                isSystem = item.isSystem
+            )
+
+            val valueText =
+                if (item.value % 1 == 0f) item.value.toInt().toString()
+                else "%.1f".format(item.value)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -598,7 +610,7 @@ private fun Legend(
                         .background(finalColor)
                 )
                 Text(
-                    text = "${item.label}: ${if (item.value % 1 == 0f) item.value.toInt() else "%.1f".format(item.value)}",
+                    text = "$label: $valueText",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = calculateResponsiveFontSize(screenHeight, 0.016f)
                     ),

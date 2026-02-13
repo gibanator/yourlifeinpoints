@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +34,8 @@ fun EditCommentTemplatesScreen(
     }
 
     val categoryName by vm.categoryName.collectAsState()
+    val categoryNameKey by vm.categoryNameKey.collectAsState()
+    val isSystem by vm.isSystem.collectAsState()
 
     val templates by vm.observeTemplates(categoryId).collectAsState(initial = emptyList())
     val map = remember(templates) { templates.associateBy { it.position } }
@@ -43,7 +46,15 @@ fun EditCommentTemplatesScreen(
     Scaffold(
         topBar = {
             AppTopAppBar(
-                title = { Text(categoryName ?: stringResource(R.string.comment_templates_page_title)) },
+                title = {
+                    Text(
+                        categoryDisplayName(
+                    categoryName.orEmpty(),
+                    categoryNameKey,
+                            isSystem
+                            )
+                    )
+                        },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

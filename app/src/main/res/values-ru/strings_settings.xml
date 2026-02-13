@@ -46,6 +46,13 @@
     <string name="category_entrance_start_option">Начала</string>
     <string name="category_edit_page_title">Редактирование категории</string>
 
+    <string name="delete_category_title">Удалить категорию</string>
+    <string name="delete_category_message">
+    Вы уверены, что хотите удалить «%1$s»? Это действие нельзя отменить.
+    </string>
+    <string name="delete_button">Удалить</string>
+    <string name="cancel_button">Отмена</string>
+
     <!-- Comment Template Pages -->
     <string name="comment_templates_page_title">Шаблоны комментариев</string>
     <string name="comment_template_annotation_text">Задайте до 5 быстрых комментариев для этой категории</string>

@@ -47,7 +47,9 @@ object PieChartDataTransformer {
             .map { (categoryId, value) ->
                 val category = categories.find { it.id == categoryId }
                 PieChartItem(
-                    label = category?.name ?: "Unknown", // Название категории или "Unknown"
+                    fallbackName = category?.name ?: "",
+                    systemKey = category?.nameKey,
+                    isSystem = category?.isSystem ?: false, // Название категории или "Unknown"
                     value = value,                       // Количество выборов за месяц
                     color = getCategoryColor(categoryId) // Цвет для категории
                 )
@@ -88,7 +90,9 @@ object PieChartDataTransformer {
             .map { (categoryId, value) ->
                 val category = categories.find { it.id == categoryId }
                 PieChartItem(
-                    label = category?.name ?: "Unknown",
+                    fallbackName = category?.name ?: "",
+                    systemKey = category?.nameKey,
+                    isSystem = category?.isSystem ?: false,
                     value = value,
                     color = getCategoryColor(categoryId)
                 )
@@ -132,7 +136,9 @@ object PieChartDataTransformer {
             .map { (categoryId, value) ->
                 val category = categories.find { it.id == categoryId }
                 PieChartItem(
-                    label = category?.name ?: "Unknown",
+                    fallbackName = category?.name ?: "",
+                    systemKey = category?.nameKey,
+                    isSystem = category?.isSystem ?: false,
                     value = value,
                     color = getCategoryColor(categoryId)
                 )

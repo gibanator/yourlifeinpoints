@@ -109,11 +109,11 @@ val StoneTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
-        shadow = Shadow(
+        /*shadow = Shadow(
             color = Color.Black.copy(alpha = 0.4f),
             offset = Offset(1.5f, 1.5f),
             blurRadius = 3f
-        )
+        )*/
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.Monospace,

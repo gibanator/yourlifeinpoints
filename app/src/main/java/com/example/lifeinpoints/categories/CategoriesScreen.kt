@@ -282,10 +282,25 @@ fun DeleteConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val categoryName = categoryDisplayName(
+        fallbackName = category.name,
+        systemKey = category.nameKey,
+        isSystem = category.isStatic
+    )
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete Category") },
-        text = { Text("Are you sure you want to delete \"${categoryDisplayName(category.name, category.nameKey, isSystem = category.isStatic)}\"? This action cannot be undone.") },
+        title = {
+            Text(stringResource(R.string.delete_category_title))
+        },
+        text = {
+            Text(
+                stringResource(
+                    R.string.delete_category_message,
+                    categoryName
+                )
+            )
+        },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
@@ -293,12 +308,12 @@ fun DeleteConfirmationDialog(
                     contentColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Delete")
+                Text(stringResource(R.string.delete_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel_button))
             }
         }
     )

@@ -57,6 +57,8 @@ data class MonthStatistics(
 data class CategoryStats(
     val id: Int,
     val name: String,
+    val nameKey: String? = null,
+    val isSystem: Boolean = false,
     val isVisible: Boolean = true
 )
 
