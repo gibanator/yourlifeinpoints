@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
+import com.example.lifeinpoints.core.ui.AppFloatingActionButton
 import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
@@ -91,7 +92,7 @@ fun CategoriesScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            AppFloatingActionButton(
                 onClick = onAddCategory
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Category")
