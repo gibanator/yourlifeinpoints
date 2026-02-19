@@ -43,8 +43,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.core.ui.category.categoryDisplayName
+import com.example.lifeinpoints.core.ui.theme.LocalStatsPalette
 import com.example.lifeinpoints.util.pastelIfNeeded
 import kotlin.math.min
+
+@Composable
+private fun pieItemColor(item: PieChartItem): Color {
+    val palette = LocalStatsPalette.current
+    return palette.categories.getOrElse(item.paletteIndex) { Color.Gray }
+}
 
 /**
  * Композируемый компонент для отображения кольцевой диаграммы с легендой.
@@ -81,10 +88,10 @@ fun PieChartWithLegend(
     val padding = screenWidth * 0.04f // 4% от ширины экрана для отступов
     val legendSpacing = screenHeight * 0.02f // 2% высоты экрана между диаграммой и легендой
 
-    val themedData = remember(data) {
-        data
-    }.map { item ->
-        item.copy(color = item.color.pastelIfNeeded()) // <-- это можно, мы в @Composable
+    val statsPalette = LocalStatsPalette.current
+
+    val colorForIndex = remember(statsPalette) {
+        { idx: Int -> statsPalette.categories.getOrElse(idx) { Color.Gray } }
     }
 
     // Суммируем все значения для расчета процентов
@@ -143,11 +150,12 @@ fun PieChartWithLegend(
                     var startAngle = -90f // Начинаем с верхней точки (12 часов)
 
                     // Отрисовываем каждый сегмент диаграммы
-                    themedData.forEach { item ->
+                    data.forEach { item ->
                         val sweepAngle = (item.value / total) * 360f
+                        val color = colorForIndex(item.paletteIndex)
 
                         drawPieSegment(
-                            color = item.color,
+                            color = color,
                             center = center,
                             outerRadius = outerRadius,
                             innerRadius = innerRadius,
@@ -164,7 +172,7 @@ fun PieChartWithLegend(
             if (showLegend) {
                 Spacer(modifier = Modifier.height(legendSpacing))
                 AdaptiveLegend(
-                    data = themedData,
+                    data = data,
                     total = total,
                     screenWidth = screenWidth,
                     screenHeight = screenHeight,
@@ -320,6 +328,9 @@ private fun LegendItem(
     showPercentage: Boolean = true,
     compactMode: Boolean = false
 ) {
+    val palette = LocalStatsPalette.current
+    val color = palette.categories.getOrElse(item.paletteIndex) { Color.Gray }
+
     Row(
         modifier = Modifier
             .fillMaxWidth(if (compactMode) 1f else 1f)
@@ -331,7 +342,7 @@ private fun LegendItem(
             modifier = Modifier
                 .size(itemHeight * 0.6f) // 60% от высоты элемента
                 .clip(RoundedCornerShape(itemHeight * 0.1f)) // Слегка скругленные углы
-                .background(item.color)
+                .background(color)
         )
 
         Spacer(modifier = Modifier.width(itemHeight * 0.3f)) // Отступ 30% от высоты элемента
@@ -482,7 +493,7 @@ data class PieChartItem(
     val isSystem: Boolean,
 
     val value: Float,
-    val color: Color
+    val paletteIndex: Int
 )
 
 /**

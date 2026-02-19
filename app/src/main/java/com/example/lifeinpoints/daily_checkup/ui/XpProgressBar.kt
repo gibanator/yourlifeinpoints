@@ -67,7 +67,7 @@ fun XpProgressBar(
                         Text(
                             text = stringResource(R.string.level_class_bullet, className),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -139,7 +139,7 @@ fun XpProgressBar(
                     Text(
                         text = stringResource(R.string.consecutive_days_label, levelState.consecutiveDays),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

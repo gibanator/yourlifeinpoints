@@ -1,6 +1,7 @@
 // com.example.lifeinpoints.data.daycompletion/DayCompletionRepository.kt
 package com.example.lifeinpoints.data.daycompletion
 
+import android.util.Log
 import com.example.lifeinpoints.calendar.DayInMonth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -13,9 +14,20 @@ class DayCompletionRepository @Inject constructor(
     private val dao: DayCompletionDao
 ) {
 
-    suspend fun setDayCompletion(date: String, isCompleted: Boolean) {
-        val entity = DayCompletionEntity(date = date, isCompleted = isCompleted)
-        dao.insert(entity)
+    suspend fun ensureRow(date: String) {
+        dao.insertIfAbsent(DayCompletionEntity(date = date, isCompleted = false))
+    }
+
+    suspend fun getEntityOrDefault(date: String): DayCompletionEntity =
+        dao.getByDate(date) ?: DayCompletionEntity(date = date, isCompleted = false)
+
+    suspend fun setState(date: String, isCompleted: Boolean, xpEarned: Int) {
+        dao.setState(
+            date = date,
+            isCompleted = isCompleted,
+            completedAt = System.currentTimeMillis(),
+            xpEarned = xpEarned
+        )
     }
 
     suspend fun getDayCompletion(date: String): Boolean {
@@ -34,12 +46,6 @@ class DayCompletionRepository @Inject constructor(
             .map { it.date }
     }
 
-    suspend fun toggleDayCompletion(date: String): Boolean {
-        val current = getDayCompletion(date)
-        val newState = !current
-        setDayCompletion(date, newState)
-        return newState
-    }
 
     // Добавляем метод для подписки на все изменения
     fun observeAllChanges(): Flow<List<DayCompletionEntity>> {
@@ -68,4 +74,5 @@ class DayCompletionRepository @Inject constructor(
         to: LocalDate
     ): Flow<Map<LocalDate, DayInMonth.CompletionCategory>> =
         observeYear(from.year)
+
 }

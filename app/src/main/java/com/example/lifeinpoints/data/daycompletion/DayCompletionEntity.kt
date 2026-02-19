@@ -9,5 +9,6 @@ data class DayCompletionEntity(
     @PrimaryKey
     val date: String, // формат "YYYY-MM-DD"
     val isCompleted: Boolean,
-    val completedAt: Long = System.currentTimeMillis()
+    val completedAt: Long = System.currentTimeMillis(),
+    val xpEarned: Int = 0
 )

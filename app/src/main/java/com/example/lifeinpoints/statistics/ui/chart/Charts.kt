@@ -1,6 +1,7 @@
 // com/example/lifeinpoints/statistics/ui/chart/ChartWithLegend.kt
 package com.example.lifeinpoints.statistics.ui.chart
 
+import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.category.categoryDisplayName
+import com.example.lifeinpoints.core.ui.theme.LocalStatsPalette
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 import com.example.lifeinpoints.util.pastelIfNeeded
@@ -87,6 +89,26 @@ fun ChartWithLegend(
         }
 
         val isTimeSeries = timeSeriesData != null
+        val statsPalette = LocalStatsPalette.current
+
+        val resolvedTimeSeries = if (timeSeriesData != null) {
+            timeSeriesData.map { item ->
+                val color = when (item.colorKey) {
+                    TimeSeriesColorKey.MONTH -> statsPalette.month
+                    TimeSeriesColorKey.WEEK  -> statsPalette.week
+                    TimeSeriesColorKey.YEAR  -> statsPalette.year
+                }
+                ResolvedTimeSeriesData(
+                    label = item.label,
+                    value = item.value,
+                    color = color
+                )
+            }
+        } else null
+
+        val categoryColorForIndex: (Int) -> Color = { idx ->
+            statsPalette.categories.getOrElse(idx) { Color.Gray }
+        }
 
         if ((!isTimeSeries && data.isEmpty()) || (isTimeSeries && timeSeriesData?.isEmpty() != false)) {
             Box(
@@ -116,10 +138,10 @@ fun ChartWithLegend(
                         .fillMaxSize()
                         .padding(horizontal = padding * 0.5f, vertical = padding * 0.5f)
                 ) {
-                    if (isTimeSeries && timeSeriesData != null) {
+                    if (isTimeSeries && resolvedTimeSeries != null) {
                         when (chartType) {
                             ChartType.VERTICAL_BAR -> drawVerticalTimeSeriesChart(
-                                data = timeSeriesData,
+                                data = resolvedTimeSeries,
                                 timePeriod = timePeriod,
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
@@ -129,7 +151,7 @@ fun ChartWithLegend(
                                 monthNamesShort = monthNamesShort
                             )
                             ChartType.LINE -> drawLineChart(
-                                data = timeSeriesData,
+                                data = resolvedTimeSeries,
                                 timePeriod = timePeriod,
                                 showGrid = showGrid,
                                 showDataLabels = showDataLabels,
@@ -138,7 +160,7 @@ fun ChartWithLegend(
                                 isPastel = pastelEnabled
                             )
                             else -> drawVerticalTimeSeriesChart(
-                                data = timeSeriesData,
+                                data = resolvedTimeSeries,
                                 timePeriod = timePeriod,
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
@@ -156,7 +178,7 @@ fun ChartWithLegend(
                                 barSpacingRatio = barSpacingRatio,
                                 barCornerRadius = barCornerRadius,
                                 showDataLabels = showDataLabels,
-                                isPastel = pastelEnabled
+                                colorForPaletteIndex = categoryColorForIndex
                             )
                             else -> drawVerticalBarChart(
                                 data = data,
@@ -164,7 +186,7 @@ fun ChartWithLegend(
                                 barSpacingRatio = barSpacingRatio,
                                 barCornerRadius = barCornerRadius,
                                 showDataLabels = showDataLabels,
-                                isPastel = pastelEnabled
+                                colorForPaletteIndex = categoryColorForIndex,
                             )
                         }
                     }
@@ -172,25 +194,20 @@ fun ChartWithLegend(
             }
 
             if (!isTimeSeries && data.isNotEmpty() && data.size <= 10) {
-                Box(
+                Legend(
+                    data = data,
+                    screenHeight = screenHeight,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = legendSpacing)
-                ) {
-                    Legend(
-                        data = data,
-                        screenHeight = screenHeight,
-                        isPastel = pastelEnabled,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                )
             }
         }
     }
 }
 
 private fun DrawScope.drawVerticalTimeSeriesChart(
-    data: List<TimeSeriesData>,
+    data: List<ResolvedTimeSeriesData>,
     timePeriod: TimePeriod,
     showGrid: Boolean,
     barSpacingRatio: Float,
@@ -237,10 +254,10 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
                     formattedValue,
                     leftPadding - 8f,
                     y + 4f,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = android.graphics.Color.GRAY
                         textSize = 24f
-                        textAlign = android.graphics.Paint.Align.RIGHT
+                        textAlign = Paint.Align.RIGHT
                     }
                 )
             }
@@ -282,10 +299,10 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
                     valueText,
                     x + barWidth / 2,
                     y - 8f,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = android.graphics.Color.BLACK
                         textSize = 24f
-                        textAlign = android.graphics.Paint.Align.CENTER
+                        textAlign = Paint.Align.CENTER
                     }
                 )
             }
@@ -303,10 +320,10 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
                 label,
                 x + barWidth / 2,
                 topPadding + chartHeight + 20f,
-                android.graphics.Paint().apply {
+                Paint().apply {
                     color = android.graphics.Color.BLACK
                     textSize = 22f
-                    textAlign = android.graphics.Paint.Align.CENTER
+                    textAlign = Paint.Align.CENTER
                 }
             )
         }
@@ -314,7 +331,7 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
 }
 
 private fun DrawScope.drawLineChart(
-    data: List<TimeSeriesData>,
+    data: List<ResolvedTimeSeriesData>,
     timePeriod: TimePeriod,
     showGrid: Boolean,
     showDataLabels: Boolean,
@@ -355,10 +372,10 @@ private fun DrawScope.drawLineChart(
                     formattedValue,
                     leftPadding - 8f,
                     y + 4f,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = android.graphics.Color.GRAY
                         textSize = 24f
-                        textAlign = android.graphics.Paint.Align.RIGHT
+                        textAlign = Paint.Align.RIGHT
                     }
                 )
             }
@@ -391,7 +408,7 @@ private fun DrawScope.drawLineChart(
 
     for (i in 0 until points.size - 1) {
 
-        val baseColor = data[i].color ?: Color.Blue
+        val baseColor = data[i].color 
         val finalColor = if (isPastel) baseColor.toPastel() else baseColor
 
         drawLine(
@@ -424,10 +441,10 @@ private fun DrawScope.drawLineChart(
                     valueText,
                     point.x,
                     point.y - 12f,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = android.graphics.Color.BLACK
                         textSize = 22f
-                        textAlign = android.graphics.Paint.Align.CENTER
+                        textAlign = Paint.Align.CENTER
                     }
                 )
             }
@@ -448,10 +465,10 @@ private fun DrawScope.drawLineChart(
                 label,
                 x,
                 topPadding + chartHeight + 20f,
-                android.graphics.Paint().apply {
+                Paint().apply {
                     color = android.graphics.Color.BLACK
                     textSize = 22f
-                    textAlign = android.graphics.Paint.Align.CENTER
+                    textAlign = Paint.Align.CENTER
                 }
             )
         }
@@ -464,7 +481,7 @@ private fun DrawScope.drawVerticalBarChart(
     barSpacingRatio: Float,
     barCornerRadius: Float,
     showDataLabels: Boolean,
-    isPastel: Boolean
+    colorForPaletteIndex: (Int) -> Color
 ) {
     val maxValue = data.maxOfOrNull { it.value } ?: 0f
     val itemCount = data.size
@@ -502,10 +519,10 @@ private fun DrawScope.drawVerticalBarChart(
                     formattedValue,
                     leftPadding - 8f,
                     y + 4f,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = android.graphics.Color.GRAY
                         textSize = 24f
-                        textAlign = android.graphics.Paint.Align.RIGHT
+                        textAlign = Paint.Align.RIGHT
                     }
                 )
             }
@@ -531,8 +548,7 @@ private fun DrawScope.drawVerticalBarChart(
         val barHeight = if (maxValue > 0) chartHeight * (item.value / maxValue) else 0f
         val y = topPadding + chartHeight - barHeight
 
-        val baseColor = item.color
-        val finalColor = if (isPastel) baseColor.toPastel() else baseColor
+        val finalColor = colorForPaletteIndex(item.paletteIndex)
 
         drawRoundRect(
             color = finalColor,
@@ -549,10 +565,10 @@ private fun DrawScope.drawVerticalBarChart(
                     valueText,
                     x + barWidth / 2,
                     y - 8f,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = android.graphics.Color.BLACK
                         textSize = 28f
-                        textAlign = android.graphics.Paint.Align.CENTER
+                        textAlign = Paint.Align.CENTER
                     }
                 )
             }
@@ -564,10 +580,10 @@ private fun DrawScope.drawVerticalBarChart(
                 label,
                 x + barWidth / 2,
                 topPadding + chartHeight + 20f,
-                android.graphics.Paint().apply {
+                Paint().apply {
                     color = android.graphics.Color.BLACK
                     textSize = 26f
-                    textAlign = android.graphics.Paint.Align.CENTER
+                    textAlign = Paint.Align.CENTER
                 }
             )
         }
@@ -578,15 +594,17 @@ private fun DrawScope.drawVerticalBarChart(
 private fun Legend(
     data: List<PieChartItem>,
     screenHeight: Dp,
-    isPastel: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val statsPalette = LocalStatsPalette.current
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         data.forEach { item ->
-            val finalColor = if (isPastel) item.color.toPastel() else item.color
+
+            val color = statsPalette.categories.getOrElse(item.paletteIndex) { Color.Gray }
 
             val label = categoryDisplayName(
                 fallbackName = item.fallbackName,
@@ -607,7 +625,7 @@ private fun Legend(
                 Box(
                     modifier = Modifier
                         .size(screenHeight * 0.02f)
-                        .background(finalColor)
+                        .background(color)
                 )
                 Text(
                     text = "$label: $valueText",
@@ -642,8 +660,16 @@ enum class TimePeriod {
     YEAR    // По годам
 }
 
+enum class TimeSeriesColorKey { MONTH, WEEK, YEAR }
+
 data class TimeSeriesData(
     val label: String,
     val value: Float,
-    val color: Color? = null
+    val colorKey: TimeSeriesColorKey
+)
+
+private data class ResolvedTimeSeriesData(
+    val label: String,
+    val value: Float,
+    val color: Color
 )

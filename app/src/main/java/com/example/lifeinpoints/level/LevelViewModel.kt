@@ -91,8 +91,8 @@ class LevelViewModel @Inject constructor(
     }
 
     fun getRequiredXpForLevel(level: Int): Int {
-        val b = 100 // базовое значение
-        return (b * Math.pow(level.toDouble(), 1.2)).toInt()
+        val b = 20 // базовое значение
+        return (b * Math.pow(level.toDouble(), 1.3)).toInt()
     }
 
     fun dismissLevelUpDialog() {
@@ -122,7 +122,7 @@ data class LevelUiState(
     val survival: Int = 0,
     val consecutiveDays: Int = 0,
     val playerClassKey: String = "NOVICE",
-    val xpToNextLevel: Int = 100 // XP для достижения 1 уровня
+    val xpToNextLevel: Int = 20 // XP для достижения 1 уровня
 )
 
 data class LevelUpData(

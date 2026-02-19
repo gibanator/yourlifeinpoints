@@ -7,6 +7,7 @@ import com.example.lifeinpoints.data.category.CategoryRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
+import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesColorKey
 import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,31 +43,6 @@ class StatisticsViewModel @Inject constructor(
     private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
     private val monthFormatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)
 
-    // Цвета для временных графиков
-    private val timeSeriesColors = mapOf(
-        ViewType.MONTH to Color(0xFF2196F3),
-        ViewType.WEEK to Color(0xFF4CAF50),
-        ViewType.YEAR to Color(0xFFF44336)
-    )
-
-    // Палитра цветов для категорий
-    private val categoryColors = listOf(
-        Color(0xFF4CAF50), // Зеленый
-        Color(0xFF2196F3), // Синий
-        Color(0xFFF44336), // Красный
-        Color(0xFFFF9800), // Оранжевый
-        Color(0xFF9C27B0), // Фиолетовый
-        Color(0xFF00BCD4), // Бирюзовый
-        Color(0xFF795548), // Коричневый
-        Color(0xFF607D8B), // Серо-голубой
-        Color(0xFFFFC107), // Янтарный
-        Color(0xFFE91E63), // Розовый
-        Color(0xFF8BC34A), // Светло-зеленый
-        Color(0xFFCDDC39), // Лаймовый
-        Color(0xFFFFEB3B), // Желтый
-        Color(0xFFFF5722), // Глубокий оранжевый
-        Color(0xFF9E9E9E)  // Серый
-    )
 
     init {
         setupCategorySubscription()
@@ -274,7 +250,7 @@ class StatisticsViewModel @Inject constructor(
             TimeSeriesData(
                 label = (index + 1).toString(),
                 value = sumForSelectedCategories.toFloat(),
-                color = timeSeriesColors[ViewType.MONTH]
+                colorKey = TimeSeriesColorKey.MONTH
             )
         }
     }
@@ -294,7 +270,7 @@ class StatisticsViewModel @Inject constructor(
             TimeSeriesData(
                 label = day.dayOfWeek ?: day.day.toString(),
                 value = sumForSelectedCategories.toFloat(),
-                color = timeSeriesColors[ViewType.WEEK]
+                colorKey = TimeSeriesColorKey.WEEK
             )
         }
     }
@@ -314,7 +290,7 @@ class StatisticsViewModel @Inject constructor(
             TimeSeriesData(
                 label = month.monthName,
                 value = sumForSelectedCategories.toFloat(),
-                color = timeSeriesColors[ViewType.YEAR]
+                colorKey = TimeSeriesColorKey.YEAR
             )
         }
     }
@@ -691,7 +667,7 @@ class StatisticsViewModel @Inject constructor(
                 systemKey = category.nameKey,
                 isSystem = category.isSystem,
                 value = count.toFloat(),
-                color = categoryColors.getOrElse(index) { Color.Gray }
+                paletteIndex = index,
             )
         }.filter { it.value > 0 }
     }
@@ -720,7 +696,7 @@ class StatisticsViewModel @Inject constructor(
                 systemKey = category.nameKey,
                 isSystem = category.isSystem,
                 value = count.toFloat(),
-                color = categoryColors.getOrElse(index) { Color.Gray }
+                paletteIndex = index,
             )
         }.filter { it.value > 0 }
     }
@@ -747,7 +723,7 @@ class StatisticsViewModel @Inject constructor(
                 systemKey = category.nameKey,
                 isSystem = category.isSystem,
                 value = count.toFloat(),
-                color = categoryColors.getOrElse(index) { Color.Gray }
+                paletteIndex = index
             )
         }.filter { it.value > 0 }
     }

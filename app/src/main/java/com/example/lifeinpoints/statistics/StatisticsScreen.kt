@@ -75,6 +75,7 @@ fun StatisticsScreen(
         viewModel.loadStatistics()
     }
 
+
     val pagerState = rememberPagerState()
 
     Scaffold(

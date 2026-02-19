@@ -11,8 +11,22 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DayCompletionDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(dayCompletion: DayCompletionEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIfAbsent(dayCompletion: DayCompletionEntity): Long
+
+    @Query("""
+    UPDATE day_completion
+    SET isCompleted = :isCompleted,
+        completedAt = :completedAt,
+        xpEarned = :xpEarned
+    WHERE date = :date
+""")
+    suspend fun setState(
+        date: String,
+        isCompleted: Boolean,
+        completedAt: Long,
+        xpEarned: Int
+    ): Int
 
     @Update
     suspend fun update(dayCompletion: DayCompletionEntity)
@@ -36,4 +50,5 @@ interface DayCompletionDao {
 
     @Query("DELETE FROM day_completion WHERE date = :date")
     suspend fun deleteByDate(date: String)
+
 }

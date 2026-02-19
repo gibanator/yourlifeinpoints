@@ -227,23 +227,55 @@ class DailyCheckupViewModel @Inject constructor(
     fun toggleDayEnded() {
         viewModelScope.launch {
             val date = _uiState.value.selectedDate.toString()
-            val newState = dayCompletionRepo.toggleDayCompletion(date)
 
-            _uiState.update {
-                it.copy(isDayEnded = newState)
-            }
+            // ensure row exists (so we can update it)
+            dayCompletionRepo.ensureRow(date)
 
-            if (newState) {
-                // Обновляем последовательные дни и начисляем XP
-                levelRepository.updateConsecutiveDays(date, true)
-                calculateAndAddXp()
-            } else {
-                // Сбрасываем последовательные дни
+            val before = dayCompletionRepo.getEntityOrDefault(date)
+            val nowCompleted = !before.isCompleted
+
+            if (!nowCompleted) {
+                //  un-end day: subtract what this day previously contributed
+                val oldXp = before.xpEarned
+                if (oldXp != 0) {
+                    levelRepository.addXp(-oldXp) // must support negative delta safely
+                }
+
+                dayCompletionRepo.setState(date, isCompleted = false, xpEarned = 0)
                 levelRepository.updateConsecutiveDays(date, false)
+
+                _uiState.update { it.copy(isDayEnded = false) }
+                saveProgress()
+                return@launch
             }
 
+            // ✅ end day: compute new XP and apply delta vs old stored XP
+            val newXp = calculateXpForCurrentState()
+            val delta = newXp - before.xpEarned
+            if (delta != 0) {
+                levelRepository.addXp(delta)
+            }
+
+            dayCompletionRepo.setState(date, isCompleted = true, xpEarned = newXp)
+            levelRepository.updateConsecutiveDays(date, true)
+
+            _uiState.update { it.copy(isDayEnded = true) }
             saveProgress()
         }
+    }
+    private suspend fun calculateXpForCurrentState(): Int {
+        val state = _uiState.value
+        val selectedCount = state.selectedCategories.size
+        val totalActive = state.allCategories.size
+
+        val dailyXp = if (totalActive > 0) {
+            (100.0 * selectedCount / totalActive).toInt()
+        } else 0
+
+        val progress = levelRepository.getOrCreateProgress()
+        val bonusXp = if (progress.consecutiveDays >= 3) 50 else 0
+
+        return dailyXp + bonusXp
     }
 
     private suspend fun calculateAndAddXp() {

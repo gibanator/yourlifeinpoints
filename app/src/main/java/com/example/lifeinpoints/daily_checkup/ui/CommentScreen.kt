@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import java.time.format.DateTimeFormatter
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +91,7 @@ fun CommentScreen(
                 Log.d("TEMPLATES", "${templates.size} found for category $id")
 
                 OneComment(
-                    category = category.name,
+                    category = categoryDisplayName(category.name, category.nameKey, category.isSystem),
                     isSelected = isSelected,
                     value = value,
                     templates = templates,

@@ -24,29 +24,32 @@ class LevelRepository @Inject constructor(
 
     suspend fun addXp(amount: Int): LevelProgressEntity {
         val progress = getOrCreateProgress()
-        var newXp = progress.currentXp + amount
-        var newTotalXp = progress.totalXp + amount
+
+        // totalXp only increases
+        val newTotalXp = progress.totalXp + maxOf(amount, 0)
+
+        var newXp = (progress.currentXp + amount).coerceAtLeast(0)
         var newLevel = progress.currentLevel
         var newUnspentPoints = progress.unspentSkillPoints
 
-        // Проверяем, достигли ли мы нового уровня
-        while (newXp >= getRequiredXpForLevel(newLevel + 1)) {
-            newLevel++
-            // Вычитаем XP, необходимые для этого уровня
-            newXp -= getRequiredXpForLevel(newLevel)
-            // Даём 5 очков навыков за каждый уровень
-            newUnspentPoints += 5
+        // Only level up on positive gains
+        if (amount > 0) {
+            while (newXp >= getRequiredXpForLevel(newLevel + 1)) {
+                newLevel++
+                newXp -= getRequiredXpForLevel(newLevel)
+                newUnspentPoints += 5
+            }
         }
 
-        val updatedProgress = progress.copy(
+        val updated = progress.copy(
             currentLevel = newLevel,
             currentXp = newXp,
             totalXp = newTotalXp,
             unspentSkillPoints = newUnspentPoints
         )
 
-        levelProgressDao.update(updatedProgress)
-        return updatedProgress
+        levelProgressDao.update(updated)
+        return updated
     }
 
     suspend fun updateSkill(skillType: String, value: Int): Boolean {

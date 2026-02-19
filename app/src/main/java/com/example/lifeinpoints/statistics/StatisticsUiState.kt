@@ -16,6 +16,9 @@ enum class ViewType {
 data class StatisticsUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
+
+    val isStoneTheme: Boolean = false,
+
     val currentMonth: YearMonth = YearMonth.now(),
     val currentWeekStart: LocalDate = getStartOfCurrentWeek(),
     val currentYear: Year = Year.now(),
