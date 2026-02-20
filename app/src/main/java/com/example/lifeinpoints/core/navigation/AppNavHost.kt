@@ -14,14 +14,13 @@ import com.example.lifeinpoints.calendar.ui.CalendarScreen
 import com.example.lifeinpoints.categories.AddCategoryScreen
 import com.example.lifeinpoints.categories.CategoriesScreen
 import com.example.lifeinpoints.categories.CategoryVisibilityScreen
-import com.example.lifeinpoints.categories.comment_templates.CommentTemplatesCategoriesScreen
 import com.example.lifeinpoints.categories.EditCategoryScreen
+import com.example.lifeinpoints.categories.comment_templates.CommentTemplatesCategoriesScreen
 import com.example.lifeinpoints.categories.comment_templates.EditCommentTemplatesScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 import com.example.lifeinpoints.notifications.NotificationSettingsScreen
-import com.example.lifeinpoints.statistics.StatisticsScreen  // Импортируем новый экран
-import com.example.lifeinpoints.statistics.StatisticsViewModel
+import com.example.lifeinpoints.statistics.StatisticsScreen
 import java.time.LocalDate
 
 @Composable
@@ -30,16 +29,13 @@ fun AppNavHost(
     settingsVm: SettingsViewModel,
     modifier: Modifier = Modifier
 ) {
-
-    val statisticsViewModel: StatisticsViewModel = hiltViewModel()
-
     NavHost(
         navController,
-        startDestination = Routes.DailyCheckupWithArgs,
+        startDestination = Routes.DAILY_CHECKUP_WITH_ARGS,
         modifier = modifier
     ) {
         composable(
-            route = Routes.DailyCheckupWithArgs,
+            route = Routes.DAILY_CHECKUP_WITH_ARGS,
             arguments = listOf(
                 navArgument("date") {
                     type = NavType.StringType
@@ -51,15 +47,11 @@ fun AppNavHost(
             DailyCheckupNavHost(dailyVm = vm)
         }
 
-        composable(Routes.Calendar) {
+        composable(Routes.CALENDAR) {
             CalendarScreen(
                 toCertainDate = { date ->
                     navController.navigate(Routes.checkupForDay(date ?: LocalDate.now().toString())) {
                         launchSingleTop = true
-//                        restoreState = false
-//                        popUpTo(navController.graph.findStartDestination().id) {
-//                            saveState = true
-//                        }
                     }
                 }
             )
@@ -77,7 +69,7 @@ fun AppNavHost(
             )
         }
 
-        composable(Routes.Settings) {
+        composable(Routes.SETTINGS) {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onCategoriesClick = {
@@ -93,7 +85,7 @@ fun AppNavHost(
             )
         }
 
-        composable(Routes.Statistics) {
+        composable(Routes.STATISTICS) {
             StatisticsScreen()
         }
 
@@ -189,7 +181,7 @@ fun AppNavHost(
         }
 
         // Обновляем маршрут настроек, передавая navController
-        composable(Routes.Settings) {
+        composable(Routes.SETTINGS) {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onCategoriesClick = {

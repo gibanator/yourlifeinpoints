@@ -1,6 +1,5 @@
 package com.example.lifeinpoints.calendar.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,16 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,15 +21,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.calendar.DayInMonth
-import com.example.lifeinpoints.util.allDatesOfMonthView
-import com.example.lifeinpoints.util.contains
 import com.example.lifeinpoints.util.pastelIfNeeded
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun MonthCalendar(
@@ -98,158 +85,3 @@ fun MonthCalendar(
         }
     }
 }
-
-@Composable
-fun CalendarHeader(
-    month: YearMonth,
-    onPrev: () -> Unit,
-    onNext: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onPrev) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous"
-            )
-        }
-
-        Text(
-            text = month.format(DateTimeFormatter.ofPattern("LLLL yyyy")),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-
-        IconButton(onClick = onNext) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next"
-            )
-        }
-    }
-}
-
-
-
-
-@Composable
-fun CalendarDayCell(
-    date: LocalDate?,
-    inCurrentMonth: Boolean,
-    modifier: Modifier = Modifier,
-    dayStatus: DayInMonth.CompletionCategory = DayInMonth.CompletionCategory.NONE,
-    isToday: Boolean
-) {
-    val shape = RoundedCornerShape(10.dp)
-    val outline = MaterialTheme.colorScheme.outlineVariant
-    val textColor =
-        if (inCurrentMonth) MaterialTheme.colorScheme.onSurface
-        else MaterialTheme.colorScheme.onSurfaceVariant
-
-    val fillColor = when (dayStatus) {
-        DayInMonth.CompletionCategory.COMPLETED -> MaterialTheme.colorScheme.tertiaryContainer
-        DayInMonth.CompletionCategory.PARTIAL -> MaterialTheme.colorScheme.errorContainer
-        DayInMonth.CompletionCategory.NONE -> MaterialTheme.colorScheme.surfaceVariant
-        DayInMonth.CompletionCategory.FUTURE -> MaterialTheme.colorScheme.outline
-    }
-
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .clip(shape)
-            .border(
-                width = if (isToday) 2.dp else 1.dp,
-                color = if (isToday) MaterialTheme.colorScheme.primary else outline,
-                shape = shape
-            )
-            .background(MaterialTheme.colorScheme.surface, shape)
-            .padding(6.dp),
-        contentAlignment = Alignment.TopStart
-    ) {
-        if (date != null) {
-            Text(
-                text = date.dayOfMonth.toString(),
-                style = MaterialTheme.typography.labelSmall,
-                color = textColor
-            )
-        }
-
-        if (date != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp)
-                    .clip(shape)
-                    .background(fillColor.copy(alpha = 0.35f), shape)
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(6.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(
-                    if (dayStatus == DayInMonth.CompletionCategory.COMPLETED)
-                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f)
-                    else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
-                )
-        )
-    }
-}
-
-
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Composable
-@Preview(showBackground = true)
-fun Calendar_Preview() {
-    val dates = allDatesOfMonthView(YearMonth.now())
-        .map { date ->
-            DayInMonth(
-                isToday = date == LocalDate.now(),
-                isInCurrentMonth = YearMonth.now().contains(date),
-                completionCategory = DayInMonth.CompletionCategory.COMPLETED,
-                isFuture = true,
-                date = date
-            )
-        }
-    MonthCalendar(
-        dates,
-        weeksCount = 5,
-        onDateClick = {}
-    )
-}
-
-
-
-
-
-
-//@Composable
-//@androidx.compose.ui.tooling.preview.Preview(showBackground = true, widthDp = 360)
-//fun Preview_CalendarDayCell_Row() {
-//    val today = LocalDate.now()
-//    Row(
-//        Modifier
-//            .fillMaxWidth()
-//            .padding(12.dp),
-//        horizontalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        CalendarDayCell(today.minusDays(1), inCurrentMonth = true, dayStatus = DayInMonth.CompletionCategory.COMPLETED, modifier = Modifier.weight(1f))
-//        CalendarDayCell(today,            inCurrentMonth = true, dayStatus = DayInMonth.CompletionCategory.COMPLETED, modifier = Modifier.weight(1f))
-//        CalendarDayCell(today.plusDays(1),inCurrentMonth = true, dayStatus = DayInMonth.CompletionCategory.NONE, modifier = Modifier.weight(1f))
-//        CalendarDayCell(null,             inCurrentMonth = false,  modifier = Modifier.weight(1f))
-//        CalendarDayCell(null,             inCurrentMonth = false, modifier = Modifier.weight(1f))
-//        CalendarDayCell(null,             inCurrentMonth = false, modifier = Modifier.weight(1f))
-//        CalendarDayCell(null,             inCurrentMonth = false, modifier = Modifier.weight(1f))
-//    }
-//}

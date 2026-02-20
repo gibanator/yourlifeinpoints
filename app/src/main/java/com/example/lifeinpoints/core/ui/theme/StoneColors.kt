@@ -9,10 +9,10 @@ import androidx.compose.ui.graphics.Color
 val StoneDarkGrey = Color(0xFF2C2C2C)
 val StoneLightGrey = Color(0xFF5A5A5A)
 val StoneMediumGrey = Color(0xFF3E3E3E)
-val StoneAccent = Color(0xFF8B8B8B)
+//val StoneAccent = Color(0xFF8B8B8B)
 val StoneText = Color(0xFFDDDDDD)
 val StoneTextDark = Color(0xFFAAAAAA)
-val StoneSurface = Color(0xFF353535)
+//val StoneSurface = Color(0xFF353535)
 val StoneOutline = Color(0xFF6B6B6B)
 
 // 🆕 Новые цвета для каменной темы

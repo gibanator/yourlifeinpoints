@@ -1,7 +1,6 @@
 // com/example/lifeinpoints/core/MainActivity.kt
 package com.example.lifeinpoints.core
 
-import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,25 +13,23 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.lifeinpoints.Settings.SettingsViewModel
-import com.example.lifeinpoints.calendar.CalendarViewModel
 import com.example.lifeinpoints.core.navigation.AppNavHost
-import com.example.lifeinpoints.core.navigation.Routes
 import com.example.lifeinpoints.core.ui.AppBottomBar
 import com.example.lifeinpoints.core.ui.theme.LifeInPointsTheme
 import com.example.lifeinpoints.notifications.NotificationHelper
 import com.example.lifeinpoints.notifications.NotificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import java.time.LocalDate
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -115,13 +112,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppWithTopAndBottomBar() {
     val navController = rememberNavController()
-    val calendarVm: CalendarViewModel = hiltViewModel()
     val settingsVm: SettingsViewModel = hiltViewModel()
     val notificationVm: NotificationViewModel = hiltViewModel()
     val currentTheme by settingsVm.currentTheme.collectAsState()
 
     val context = LocalContext.current
-    val notificationHelper = remember { NotificationHelper(context) }
+    //val notificationHelper = remember { NotificationHelper(context) }
 
     // Проверяем и планируем уведомления при запуске приложения
     LaunchedEffect(Unit) {

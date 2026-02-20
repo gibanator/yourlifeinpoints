@@ -1,7 +1,6 @@
 package com.example.lifeinpoints.core.ui.category
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.lifeinpoints.R
 

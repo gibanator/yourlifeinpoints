@@ -138,15 +138,6 @@ class CalendarViewModel @Inject constructor(
         saveState(_uiState.value)
     }
 
-    fun openYear(year: Int) {
-        _uiState.update {
-            it.copy(
-                mode = CalendarUiState.Mode.YEAR,
-                yearCursor = it.selectedMonth
-            )
-        }
-    }
-
     fun nextMonth() = openMonth(_uiState.value.selectedMonth.plusMonths(1))
     fun prevMonth() = openMonth(_uiState.value.selectedMonth.minusMonths(1))
 
@@ -157,9 +148,5 @@ class CalendarViewModel @Inject constructor(
         savedStateHandle["mode"] = state.mode.name
         savedStateHandle["selectedMonth"] = state.selectedMonth.toString()
         savedStateHandle["yearCursor"] = state.yearCursor.toString()
-    }
-
-    private inline fun update(x: (CalendarUiState) -> CalendarUiState) {
-        _uiState.update(x)
     }
 }

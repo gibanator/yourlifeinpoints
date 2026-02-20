@@ -1,10 +1,7 @@
 package com.example.lifeinpoints.data.category
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.lifeinpoints.data.user.UserEntity
 
 @Entity(
     tableName = "categories",

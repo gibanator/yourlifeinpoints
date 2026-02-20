@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -57,9 +57,6 @@ fun AddCategoryScreen(
                     IconButton(
                         onClick = {
                             if (categoryName.isNotBlank()) {
-                                isLoading = true
-                                errorMessage = null
-
                                 coroutineScope.launch {
                                     val createdAtForVisibility = when (startMode) {
                                         CategoryStartMode.TODAY -> LocalDate.now().toEpochMilliAtStartOfDay()
@@ -72,12 +69,9 @@ fun AddCategoryScreen(
                                         categoryName.trim(),
                                         createdAt = createdAtForVisibility
                                     )
-                                    isLoading = false
 
                                     if (result.isSuccess) {
                                         onCategoryAdded()
-                                    } else {
-                                        errorMessage = result.exceptionOrNull()?.message
                                     }
                                 }
                             }

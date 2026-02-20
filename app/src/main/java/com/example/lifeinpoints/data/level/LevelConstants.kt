@@ -1,9 +1,9 @@
 package com.example.lifeinpoints.data.level
 
+import kotlin.math.pow
+
 object LevelConstants {
     const val BASE_XP = 20 // b = 100
-    const val CONSECUTIVE_BONUS = 50 // k = 50
-    const val SKILL_POINTS_PER_LEVEL = 5
 
     // Таблица множителей для классов
     val CLASS_MULTIPLIERS = mapOf(
@@ -22,14 +22,6 @@ object LevelConstants {
     )
 
     fun getRequiredXpForLevel(level: Int): Int {
-        return (BASE_XP * Math.pow(level.toDouble(), 1.3)).toInt()
-    }
-
-    fun calculateDailyXp(selectedCount: Int, totalCount: Int): Int {
-        return if (totalCount > 0) {
-            (100.0 * selectedCount / totalCount).toInt()
-        } else {
-            0
-        }
+        return (BASE_XP * level.toDouble().pow(1.3)).toInt()
     }
 }

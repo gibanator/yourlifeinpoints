@@ -53,8 +53,8 @@ data class BottomNavItem(
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Routes.DailyCheckupWithArgs, Icons.Default.Home, R.string.main_page_navbar_item),
-    BottomNavItem(Routes.Calendar, Icons.Default.DateRange, R.string.calendar_page_navbar_item),
-    BottomNavItem(Routes.Statistics, Icons.Default.Assessment, R.string.statistics_page_navbar_item),
-    BottomNavItem(Routes.Settings, Icons.Default.Settings, R.string.settings_page_navbar_item)
+    BottomNavItem(Routes.DAILY_CHECKUP_WITH_ARGS, Icons.Default.Home, R.string.main_page_navbar_item),
+    BottomNavItem(Routes.CALENDAR, Icons.Default.DateRange, R.string.calendar_page_navbar_item),
+    BottomNavItem(Routes.STATISTICS, Icons.Default.Assessment, R.string.statistics_page_navbar_item),
+    BottomNavItem(Routes.SETTINGS, Icons.Default.Settings, R.string.settings_page_navbar_item)
 )

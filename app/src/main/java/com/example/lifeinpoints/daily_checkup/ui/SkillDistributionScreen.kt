@@ -100,7 +100,7 @@ fun SkillDistributionScreen(
     fun updateLocalSkill(skillType: String, delta: Int) {
         when (skillType) {
             "strength" -> {
-                if (delta > 0 && localUnspentPoints >= delta) {
+                if (delta in 1..localUnspentPoints) {
                     localStrength += delta
                     localUnspentPoints -= delta
                     onSkillUpdated("strength", delta)
@@ -111,7 +111,7 @@ fun SkillDistributionScreen(
                 }
             }
             "agility" -> {
-                if (delta > 0 && localUnspentPoints >= delta) {
+                if (delta in 1..localUnspentPoints) {
                     localAgility += delta
                     localUnspentPoints -= delta
                     onSkillUpdated("agility", delta)
@@ -122,7 +122,7 @@ fun SkillDistributionScreen(
                 }
             }
             "charisma" -> {
-                if (delta > 0 && localUnspentPoints >= delta) {
+                if (delta in 1..localUnspentPoints) {
                     localCharisma += delta
                     localUnspentPoints -= delta
                     onSkillUpdated("charisma", delta)
@@ -133,7 +133,7 @@ fun SkillDistributionScreen(
                 }
             }
             "will" -> {
-                if (delta > 0 && localUnspentPoints >= delta) {
+                if (delta in 1..localUnspentPoints) {
                     localWill += delta
                     localUnspentPoints -= delta
                     onSkillUpdated("will", delta)
@@ -144,7 +144,7 @@ fun SkillDistributionScreen(
                 }
             }
             "intelligence" -> {
-                if (delta > 0 && localUnspentPoints >= delta) {
+                if (delta in 1..localUnspentPoints) {
                     localIntelligence += delta
                     localUnspentPoints -= delta
                     onSkillUpdated("intelligence", delta)
@@ -155,7 +155,7 @@ fun SkillDistributionScreen(
                 }
             }
             "survival" -> {
-                if (delta > 0 && localUnspentPoints >= delta) {
+                if (delta in 1..localUnspentPoints) {
                     localSurvival += delta
                     localUnspentPoints -= delta
                     onSkillUpdated("survival", delta)

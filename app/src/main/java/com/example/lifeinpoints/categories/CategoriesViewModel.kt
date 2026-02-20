@@ -3,7 +3,6 @@ package com.example.lifeinpoints.categories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lifeinpoints.data.category.CategoryEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.data.category.CategoryRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 // com.example.lifeinpoints.categories/CategoriesViewModel.kt
@@ -108,11 +106,6 @@ class CategoriesViewModel @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-
-    fun getCategoryById(categoryId: Int): CategoryUiItem? {
-        val currentState = _uiState.value
-        return currentState.categories.find { it.id == categoryId }
     }
 
     fun isStaticCategory(categoryId: Int): Boolean {
