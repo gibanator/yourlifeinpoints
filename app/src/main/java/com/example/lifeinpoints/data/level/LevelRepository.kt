@@ -7,8 +7,7 @@ import javax.inject.Singleton
 
 @Singleton
 class LevelRepository @Inject constructor(
-    private val levelProgressDao: LevelProgressDao,
-    private val skillPointsDao: SkillPointsDao
+    private val levelProgressDao: LevelProgressDao
 ) {
     suspend fun getOrCreateProgress(): LevelProgressEntity {
         return levelProgressDao.get() ?: LevelProgressEntity().also {
@@ -17,10 +16,11 @@ class LevelRepository @Inject constructor(
     }
 
     fun observeProgress(): Flow<LevelProgressEntity?> = levelProgressDao.observe()
-
+/*
     suspend fun updateProgress(progress: LevelProgressEntity) {
         levelProgressDao.update(progress)
     }
+ */
 
     suspend fun addXp(amount: Int): LevelProgressEntity {
         val progress = getOrCreateProgress()
@@ -176,10 +176,11 @@ class LevelRepository @Inject constructor(
         levelProgressDao.update(updatedProgress)
         return updatedProgress
     }
-
+/*
     private fun isConsecutiveDay(previousDate: String, currentDate: String): Boolean {
         // Простая проверка: предыдущий день = текущий день - 1 день
         // Реализуем позже с использованием LocalDate
         return true // Временная заглушка
     }
+ */
 }

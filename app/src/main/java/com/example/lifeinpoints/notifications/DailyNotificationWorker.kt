@@ -4,7 +4,7 @@ package com.example.lifeinpoints.notifications
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import androidx.work.Data
+//import androidx.work.Data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.example.lifeinpoints.R
@@ -22,8 +22,8 @@ class DailyNotificationWorker(
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                val date = inputData.getString(KEY_DATE)
-                    ?: java.time.LocalDate.now().toString()
+                //val date = inputData.getString(KEY_DATE)
+                 //   ?: java.time.LocalDate.now().toString()
 
                 val title = applicationContext.getString(R.string.notif_daily_title)
                 val message = applicationContext.getString(R.string.notif_daily_message)

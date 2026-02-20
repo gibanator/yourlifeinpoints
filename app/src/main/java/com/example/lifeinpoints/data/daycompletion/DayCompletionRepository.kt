@@ -1,7 +1,7 @@
 // com.example.lifeinpoints.data.daycompletion/DayCompletionRepository.kt
 package com.example.lifeinpoints.data.daycompletion
 
-import android.util.Log
+//import android.util.Log
 import com.example.lifeinpoints.calendar.DayInMonth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -33,18 +33,22 @@ class DayCompletionRepository @Inject constructor(
     suspend fun getDayCompletion(date: String): Boolean {
         return dao.getByDate(date)?.isCompleted ?: false
     }
-
+/*
     fun observeDayCompletion(date: String): Flow<Boolean> {
         return dao.observeByDate(date).map { entity ->
             entity?.isCompleted ?: false
         }
     }
 
+
+
     suspend fun getCompletedDaysInRange(startDate: String, endDate: String): List<String> {
         return dao.getByDateRange(startDate, endDate)
             .filter { it.isCompleted }
             .map { it.date }
     }
+
+ */
 
 
     // Добавляем метод для подписки на все изменения
@@ -69,10 +73,12 @@ class DayCompletionRepository @Inject constructor(
         }
     }
 
+    /*
+
     fun observeRange(
         from: LocalDate,
         to: LocalDate
     ): Flow<Map<LocalDate, DayInMonth.CompletionCategory>> =
         observeYear(from.year)
-
+    */
 }

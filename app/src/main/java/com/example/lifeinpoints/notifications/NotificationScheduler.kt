@@ -3,7 +3,7 @@ package com.example.lifeinpoints.notifications
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
+//import androidx.lifecycle.LiveData
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -89,29 +89,31 @@ class NotificationScheduler(private val context: Context) {
     /**
      * Получает LiveData с информацией о запланированной работе
      */
-    fun getNotificationWorkInfo(): LiveData<List<WorkInfo>> {
-        return WorkManager.getInstance(context)
-            .getWorkInfosForUniqueWorkLiveData(WORK_NAME)
-    }
+/*
+fun getNotificationWorkInfo(): LiveData<List<WorkInfo>> {
+    return WorkManager.getInstance(context)
+        .getWorkInfosForUniqueWorkLiveData(WORK_NAME)
+}
+ */
 
-    /**
-     * Проверяет, запланировано ли уведомление (синхронная версия)
-     * Используем ListenableFuture и корутины
-     */
-    suspend fun isNotificationScheduled(): Boolean = withContext(Dispatchers.IO) {
-        try {
-            // Используем ListenableFuture и ждём результат
-            val workInfos = WorkManager.getInstance(context)
-                .getWorkInfosForUniqueWork(WORK_NAME)
-                .get() // Блокирующий вызов, но в Dispatchers.IO это нормально
+/**
+ * Проверяет, запланировано ли уведомление (синхронная версия)
+ * Используем ListenableFuture и корутины
+ */
+suspend fun isNotificationScheduled(): Boolean = withContext(Dispatchers.IO) {
+    try {
+        // Используем ListenableFuture и ждём результат
+        val workInfos = WorkManager.getInstance(context)
+            .getWorkInfosForUniqueWork(WORK_NAME)
+            .get() // Блокирующий вызов, но в Dispatchers.IO это нормально
 
-            workInfos.any { workInfo ->
-                workInfo.state == WorkInfo.State.ENQUEUED ||
-                        workInfo.state == WorkInfo.State.RUNNING
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking notification status", e)
-            false
+        workInfos.any { workInfo ->
+            workInfo.state == WorkInfo.State.ENQUEUED ||
+                    workInfo.state == WorkInfo.State.RUNNING
         }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error checking notification status", e)
+        false
     }
+}
 }

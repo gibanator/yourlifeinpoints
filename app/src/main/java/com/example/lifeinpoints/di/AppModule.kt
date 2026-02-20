@@ -2,7 +2,7 @@
 package com.example.lifeinpoints.di
 
 import android.content.Context
-import com.example.lifeinpoints.data.notifications.NotificationPreferences
+import com.example.lifeinpoints.notifications.NotificationPreferences
 import com.example.lifeinpoints.notifications.NotificationScheduler
 import dagger.Module
 import dagger.Provides
