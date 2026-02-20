@@ -23,8 +23,6 @@ class CommentTemplatesViewModel @Inject constructor(
     val categoryNameKey: StateFlow<String?> = _categoryNameKey.asStateFlow()
     val isSystem: StateFlow<Boolean> = _isSystem.asStateFlow()
 
-    private val _isEditing = MutableStateFlow(false)
-
     fun observeTemplates(categoryId: Int): Flow<List<CommentTemplateEntity>> {
         return templatesRepository.observeByCategory(categoryId.toLong())
     }

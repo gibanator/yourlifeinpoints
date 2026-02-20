@@ -42,7 +42,4 @@ class CommentTemplateRepository @Inject constructor(
         dao.clearSlot(categoryId, position)
     }
 
-    suspend fun deleteByCategory(categoryId: Long) {
-        dao.deleteByCategory(categoryId)
-    }
 }

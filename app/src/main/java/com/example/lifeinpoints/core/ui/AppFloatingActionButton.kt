@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
-import com.example.lifeinpoints.core.ui.theme.ThemeType
 import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 
 @Composable

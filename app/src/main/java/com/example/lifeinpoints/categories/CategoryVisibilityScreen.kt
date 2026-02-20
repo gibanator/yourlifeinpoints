@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.lifeinpoints.statistics.StatisticsViewModel
 import kotlinx.coroutines.launch
 import com.example.lifeinpoints.R
@@ -104,8 +104,6 @@ fun CategoryVisibilityItem(
     category: CategoryUiItem,
     onVisibilityChanged: (Boolean) -> Unit
 ) {
-    var isVisible by remember { mutableStateOf(true) } // Будем получать из базы, но для простоты используем состояние
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

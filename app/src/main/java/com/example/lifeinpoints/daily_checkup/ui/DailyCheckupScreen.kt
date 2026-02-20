@@ -60,10 +60,7 @@ import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsViewModel
 import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.category.categoryDisplayName
-import com.example.lifeinpoints.core.ui.theme.LocalThemeType
-import com.example.lifeinpoints.core.ui.theme.StoneCardBackground
 import com.example.lifeinpoints.core.ui.theme.clipByTheme
-import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 import com.example.lifeinpoints.level.LevelViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -358,12 +355,6 @@ fun CategoryListCard(
     modifier: Modifier = Modifier
 ) {
 
-    val isStone = LocalThemeType.current.isStoneTheme
-    val containerColor = if (isStone) {
-        StoneCardBackground   // специальный светлый цвет
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
-    }
 
     Card(
         modifier = modifier,
@@ -393,8 +384,6 @@ fun CategoryListCard(
             ActionButtonsRow(
                 selectedCount = selectedCategories.size,
                 totalCount = if (isMultiplierMode) categories.size * 31 else categories.size,
-                isDayEnded = isDayEnded,
-                isMultiplierMode = isMultiplierMode,
                 onToggleMultiplierMode = onToggleMultiplierMode,
                 onAddComment = onAddComment,
                 modifier = Modifier.fillMaxWidth()
@@ -407,8 +396,6 @@ fun CategoryListCard(
 fun ActionButtonsRow(
     selectedCount: Int,
     totalCount: Int,
-    isDayEnded: Boolean,
-    isMultiplierMode: Boolean,
     onToggleMultiplierMode: () -> Unit,
     onAddComment: () -> Unit,
     modifier: Modifier = Modifier

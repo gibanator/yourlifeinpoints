@@ -10,7 +10,6 @@ import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.data.level.LevelRepository
-import com.example.lifeinpoints.level.LevelViewModel
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
-import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 import javax.inject.Inject
@@ -60,7 +58,7 @@ class DailyCheckupViewModel @Inject constructor(
 
         // Подписываемся на изменения видимых категорий
         viewModelScope.launch {
-            categoryRepository.observeVisibleCategories().collect { visibleCategories ->
+            categoryRepository.observeVisibleCategories().collect { _ ->
                 // Обновляем состояние, когда меняются видимые категории
                 initStateForDay(today)
             }
@@ -115,6 +113,9 @@ class DailyCheckupViewModel @Inject constructor(
             .getVisibleCategoriesCreatedBefore(selectedDayMillis)
             .map { CategoryUi(id = it.id, name = it.name, isSystem = it.isSystem, nameKey = it.nameKey) }
 
+        val visibleIds = visibleCategories.map { category -> category.id }.toSet()
+
+
         val templatesByCategory: Map<Int, List<String>> =
             visibleCategories.associate { cat ->
                 val list = commentTemplateRepo
@@ -128,7 +129,9 @@ class DailyCheckupViewModel @Inject constructor(
             state.copy(
                 selectedDate = selected,
                 currentWeek = mapToUi(week, selected),
-                selectedCategories = completedCategories.filter { it in visibleCategories.map { it.id } }.toSet(),
+                selectedCategories = completedCategories
+                    .filter { categoryId -> categoryId in visibleIds }
+                    .toSet(),
                 allCategories = visibleCategories,
                 orderedCategories = visibleCategories, // Сохраняем упорядоченный список видимых категорий
                 isDayEnded = isDayCompleted,
@@ -278,44 +281,6 @@ class DailyCheckupViewModel @Inject constructor(
         return dailyXp + bonusXp
     }
 
-    private suspend fun calculateAndAddXp() {
-        val state = _uiState.value
-        val selectedCount = state.selectedCategories.size
-        val totalActive = state.allCategories.size
-
-        // Базовые XP за день по формуле: 100 * (m/n)
-        val dailyXp = if (totalActive > 0) {
-            (100.0 * selectedCount / totalActive).toInt()
-        } else {
-            0
-        }
-
-        // Получаем текущий прогресс для проверки последовательных дней
-        val progress = levelRepository.getOrCreateProgress()
-
-        // Бонус за 3+ последовательных дней (k = 50)
-        val bonusXp = if (progress.consecutiveDays >= 3) 50 else 0
-
-        // Общее количество XP
-        val totalXp = dailyXp + bonusXp
-
-        if (totalXp > 0) {
-            // Сохраняем старый уровень для проверки
-            val oldLevel = progress.currentLevel
-
-            // Начисляем XP
-            val updatedProgress = levelRepository.addXp(totalXp)
-
-            // Проверяем, повысился ли уровень
-            if (updatedProgress.currentLevel > oldLevel) {
-                // Триггерим событие повышения уровня
-                _levelUpEvent.value = updatedProgress.currentLevel
-            }
-
-            Log.d("XP", "Начислено XP: $totalXp (базовых: $dailyXp, бонус: $bonusXp)")
-        }
-    }
-
     fun onCommentChanged(categoryId: Int, newText: String) {
         _uiState.update { s ->
             s.copy(
@@ -353,17 +318,6 @@ class DailyCheckupViewModel @Inject constructor(
             it.copy(isMultiplierMode = !it.isMultiplierMode)
         }
     }
-
-    private fun resetCategories() {
-        _uiState.update {
-            it.copy(
-                isMultiplierMode = false,
-                selectedCategories = emptySet(),
-                isDayEnded = false
-            )
-        }
-    }
-
     /**
      * A function for UI
      */

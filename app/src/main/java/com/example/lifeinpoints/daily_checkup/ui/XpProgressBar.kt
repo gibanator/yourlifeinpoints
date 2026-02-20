@@ -29,7 +29,7 @@ fun XpProgressBar(
     val percent = (progress * 100).roundToInt()
 
     val className = stringResource(classLabelRes(levelState.playerClassKey))
-    val showClassBadge = levelState.playerClassKey != "NOVICE"
+    //val showClassBadge = levelState.playerClassKey != "NOVICE"
 
     Card(
         modifier = modifier
@@ -113,8 +113,6 @@ fun XpProgressBar(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-
-                // Сам прогресс-бар
                 LinearProgressIndicator(
                     progress = progress,
                     modifier = Modifier.fillMaxWidth(),

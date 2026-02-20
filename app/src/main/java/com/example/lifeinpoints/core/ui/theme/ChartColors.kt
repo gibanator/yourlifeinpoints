@@ -28,9 +28,3 @@ fun chartPalette(themeType: ThemeType): List<Color> {
 
     return if (pastel) base.map { it.copy(alpha = 0.60f) } else base
 }
-
-@Composable
-fun chartColorForCategory(categoryId: Int, themeType: ThemeType): Color {
-    val palette = chartPalette(themeType)
-    return palette[categoryId % palette.size]
-}

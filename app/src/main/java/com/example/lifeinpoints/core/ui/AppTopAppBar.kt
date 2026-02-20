@@ -10,7 +10,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
-import com.example.lifeinpoints.core.ui.theme.ThemeType
 import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 
 // com/example/lifeinpoints/core/ui/AppTopAppBar.kt

@@ -1,16 +1,12 @@
 package com.example.lifeinpoints.core.navigation
 
-import java.time.LocalDate
-
 object Routes {
-    const val DailyCheckup = "daily_checkup"
+    const val DAILY_CHECKUP_WITH_ARGS = "daily_checkup/{date}"
+    const val CALENDAR = "calendar"
 
-    const val DailyCheckupWithArgs = "daily_checkup/{date}"
-    const val Calendar = "calendar"
+    const val STATISTICS = "statistics"  // Добавляем новый маршрут
 
-    const val Statistics = "statistics"  // Добавляем новый маршрут
-
-    const val Settings = "settings"
+    const val SETTINGS = "settings"
 
     const val ADD_CATEGORY = "add_category"
 
