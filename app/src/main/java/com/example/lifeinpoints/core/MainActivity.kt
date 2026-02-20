@@ -18,7 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+//import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
@@ -116,7 +116,7 @@ fun AppWithTopAndBottomBar() {
     val notificationVm: NotificationViewModel = hiltViewModel()
     val currentTheme by settingsVm.currentTheme.collectAsState()
 
-    val context = LocalContext.current
+    //val context = LocalContext.current
     //val notificationHelper = remember { NotificationHelper(context) }
 
     // Проверяем и планируем уведомления при запуске приложения

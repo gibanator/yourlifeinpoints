@@ -1,5 +1,5 @@
 // com/example/lifeinpoints/data/notifications/NotificationPreferences.kt
-package com.example.lifeinpoints.data.notifications
+package com.example.lifeinpoints.notifications
 
 import android.content.Context
 import androidx.datastore.preferences.core.*

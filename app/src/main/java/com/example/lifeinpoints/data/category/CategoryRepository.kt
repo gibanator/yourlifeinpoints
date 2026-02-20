@@ -166,10 +166,12 @@ class CategoryRepository @Inject constructor(
     // Получаем категорию по ID с проверкой на системность
     suspend fun getById(id: Int): CategoryEntity? = dao.getById(id)
 
+    /*
     // Проверяем, является ли категория системной
     suspend fun isSystemCategory(categoryId: Int): Boolean {
         return dao.getById(categoryId)?.isSystem ?: false
     }
+     */
 
     // Остальные методы остаются без изменений
     fun observeAll(): Flow<List<CategoryEntity>> {
@@ -206,6 +208,7 @@ class CategoryRepository @Inject constructor(
         return colors[index % colors.size]
     }
 
+    /*
     suspend fun setCategoryVisibility(categoryId: Int, isVisible: Boolean): Result<Unit> {
         return try {
             dao.setVisibility(categoryId, isVisible)
@@ -214,6 +217,7 @@ class CategoryRepository @Inject constructor(
             Result.failure(e)
         }
     }
+     */
 
     // Убедимся, что observeVisibleCategories() возвращает только видимые
     fun observeVisibleCategories(): Flow<List<CategoryEntity>> {
@@ -231,11 +235,11 @@ class CategoryRepository @Inject constructor(
         }
     }
 
-    suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()
+    //suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()
 
     suspend fun getVisibleCategoriesCreatedBefore(fromTime: Long) = dao.getVisibleCategoriesCreatedBefore(fromTime)
 
     // Обновим системные категории - по умолчанию все видимые
-    suspend fun getAllIds() = dao.getAllIds()
+    //suspend fun getAllIds() = dao.getAllIds()
 
 }

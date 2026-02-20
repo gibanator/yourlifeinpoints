@@ -70,7 +70,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyCheckupScreen(
-    modifier: Modifier = Modifier,
+    //modifier: Modifier = Modifier,
     vm: DailyCheckupViewModel = hiltViewModel(),
     onNavigateToComments: () -> Unit
 ) {

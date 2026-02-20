@@ -12,10 +12,11 @@ import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+//import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,7 +37,7 @@ fun NotificationSettingsScreen(
     val hour by viewModel.notificationHour.collectAsState()
     val minute by viewModel.notificationMinute.collectAsState()
 
-    val context = LocalContext.current
+    //val context = LocalContext.current
     val scrollState = rememberScrollState()
 
     val timeText = remember(hour, minute) {
@@ -134,7 +135,7 @@ fun NotificationSettingsScreen(
                         )
                     }
 
-                    Divider()
+                    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 
                     // Время уведомления
                     Row(
@@ -165,64 +166,6 @@ fun NotificationSettingsScreen(
                             initialMinute = minute,
                             onTimeSelected = { h, m -> viewModel.setNotificationTime(h, m) }
                         )
-                    }
-                }
-            }
-
-            // Советы
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.notification_tips_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.notification_tips_body),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.notification_test_title),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = stringResource(R.string.notification_test_desc),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Button(
-                                onClick = {
-                                    val notificationHelper = NotificationHelper(context)
-                                    notificationHelper.showDailyCheckupNotification(
-                                        context.getString(R.string.notification_test_notif_title),
-                                        context.getString(R.string.notification_test_notif_message)
-                                    )
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(stringResource(R.string.notification_test_button))
-                            }
-                        }
                     }
                 }
             }

@@ -1,6 +1,7 @@
 // com.example.lifeinpoints.di/LevelModule.kt
 package com.example.lifeinpoints.di
 
+import com.example.lifeinpoints.data.level.LevelProgressDao
 import com.example.lifeinpoints.data.level.LevelRepository
 import dagger.Module
 import dagger.Provides
@@ -14,7 +15,6 @@ object LevelModule {
     @Provides
     @Singleton
     fun provideLevelRepository(
-        levelProgressDao: com.example.lifeinpoints.data.level.LevelProgressDao,
-        skillPointsDao: com.example.lifeinpoints.data.level.SkillPointsDao
-    ): LevelRepository = LevelRepository(levelProgressDao, skillPointsDao)
+        levelProgressDao: LevelProgressDao
+    ): LevelRepository = LevelRepository(levelProgressDao)
 }

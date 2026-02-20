@@ -4,10 +4,9 @@ package com.example.lifeinpoints.notifications
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
+//import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkInfo
-import com.example.lifeinpoints.data.notifications.NotificationPreferences
+//import androidx.work.WorkInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -133,7 +132,9 @@ class NotificationViewModel @Inject constructor(
     /**
      * Получает LiveData для наблюдения за статусом работы уведомлений
      */
-    fun getNotificationWorkInfo(): LiveData<List<WorkInfo>> {
-        return notificationScheduler.getNotificationWorkInfo()
-    }
+/*
+fun getNotificationWorkInfo(): LiveData<List<WorkInfo>> {
+    return notificationScheduler.getNotificationWorkInfo()
+}
+ */
 }
