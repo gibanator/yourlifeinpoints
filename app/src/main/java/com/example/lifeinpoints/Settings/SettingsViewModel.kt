@@ -45,10 +45,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /*
     // Функция для установки конкретного значения
     fun setGameMode(enabled: Boolean) {
         viewModelScope.launch {
             repo.updateGameMode(enabled)
         }
     }
+     */
 }

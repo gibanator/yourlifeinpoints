@@ -30,7 +30,7 @@ fun MonthCalendar(
     monthDays: List<DayInMonth>,
     weeksCount: Int,
     onDateClick: (String?) -> Unit,
-    modifier: Modifier = Modifier
+    //modifier: Modifier = Modifier
 ) {
     Column(
         modifier = Modifier

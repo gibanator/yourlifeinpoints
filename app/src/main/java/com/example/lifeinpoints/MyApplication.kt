@@ -3,9 +3,6 @@ package com.example.lifeinpoints
 import android.app.Application
 import com.example.lifeinpoints.data.category.CategoryDatabase
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp

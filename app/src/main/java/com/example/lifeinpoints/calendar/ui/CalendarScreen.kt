@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -26,7 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+//import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,103 +48,99 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
-    modifier: Modifier = Modifier,
+    //modifier: Modifier = Modifier,
     vm: CalendarViewModel = hiltViewModel(),
     toCertainDate: (String?) -> Unit
 ) {
     val calendarUiState by vm.uiState.collectAsStateWithLifecycle()
-
     val monthUi by vm.monthUi.collectAsStateWithLifecycle()
     val yearMonths by vm.yearUi.collectAsStateWithLifecycle()
 
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
+    BoxWithConstraints {
+        val screenHeight = maxHeight // Получаем высоту контейнера
 
-    Scaffold(
-        topBar = {
-            AppTopAppBar(
-                title = {
-                    Text(
-                        if (calendarUiState.mode == CalendarUiState.Mode.MONTH)
-                            calendarUiState.selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
-                        else
-                            calendarUiState.yearCursor.year.toString()
-                    )
-                },
-                // modifier = Modifier.heightIn(max = 56.dp), если нужно поменять размер
-            )
-        }
-    ) { paddingValues ->
-        val layoutDirection = LocalLayoutDirection.current
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    start = paddingValues.calculateStartPadding(layoutDirection),
-                    end = paddingValues.calculateEndPadding(layoutDirection)
-                    // no bottom padding
+        Scaffold(
+            topBar = {
+                AppTopAppBar(
+                    title = {
+                        Text(
+                            if (calendarUiState.mode == CalendarUiState.Mode.MONTH)
+                                calendarUiState.selectedMonth.format(DateTimeFormatter.ofPattern("LLLL yyyy"))
+                            else
+                                calendarUiState.yearCursor.year.toString()
+                        )
+                    }
                 )
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            val isInMonthMode = if (calendarUiState.mode == CalendarUiState.Mode.MONTH) true else false
-            CalendarModeSwitchCard(
-                mode = calendarUiState.mode,
-                selectedMonth = calendarUiState.selectedMonth,
-                year = calendarUiState.yearCursor.year,
-                onToggle = {
-                    if (isInMonthMode) vm.openYear()
-                    else vm.openMonth()
-                },
-                onPrev = {
-                    if (isInMonthMode) vm.prevMonth()
-                    else vm.prevYear()
-                },
-                onNext = {
-                    if (isInMonthMode) vm.nextMonth()
-                    else vm.nextYear()
-                },
-                screenHeight = screenHeight,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = screenHeight * 0.02f)
-            )
-            if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    item {
-                        MonthCalendar(
-                            monthDays = monthUi.days,
-                            weeksCount = monthUi.weeksCount,
-                            onDateClick = toCertainDate
-                        )
-                    }
-                    item {
-                        val stats = computeMonthStats(monthUi.month, monthUi.days)
-                        MonthStatsCard(
-                            modifier = Modifier
-                                .padding(bottom = 24.dp),
-                            stats = stats
-                        )
-                    }
-                }
             }
-            else {
-                YearCalendarView(
-                    months = yearMonths,
-                    onMonthClick = { ym -> vm.openMonth(ym) }
+        ) { paddingValues ->
+            val layoutDirection = LocalLayoutDirection.current
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = paddingValues.calculateStartPadding(layoutDirection),
+                        end = paddingValues.calculateEndPadding(layoutDirection)
+                    )
+                    .padding(
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                val isInMonthMode = calendarUiState.mode == CalendarUiState.Mode.MONTH
+
+                CalendarModeSwitchCard(
+                    mode = calendarUiState.mode,
+                    selectedMonth = calendarUiState.selectedMonth,
+                    year = calendarUiState.yearCursor.year,
+                    onToggle = {
+                        if (isInMonthMode) vm.openYear()
+                        else vm.openMonth()
+                    },
+                    onPrev = {
+                        if (isInMonthMode) vm.prevMonth()
+                        else vm.prevYear()
+                    },
+                    onNext = {
+                        if (isInMonthMode) vm.nextMonth()
+                        else vm.nextYear()
+                    },
+                    screenHeight = screenHeight,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = screenHeight * 0.02f)
                 )
+
+                if (calendarUiState.mode == CalendarUiState.Mode.MONTH) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        item {
+                            MonthCalendar(
+                                monthDays = monthUi.days,
+                                weeksCount = monthUi.weeksCount,
+                                onDateClick = toCertainDate
+                            )
+                        }
+                        item {
+                            val stats = computeMonthStats(monthUi.month, monthUi.days)
+                            MonthStatsCard(
+                                modifier = Modifier.padding(bottom = 24.dp),
+                                stats = stats
+                            )
+                        }
+                    }
+                } else {
+                    YearCalendarView(
+                        months = yearMonths,
+                        onMonthClick = { ym -> vm.openMonth(ym) }
+                    )
+                }
             }
         }
     }
-
 }
 
 @Composable
@@ -163,7 +160,7 @@ private fun CalendarModeSwitchCard(
     } else {
         year.toString()
     }
-    val period_name = if (mode == CalendarUiState.Mode.MONTH) {
+    val periodname = if (mode == CalendarUiState.Mode.MONTH) {
         stringResource(R.string.month)
     } else {
         stringResource(R.string.year)
@@ -192,7 +189,7 @@ private fun CalendarModeSwitchCard(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "$title • $period_name",
+                text = "$title • $periodname",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = calculateAdaptiveFontSize(screenHeight, 0.02f)
                 ),
