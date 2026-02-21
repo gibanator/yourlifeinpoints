@@ -39,7 +39,7 @@ data class StatisticsUiState(
 
 enum class DisplayMode {
     TABLE,
-    CHART
+    //CHART
 }
 
 data class DayStatistics(

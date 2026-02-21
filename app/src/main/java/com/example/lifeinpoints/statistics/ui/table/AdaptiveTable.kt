@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+//import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,8 +43,10 @@ fun AdaptiveSmartCenteredTable(
     modifier: Modifier = Modifier,
     isYearMode: Boolean = false
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
+    //val configuration = LocalConfiguration.current
+    val screenHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp()
+    }
     val totalCells = 2 + categories.size
 
     Box(
@@ -96,8 +100,10 @@ fun AdaptiveYearTable(
     categories: List<CategoryStats>,
     modifier: Modifier = Modifier
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
+    //val configuration = LocalConfiguration.current
+    val screenHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp()
+    }
     val totalCells = 2 + categories.size
 
     Box(
@@ -370,9 +376,10 @@ private fun AdaptiveYearTableRow(
 @Composable
 fun AdaptiveTableHeaderCell(
     text: String,
+    modifier: Modifier = Modifier,
     screenHeight: Dp,
-    isVisible: Boolean = true,
-    modifier: Modifier = Modifier
+    isVisible: Boolean = true
+
 ) {
     Box(
         modifier = modifier

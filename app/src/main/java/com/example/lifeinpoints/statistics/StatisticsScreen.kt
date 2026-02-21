@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.lifeinpoints.statistics
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,7 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+//import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,9 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
-import com.example.lifeinpoints.core.ui.theme.LocalThemeType
-import com.example.lifeinpoints.core.ui.theme.ThemeType
-import com.example.lifeinpoints.core.ui.theme.isStoneTheme
+//import com.example.lifeinpoints.core.ui.theme.LocalThemeType
+//import com.example.lifeinpoints.core.ui.theme.ThemeType
+//import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 import com.example.lifeinpoints.statistics.ui.AdaptiveMonthSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveWeekSummaryStatsCard
 import com.example.lifeinpoints.statistics.ui.AdaptiveYearSummaryStatsCard
@@ -61,12 +64,13 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import java.time.format.DateTimeFormatter
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun StatisticsScreen(
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
-    val isStone = LocalThemeType.current.isStoneTheme
+    //val isStone = LocalThemeType.current.isStoneTheme
     val uiState by viewModel.uiState.collectAsState()
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -129,7 +133,7 @@ fun StatisticsScreen(
                 screenHeight = screenHeight,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = screenHeight * 0.02f, /*vertical = screenHeight * 0.01f*/)
+                    .padding(horizontal = screenHeight * 0.02f /*vertical = screenHeight * 0.01f*/)
             )
 
             if (uiState.isLoading) {

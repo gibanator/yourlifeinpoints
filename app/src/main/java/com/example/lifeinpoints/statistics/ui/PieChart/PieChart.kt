@@ -44,14 +44,16 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.core.ui.theme.LocalStatsPalette
-import com.example.lifeinpoints.util.pastelIfNeeded
+//import com.example.lifeinpoints.util.pastelIfNeeded
 import kotlin.math.min
 
+/*
 @Composable
 private fun pieItemColor(item: PieChartItem): Color {
     val palette = LocalStatsPalette.current
     return palette.categories.getOrElse(item.paletteIndex) { Color.Gray }
 }
+ */
 
 /**
  * Композируемый компонент для отображения кольцевой диаграммы с легендой.
@@ -81,7 +83,7 @@ fun PieChartWithLegend(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val density = LocalDensity.current
+    //val density = LocalDensity.current
 
     // Вычисляем размеры на основе процентов от экрана
     val chartHeight = screenHeight * 0.35f // 35% высоты экрана под диаграмму
@@ -184,17 +186,6 @@ fun PieChartWithLegend(
     }
 }
 
-/**
- * Адаптивная легенда, которая автоматически выбирает оптимальный режим отображения
- * в зависимости от количества элементов и размера экрана.
- *
- * @param data Список элементов легенды
- * @param total Общая сумма всех значений (для расчета процентов)
- * @param screenWidth Ширина экрана
- * @param screenHeight Высота экрана
- * @param config Конфигурация легенды
- * @param modifier Модификатор для настройки компоновки
- */
 @Composable
 private fun AdaptiveLegend(
     data: List<PieChartItem>,
@@ -204,7 +195,7 @@ private fun AdaptiveLegend(
     config: LegendConfig,
     modifier: Modifier = Modifier
 ) {
-    val density = LocalDensity.current
+    //val density = LocalDensity.current
     val itemCount = data.size
 
     // Определяем оптимальный тип легенды на основе количества элементов и ширины экрана
@@ -212,8 +203,8 @@ private fun AdaptiveLegend(
         calculateOptimalLegendType(
             itemCount = itemCount,
             screenWidth = screenWidth,
-            minColumns = config.minColumns,
-            maxColumns = config.maxColumns,
+            //minColumns = config.minColumns,
+            //maxColumns = config.maxColumns,
             maxItemsPerRow = config.maxItemsPerRow
         )
     }
@@ -388,7 +379,7 @@ private fun LegendItem(
         if (!compactMode && showPercentage) {
             Spacer(modifier = Modifier.width(itemHeight * 0.3f))
             Text(
-                text = "${item.value.toInt()} ${if (compactMode) "($percentage%)" else "($percentage%)"}",
+                text = "${item.value.toInt()} ${"($percentage%)"}",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium,
                     fontSize = fontSize
@@ -399,22 +390,11 @@ private fun LegendItem(
     }
 }
 
-/**
- * Определяет оптимальный тип отображения легенды на основе количества элементов
- * и размеров экрана.
- *
- * @param itemCount Количество элементов в легенде
- * @param screenWidth Ширина экрана
- * @param minColumns Минимальное количество колонок (из конфигурации)
- * @param maxColumns Максимальное количество колонок (из конфигурации)
- * @param maxItemsPerRow Максимальное количество элементов в строке (из конфигурации)
- * @return Оптимальный тип легенды
- */
 private fun calculateOptimalLegendType(
     itemCount: Int,
     screenWidth: Dp,
-    minColumns: Int = 1,
-    maxColumns: Int = 3,
+    //minColumns: Int = 1,
+    //maxColumns: Int = 3,
     maxItemsPerRow: Int = 6
 ): LegendType {
     return when {
@@ -480,13 +460,7 @@ private fun calculateResponsiveFontSize(screenHeight: Dp, ratio: Float): TextUni
     }
 }
 
-/**
- * Модель данных для элемента кольцевой диаграммы.
- *
- * @param label Название категории (отображается в легенде)
- * @param value Числовое значение категории
- * @param color Цвет сегмента на диаграмме
- */
+
 data class PieChartItem(
     val fallbackName: String,
     val systemKey: String?,

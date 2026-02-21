@@ -39,7 +39,7 @@ import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.core.ui.theme.LocalStatsPalette
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
 import com.example.lifeinpoints.core.ui.theme.isStoneTheme
-import com.example.lifeinpoints.util.pastelIfNeeded
+//import com.example.lifeinpoints.util.pastelIfNeeded
 import com.example.lifeinpoints.util.toPastel
 
 @Composable
@@ -58,7 +58,7 @@ fun ChartWithLegend(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val density = LocalDensity.current
+    //val density = LocalDensity.current
 
     val chartHeight = screenHeight * 0.35f
     val padding = screenWidth * 0.02f
@@ -649,7 +649,7 @@ private fun calculateResponsiveFontSize(screenHeight: Dp, ratio: Float): TextUni
 
 enum class ChartType {
     VERTICAL_BAR,   // Вертикальная столбчатая диаграмма
-    HORIZONTAL_BAR, // Горизонтальная столбчатая диаграмма
+    //HORIZONTAL_BAR, // Горизонтальная столбчатая диаграмма
     LINE            // Линейный график
 }
 

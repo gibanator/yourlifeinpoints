@@ -1,6 +1,6 @@
 package com.example.lifeinpoints.statistics
 
-import androidx.compose.ui.graphics.Color
+//import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
@@ -10,6 +10,7 @@ import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
 import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesColorKey
 import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+//import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 import java.time.Year
 import java.time.format.TextStyle
@@ -39,9 +40,9 @@ class StatisticsViewModel @Inject constructor(
 
     private val _forceRefresh = MutableStateFlow(0)
 
-    private val dateFormatter = DateTimeFormatter.ofPattern("d")
-    private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
-    private val monthFormatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)
+    //private val dateFormatter = DateTimeFormatter.ofPattern("d")
+    //private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
+    //private val monthFormatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)
 
 
     init {
@@ -50,6 +51,7 @@ class StatisticsViewModel @Inject constructor(
         loadStatistics()
     }
 
+    @OptIn(FlowPreview::class)
     private fun setupCategorySubscription() {
         combine(
             categoryRepository.observeAll(),
@@ -64,6 +66,7 @@ class StatisticsViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    @OptIn(FlowPreview::class)
     private fun setupDayCompletionSubscription() {
         dayCompletionRepo.observeAllChanges()
             .debounce(500)
