@@ -1,6 +1,7 @@
 // com/example/lifeinpoints/statistics/ui/PieChart.kt
 package com.example.lifeinpoints.statistics.ui.PieChart
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -68,6 +69,7 @@ private fun pieItemColor(item: PieChartItem): Color {
  * @param cornerRadius Радиус скругления углов
  * @param legendConfig Конфигурация отображения легенды
  */
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun PieChartWithLegend(
     modifier: Modifier = Modifier,

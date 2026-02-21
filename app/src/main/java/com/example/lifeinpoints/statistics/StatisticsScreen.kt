@@ -278,13 +278,6 @@ fun StatisticsScreen(
                                 if (dataToShow.isNotEmpty()) {
                                     ChartWithLegend(
                                         timeSeriesData = dataToShow,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(0.6f) // 60% для графика
-                                            .padding(
-                                                horizontal = screenWidth * 0.02f,
-                                                vertical = screenHeight * 0.01f
-                                            ),
                                         title = when (uiState.viewType) {
                                             ViewType.MONTH -> stringResource(R.string.piechart_title_month)
                                             ViewType.WEEK -> stringResource(R.string.piechart_title_week)
@@ -298,7 +291,7 @@ fun StatisticsScreen(
                                         },
                                         showGrid = true,
                                         barSpacingRatio = 0.2f,
-                                        barCornerRadius = 4f,
+                                        //barCornerRadius = 4f,
                                         showDataLabels = true
                                     )
                                 } else {

@@ -1,6 +1,7 @@
 // com/example/lifeinpoints/statistics/ui/chart/ChartWithLegend.kt
 package com.example.lifeinpoints.statistics.ui.chart
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -42,9 +43,9 @@ import com.example.lifeinpoints.core.ui.theme.isStoneTheme
 //import com.example.lifeinpoints.util.pastelIfNeeded
 import com.example.lifeinpoints.util.toPastel
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun ChartWithLegend(
-    modifier: Modifier = Modifier,
     data: List<PieChartItem> = emptyList(),
     timeSeriesData: List<TimeSeriesData>? = null,
     title: String? = null,
@@ -52,7 +53,7 @@ fun ChartWithLegend(
     timePeriod: TimePeriod = TimePeriod.MONTH,
     showGrid: Boolean = true,
     barSpacingRatio: Float = 0.2f,
-    barCornerRadius: Float = 4f,
+    //barCornerRadius: Float = 4f,
     showDataLabels: Boolean = true
 ) {
     val configuration = LocalConfiguration.current
@@ -91,26 +92,24 @@ fun ChartWithLegend(
         val isTimeSeries = timeSeriesData != null
         val statsPalette = LocalStatsPalette.current
 
-        val resolvedTimeSeries = if (timeSeriesData != null) {
-            timeSeriesData.map { item ->
-                val color = when (item.colorKey) {
-                    TimeSeriesColorKey.MONTH -> statsPalette.month
-                    TimeSeriesColorKey.WEEK  -> statsPalette.week
-                    TimeSeriesColorKey.YEAR  -> statsPalette.year
-                }
-                ResolvedTimeSeriesData(
-                    label = item.label,
-                    value = item.value,
-                    color = color
-                )
+        val resolvedTimeSeries = timeSeriesData?.map { item ->
+            val color = when (item.colorKey) {
+                TimeSeriesColorKey.MONTH -> statsPalette.month
+                TimeSeriesColorKey.WEEK  -> statsPalette.week
+                TimeSeriesColorKey.YEAR  -> statsPalette.year
             }
-        } else null
+            ResolvedTimeSeriesData(
+                label = item.label,
+                value = item.value,
+                color = color
+            )
+        }
 
         val categoryColorForIndex: (Int) -> Color = { idx ->
             statsPalette.categories.getOrElse(idx) { Color.Gray }
         }
 
-        if ((!isTimeSeries && data.isEmpty()) || (isTimeSeries && timeSeriesData?.isEmpty() != false)) {
+        if ((!isTimeSeries && data.isEmpty()) || (isTimeSeries && timeSeriesData.isEmpty())) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -145,7 +144,7 @@ fun ChartWithLegend(
                                 timePeriod = timePeriod,
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
-                                barCornerRadius = barCornerRadius,
+                                //barCornerRadius = barCornerRadius,
                                 showDataLabels = showDataLabels,
                                 dayNamesShort = dayNamesShort,
                                 monthNamesShort = monthNamesShort
@@ -159,16 +158,6 @@ fun ChartWithLegend(
                                 monthNamesShort = monthNamesShort,
                                 isPastel = pastelEnabled
                             )
-                            else -> drawVerticalTimeSeriesChart(
-                                data = resolvedTimeSeries,
-                                timePeriod = timePeriod,
-                                showGrid = showGrid,
-                                barSpacingRatio = barSpacingRatio,
-                                barCornerRadius = barCornerRadius,
-                                showDataLabels = showDataLabels,
-                                dayNamesShort = dayNamesShort,
-                                monthNamesShort = monthNamesShort
-                            )
                         }
                     } else {
                         when (chartType) {
@@ -176,7 +165,7 @@ fun ChartWithLegend(
                                 data = data,
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
-                                barCornerRadius = barCornerRadius,
+                                //barCornerRadius = barCornerRadius,
                                 showDataLabels = showDataLabels,
                                 colorForPaletteIndex = categoryColorForIndex
                             )
@@ -184,7 +173,7 @@ fun ChartWithLegend(
                                 data = data,
                                 showGrid = showGrid,
                                 barSpacingRatio = barSpacingRatio,
-                                barCornerRadius = barCornerRadius,
+                                //barCornerRadius = barCornerRadius,
                                 showDataLabels = showDataLabels,
                                 colorForPaletteIndex = categoryColorForIndex,
                             )
@@ -211,7 +200,7 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
     timePeriod: TimePeriod,
     showGrid: Boolean,
     barSpacingRatio: Float,
-    barCornerRadius: Float,
+    //barCornerRadius: Float,
     showDataLabels: Boolean,
     dayNamesShort: Array<String>,
     monthNamesShort: Array<String>
@@ -285,7 +274,7 @@ private fun DrawScope.drawVerticalTimeSeriesChart(
 
 
         drawRoundRect(
-            color = item.color ?: Color.Blue,
+            color = item.color,
             topLeft = Offset(x, y),
             size = Size(barWidth, barHeight),
         )
@@ -421,7 +410,7 @@ private fun DrawScope.drawLineChart(
 
     points.forEachIndexed { index, point ->
 
-        val baseColor = data[index].color ?: Color.Blue
+        val baseColor = data[index].color
         val finalColor = if (isPastel) baseColor.toPastel() else baseColor
 
         drawCircle(
@@ -479,7 +468,7 @@ private fun DrawScope.drawVerticalBarChart(
     data: List<PieChartItem>,
     showGrid: Boolean,
     barSpacingRatio: Float,
-    barCornerRadius: Float,
+    //barCornerRadius: Float,
     showDataLabels: Boolean,
     colorForPaletteIndex: (Int) -> Color
 ) {

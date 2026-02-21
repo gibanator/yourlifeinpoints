@@ -58,7 +58,7 @@ fun CategoryFilter(
                 isActive = selectedCategoryIds.size == categories.size,
                 onClick = onSelectAll,
                 screenHeight = screenHeight,
-                screenWidth = screenWidth,
+                //screenWidth = screenWidth,
                 modifier = Modifier.weight(1f)
             )
 
@@ -70,7 +70,7 @@ fun CategoryFilter(
                 isActive = selectedCategoryIds.isEmpty(),
                 onClick = onDeselectAll,
                 screenHeight = screenHeight,
-                screenWidth = screenWidth,
+                //screenWidth = screenWidth,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -117,7 +117,7 @@ private fun ControlButton(
     isActive: Boolean,
     onClick: () -> Unit,
     screenHeight: Dp,
-    screenWidth: Dp,
+    //screenWidth: Dp,
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = if (isActive) {
