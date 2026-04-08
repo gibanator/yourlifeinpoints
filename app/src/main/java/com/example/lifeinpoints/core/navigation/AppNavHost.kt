@@ -1,5 +1,6 @@
 package com.example.lifeinpoints.core.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -20,6 +21,7 @@ import com.example.lifeinpoints.categories.comment_templates.EditCommentTemplate
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 import com.example.lifeinpoints.notifications.NotificationSettingsScreen
+import com.example.lifeinpoints.registration.RegistrationScreen
 import com.example.lifeinpoints.statistics.StatisticsScreen
 import java.time.LocalDate
 
@@ -68,8 +70,12 @@ fun AppNavHost(
                 }
             )
         }
+        composable("registration") {
+            Log.d("SCREEN", "REG")
+            RegistrationScreen()
+        }
 
-        composable(Routes.SETTINGS) {
+        composable(Routes.SETTINGS) { // WRONG SETTINGS???
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onCategoriesClick = {
@@ -192,6 +198,9 @@ fun AppNavHost(
                 },
                 onTemplatesClick = {
                     navController.navigate("comment_templates")
+                },
+                onRegistrationClick = {
+                    navController.navigate("registration")
                 },
                 navController = navController, // Передаем navController
                 vm = settingsVm

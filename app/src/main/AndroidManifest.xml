@@ -8,7 +8,11 @@
     <!-- Если нужно для старых версий -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Разрешение на подключение к интернету, чтобы отправлять запросы -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:networkSecurityConfig="@xml/network_security_rules"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
