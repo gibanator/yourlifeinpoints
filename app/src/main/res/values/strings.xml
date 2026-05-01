@@ -59,4 +59,18 @@
     <string name="cat_work">Work</string>
     <string name="cat_health">Health</string>
     <string name="cat_personal_life">Personal life</string>
+
+    <!-- Registration -->
+    <string name="registration_title">Registration</string>
+    <string name="registration_email_label">Email</string>
+    <string name="registration_password_label">Password</string>
+    <string name="registration_button">Register</string>
+    <string name="registration_success">Registration successful</string>
+    <string name="registration_error_required">Email and password are required</string>
+    <string name="registration_info_card">By registering, you will be able to synchronize your data across multiple devices.</string>
+
+    <!-- Success Messages -->
+    <string name="category_added_success">Category added successfully</string>
+    <string name="category_updated_success">Category updated successfully</string>
+    <string name="category_deleted_success">Category deleted successfully</string>
 </resources>

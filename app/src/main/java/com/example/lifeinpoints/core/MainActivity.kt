@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 //import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -30,6 +34,7 @@ import com.example.lifeinpoints.notifications.NotificationHelper
 import com.example.lifeinpoints.notifications.NotificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -115,9 +120,9 @@ fun AppWithTopAndBottomBar() {
     val settingsVm: SettingsViewModel = hiltViewModel()
     val notificationVm: NotificationViewModel = hiltViewModel()
     val currentTheme by settingsVm.currentTheme.collectAsState()
-
-    //val context = LocalContext.current
-    //val notificationHelper = remember { NotificationHelper(context) }
+    
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // Проверяем и планируем уведомления при запуске приложения
     LaunchedEffect(Unit) {
@@ -129,7 +134,8 @@ fun AppWithTopAndBottomBar() {
         Scaffold(
             bottomBar = {
                 AppBottomBar(navController = navController)
-            }
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { paddingValues ->
             val layoutDirection = LocalLayoutDirection.current
 
@@ -142,7 +148,12 @@ fun AppWithTopAndBottomBar() {
                         end = paddingValues.calculateEndPadding(layoutDirection),
                         bottom = paddingValues.calculateBottomPadding()
                     ),
-                settingsVm = settingsVm
+                settingsVm = settingsVm,
+                onShowSnackbar = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
             )
         }
     }
