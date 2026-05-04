@@ -59,4 +59,41 @@
     <string name="cat_work">Work</string>
     <string name="cat_health">Health</string>
     <string name="cat_personal_life">Personal life</string>
+
+    <!-- Learn screen -->
+    <string name="start_sc_title">Welcome to Life in Points!</string>
+    <string name="start_sc_text">Track your daily activities and level up your character.</string>
+
+    <string name="sec_sc_title">Main Screen</string>
+    <string name="sec_sc_text">Mark completed categories to earn experience points. Don’t forget to end the day!</string>
+
+    <string name="cal_sc_title">Calendar</string>
+    <string name="cal_sc_text">Check which days are completed and quickly jump to the days you\'re interested in.</string>
+
+    <string name="stat_sc_title">Statistic</string>
+    <string name="stat_sc_text">Track your progress with various charts and tables.</string>
+
+    <string name="set_sc_title">Settings</string>
+    <string name="set_sc_text">Add new categories you need, hide unnecessary ones, create basic responses to comments, have a theme and set up notifications</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Start</string>
+
+    <!-- Theme selection -->
+    <string name="theme_selection_title">Choose theme</string>
+    <string name="continue_button">Continue</string>
+    <string name="theme_preview_system_title">System</string>
+    <string name="theme_preview_system_subtitle">Follow system theme</string>
+    <string name="theme_preview_light_title">Light</string>
+    <string name="theme_preview_light_subtitle">Always use light theme</string>
+    <string name="theme_preview_dark_title">Dark</string>
+    <string name="theme_preview_dark_subtitle">Always use dark theme</string>
+    <string name="theme_preview_dark_stone_title">Dark Stone</string>
+    <string name="theme_preview_dark_stone_subtitle">Always use dark stone theme</string>
+    <string name="theme_preview_light_stone_title">Light Stone</string>
+    <string name="theme_preview_light_stone_subtitle">Always use light stone theme</string>
+
+
 </resources>

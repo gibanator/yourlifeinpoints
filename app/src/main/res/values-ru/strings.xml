@@ -59,4 +59,40 @@
     <string name="cat_work">Работа</string>
     <string name="cat_health">Здоровье</string>
     <string name="cat_personal_life">Личная жизнь</string>
+
+    <!-- Learn screen -->
+    <string name="start_sc_title">Добро пожаловать в Life in Points!</string>
+    <string name="start_sc_text">Отслеживайте свои ежедневные активности и прокачивайте персонажа.</string>
+
+    <string name="sec_sc_title">Главный экран: "Сегодня"</string>
+    <string name="sec_sc_text"> Главное, не забывайте завершать день!</string>
+
+    <string name="cal_sc_title">Календарь</string>
+    <string name="cal_sc_text">Проверяйте, какие дни завершены и быстро переходите к интересующим вам дням</string>
+
+    <string name="stat_sc_title">Статистика</string>
+    <string name="stat_sc_text">Следите за за своим развитием с помощью различных графиков и таблиц</string>
+
+    <string name="set_sc_title">Настройки</string>
+    <string name="set_sc_text">Добавляйте новые, нужные Вам, категории, скрывайте ненужные, создавайте базовые ответы на комментарии, мейте тему и настраивайте уведомления</string>
+
+    <!-- Онбординг -->
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_start">Начать</string>
+
+    <!-- Выбор темы -->
+    <string name="theme_selection_title">Выберите тему оформления</string>
+    <string name="continue_button">Продолжить</string>
+    <string name="theme_preview_system_title">Системная</string>
+    <string name="theme_preview_system_subtitle">Следовать системной теме</string>
+    <string name="theme_preview_light_title">Светлая</string>
+    <string name="theme_preview_light_subtitle">Всегда использовать светлую тему</string>
+    <string name="theme_preview_dark_title">Тёмная</string>
+    <string name="theme_preview_dark_subtitle">Всегда использовать тёмную тему</string>
+    <string name="theme_preview_dark_stone_title">Тёмная каменная</string>
+    <string name="theme_preview_dark_stone_subtitle">Всегда использовать тёмную тему</string>
+    <string name="theme_preview_light_stone_title">Светлая каменная</string>
+    <string name="theme_preview_light_stone_subtitle">Всегда использовать светлую тему</string>
+
 </resources>
