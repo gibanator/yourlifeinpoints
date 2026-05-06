@@ -60,6 +60,20 @@
     <string name="cat_health">Здоровье</string>
     <string name="cat_personal_life">Личная жизнь</string>
 
+    <!-- Registration -->
+    <string name="registration_title">Регистрация</string>
+    <string name="registration_email_label">Email</string>
+    <string name="registration_password_label">Пароль</string>
+    <string name="registration_button">Зарегистрироваться</string>
+    <string name="registration_success">Регистрация прошла успешно</string>
+    <string name="registration_error_required">Email и пароль обязательны</string>
+    <string name="registration_info_card">Зарегистрировавшись, вы сможете синхронизировать свои данные между несколькими устройствами.</string>
+
+    <!-- Success Messages -->
+    <string name="category_added_success">Категория создана успешно</string>
+    <string name="category_updated_success">Категория обновлена успешно</string>
+    <string name="category_deleted_success">Категория удалена успешно</string>
+
     <!-- Learn screen -->
     <string name="start_sc_title">Добро пожаловать в Life in Points!</string>
     <string name="start_sc_text">Отслеживайте свои ежедневные активности и прокачивайте персонажа.</string>

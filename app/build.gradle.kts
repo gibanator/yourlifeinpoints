@@ -68,6 +68,11 @@ dependencies {
     implementation(libs.androidx.contentpager)
     implementation(libs.room.runtime)
     implementation(libs.androidx.datastore)
+
+    // Retrofit для запросов в API (бэкенд)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+
     // WorkManager для уведомлений по расписанию
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 

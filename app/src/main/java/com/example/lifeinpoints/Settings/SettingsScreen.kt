@@ -49,6 +49,7 @@ fun SettingsScreen(
     onCategoriesClick: () -> Unit = {}, // Новый параметр для навигации
     onVisibilityClick: () -> Unit = {},
     onTemplatesClick: () -> Unit = {},
+    onRegistrationClick: () -> Unit = {},
     navController: NavController? = null, // Добавляем navController для навигации
     vm: SettingsViewModel
 ) {
@@ -85,6 +86,14 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            RegistrationCard(
+                onRegistrationCardClick = {
+                    Log.d("INFO", "REG CLICKED")
+                    onRegistrationClick()
+                }
+            )
+
             Text(
                 text = stringResource(R.string.theme_setting_title),
                 style = MaterialTheme.typography.titleMedium,
@@ -151,6 +160,23 @@ fun SettingsScreen(
     }
 }
 
+@Composable
+fun RegistrationCard(
+    onRegistrationCardClick: () -> Unit
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onRegistrationCardClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Text(
+            "Register test!",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
 // Новая карточка для уведомлений
 @Composable
 fun NotificationSettingsCard(
@@ -194,7 +220,7 @@ fun NotificationSettingsCard(
     }
 }
 
-// com.example.lifeinpoints.Settings/SettingsScreen.kt
+
 @Composable
 fun CategoriesCard(
     onCategoriesClick: () -> Unit,

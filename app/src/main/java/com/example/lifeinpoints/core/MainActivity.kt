@@ -20,11 +20,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -42,6 +46,7 @@ import com.example.lifeinpoints.onboarding.OnboardingViewModel
 import com.example.lifeinpoints.onboarding.ThemeSelectionScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -89,24 +94,32 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        // Обрабатываем нажатие на уведомление, когда приложение уже запущено
         handleNotificationClick(intent)
     }
 
+    /**
+     * Обрабатывает нажатие на уведомление
+     */
     private fun handleNotificationClick(intent: Intent?) {
         if (intent != null) {
             val fromNotification = intent.getBooleanExtra("from_notification", false)
             if (fromNotification) {
                 val date = intent.getStringExtra("notification_date")
                 println("App opened from notification with date: $date")
+                // Здесь можно добавить дополнительную логику,
+                // например, показать snackbar или перейти на определенный экран
             }
 
             val action = intent.getStringExtra("action")
             when (action) {
                 NotificationHelper.ACTION_COMPLETE_TODAY -> {
                     println("Complete today action clicked")
+                    // Здесь можно добавить логику для действия "Выполнить сегодня"
                 }
                 NotificationHelper.ACTION_POSTPONE -> {
                     println("Postpone action clicked")
+                    // Здесь можно добавить логику для действия "Отложить"
                 }
             }
         }
@@ -166,6 +179,10 @@ fun AppWithTopAndBottomBar() {
     val notificationVm: NotificationViewModel = hiltViewModel()
     val currentTheme by settingsVm.currentTheme.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // Проверяем и планируем уведомления при запуске приложения
     LaunchedEffect(Unit) {
         delay(1000)
         notificationVm.checkNotificationStatus()
@@ -175,7 +192,8 @@ fun AppWithTopAndBottomBar() {
         Scaffold(
             bottomBar = {
                 AppBottomBar(navController = navController)
-            }
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { paddingValues ->
             val layoutDirection = LocalLayoutDirection.current
 
@@ -188,7 +206,12 @@ fun AppWithTopAndBottomBar() {
                         end = paddingValues.calculateEndPadding(layoutDirection),
                         bottom = paddingValues.calculateBottomPadding()
                     ),
-                settingsVm = settingsVm
+                settingsVm = settingsVm,
+                onShowSnackbar = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
             )
         }
     }

@@ -2,12 +2,14 @@ package com.example.lifeinpoints.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsScreen
 import com.example.lifeinpoints.Settings.SettingsViewModel
 import com.example.lifeinpoints.calendar.ui.CalendarScreen
@@ -20,6 +22,7 @@ import com.example.lifeinpoints.categories.comment_templates.EditCommentTemplate
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
 import com.example.lifeinpoints.notifications.NotificationSettingsScreen
+import com.example.lifeinpoints.registration.RegistrationScreen
 import com.example.lifeinpoints.statistics.StatisticsScreen
 import java.time.LocalDate
 
@@ -27,8 +30,14 @@ import java.time.LocalDate
 fun AppNavHost(
     navController: NavHostController,
     settingsVm: SettingsViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShowSnackbar: (String) -> Unit = {}
 ) {
+    val registrationSuccessMessage = stringResource(R.string.registration_success)
+    val categoryAddedMessage = stringResource(R.string.category_added_success)
+    val categoryUpdatedMessage = stringResource(R.string.category_updated_success)
+    val categoryDeletedMessage = stringResource(R.string.category_deleted_success)
+
     NavHost(
         navController,
         startDestination = Routes.DAILY_CHECKUP_WITH_ARGS,
@@ -68,8 +77,17 @@ fun AppNavHost(
                 }
             )
         }
+        composable("registration") {
+            RegistrationScreen(
+                onBack = { navController.popBackStack() },
+                onRegisterSuccess = {
+                    navController.popBackStack()
+                    onShowSnackbar(registrationSuccessMessage)
+                }
+            )
+        }
 
-        composable(Routes.SETTINGS) {
+        composable(Routes.SETTINGS) { // WRONG SETTINGS???
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onCategoriesClick = {
@@ -81,6 +99,10 @@ fun AppNavHost(
                 onTemplatesClick = {
                     navController.navigate("comment_templates")
                 },
+                onRegistrationClick = {
+                    navController.navigate("registration")
+                },
+                navController = navController,
                 vm = settingsVm
             )
         }
@@ -96,7 +118,7 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onCategoryAdded = {
                     navController.popBackStack()
-                    // Можно показать snackbar сообщение об успехе
+                    onShowSnackbar(categoryAddedMessage)
                 }
             )
         }
@@ -106,7 +128,7 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onCategoryAdded = {
                     navController.popBackStack()
-                    // Можно добавить snackbar сообщение об успехе
+                    onShowSnackbar(categoryAddedMessage)
                 }
             )
         }
@@ -119,11 +141,11 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onCategoryUpdated = {
                     navController.popBackStack()
-                    // Можно показать snackbar сообщение об успехе
+                    onShowSnackbar(categoryUpdatedMessage)
                 },
                 onCategoryDeleted = {
                     navController.popBackStack()
-                    // Можно показать snackbar сообщение об успехе
+                    onShowSnackbar(categoryDeletedMessage)
                 }
             )
         }
@@ -177,24 +199,6 @@ fun AppNavHost(
         composable("notification_settings") {
             NotificationSettingsScreen(
                 onBack = { navController.popBackStack() }
-            )
-        }
-
-        // Обновляем маршрут настроек, передавая navController
-        composable(Routes.SETTINGS) {
-            SettingsScreen(
-                onBack = { navController.popBackStack() },
-                onCategoriesClick = {
-                    navController.navigate("categories")
-                },
-                onVisibilityClick = {
-                    navController.navigate("category_visibility")
-                },
-                onTemplatesClick = {
-                    navController.navigate("comment_templates")
-                },
-                navController = navController, // Передаем navController
-                vm = settingsVm
             )
         }
     }
