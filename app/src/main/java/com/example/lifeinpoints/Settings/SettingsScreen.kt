@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.theme.ThemeType
+import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -257,7 +258,7 @@ fun CategoriesCard(
             }
 
             // Разделитель
-            Divider()
+            HorizontalDivider()
 
             // Строка управления видимостью
             Row(
@@ -282,7 +283,7 @@ fun CategoriesCard(
                 }
             }
 
-            Divider()
+            HorizontalDivider()
 
             // Строка управления темплейтами
             Row(
@@ -293,11 +294,16 @@ fun CategoriesCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
                         text = stringResource(R.string.comment_management_title),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            // 💡 Уменьшите это значение, если строки слишком далеко друг от друга
+                            lineHeight = 15.sp
+                        ),
+                        fontWeight = FontWeight.Medium,
                     )
                     Text(
                         text = stringResource(R.string.comment_management_subtitle),
