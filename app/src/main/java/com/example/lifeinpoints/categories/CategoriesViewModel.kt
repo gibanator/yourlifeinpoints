@@ -30,8 +30,6 @@ class CategoriesViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                categoryRepository.initializeSystemCategories()
-
                 categoryRepository.observeAll().collect { categories ->
                     _uiState.update {
                         it.copy(
