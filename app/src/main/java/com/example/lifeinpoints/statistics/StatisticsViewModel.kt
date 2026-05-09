@@ -144,6 +144,33 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
+    private data class Processed<T>(
+        val filteredData: T,
+        val categoriesToShow: List<CategoryStats>,
+        val pieChartData: List<PieChartItem>,
+        val initialSelectedIds: Set<Int>
+    )
+
+    private fun processDayData(
+        rawData: List<DayStatistics>,
+        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+    ): Processed<List<DayStatistics>> {
+        val relevantIds = findRelevantCategories(rawData, allCategories)
+        val categoriesToShow = filterCategories(allCategories, relevantIds)
+        val filteredData = filterDayDataForRelevantCategories(rawData, relevantIds)
+        return Processed(filteredData, categoriesToShow, preparePieChartDataForDays(filteredData, categoriesToShow), categoriesToShow.map { it.id }.toSet())
+    }
+
+    private fun processYearData(
+        rawData: List<MonthStatistics>,
+        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+    ): Processed<List<MonthStatistics>> {
+        val relevantIds = findRelevantCategoriesForYear(rawData, allCategories)
+        val categoriesToShow = filterCategories(allCategories, relevantIds)
+        val filteredData = filterYearDataForRelevantCategories(rawData, relevantIds)
+        return Processed(filteredData, categoriesToShow, preparePieChartDataForYear(filteredData, categoriesToShow), categoriesToShow.map { it.id }.toSet())
+    }
+
     private fun reloadStatistics(
         allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
     ) {
@@ -153,23 +180,16 @@ class StatisticsViewModel @Inject constructor(
 
                 when (currentState.viewType) {
                     ViewType.MONTH -> {
-                        val monthData = loadMonthData(currentState.currentMonth, allCategories.map { it.id })
-                        val relevantCategoryIds = findRelevantCategories(monthData, allCategories)
-                        val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
-                        val filteredMonthData = filterMonthDataForRelevantCategories(monthData, relevantCategoryIds)
-                        val monthSummary = calculateMonthSummaryStats(filteredMonthData, currentState.currentMonth)
-                        val pieChartData = preparePieChartDataForMonth(filteredMonthData, categoriesToShow)
-
-                        // Инициализируем выбранные категории (все по умолчанию)
-                        val initialSelectedIds = categoriesToShow.map { it.id }.toSet()
-                        val timeSeriesData = prepareTimeSeriesDataForMonth(filteredMonthData, initialSelectedIds)
-
+                        val rawData = loadMonthData(currentState.currentMonth, allCategories.map { it.id })
+                        val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
+                        val summary = calculateMonthSummaryStats(filteredData, currentState.currentMonth)
+                        val timeSeriesData = prepareTimeSeriesDataForMonth(filteredData, initialSelectedIds)
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                monthData = filteredMonthData,
+                                monthData = filteredData,
                                 categories = categoriesToShow,
-                                monthSummary = monthSummary,
+                                monthSummary = summary,
                                 pieChartData = pieChartData,
                                 timeSeriesData = timeSeriesData,
                                 filteredTimeSeriesData = timeSeriesData,
@@ -178,22 +198,16 @@ class StatisticsViewModel @Inject constructor(
                         }
                     }
                     ViewType.WEEK -> {
-                        val weekData = loadWeekData(currentState.currentWeekStart, allCategories.map { it.id })
-                        val relevantCategoryIds = findRelevantCategories(weekData, allCategories)
-                        val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
-                        val filteredWeekData = filterWeekDataForRelevantCategories(weekData, relevantCategoryIds)
-                        val weekSummary = calculateWeekSummaryStats(filteredWeekData, currentState.currentWeekStart)
-                        val pieChartData = preparePieChartDataForWeek(filteredWeekData, categoriesToShow)
-
-                        val initialSelectedIds = categoriesToShow.map { it.id }.toSet()
-                        val timeSeriesData = prepareTimeSeriesDataForWeek(filteredWeekData, initialSelectedIds)
-
+                        val rawData = loadWeekData(currentState.currentWeekStart, allCategories.map { it.id })
+                        val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
+                        val summary = calculateWeekSummaryStats(filteredData, currentState.currentWeekStart)
+                        val timeSeriesData = prepareTimeSeriesDataForWeek(filteredData, initialSelectedIds)
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                weekData = filteredWeekData,
+                                weekData = filteredData,
                                 categories = categoriesToShow,
-                                weekSummary = weekSummary,
+                                weekSummary = summary,
                                 pieChartData = pieChartData,
                                 timeSeriesData = timeSeriesData,
                                 filteredTimeSeriesData = timeSeriesData,
@@ -202,22 +216,16 @@ class StatisticsViewModel @Inject constructor(
                         }
                     }
                     ViewType.YEAR -> {
-                        val yearData = loadYearData(currentState.currentYear, allCategories.map { it.id })
-                        val relevantCategoryIds = findRelevantCategoriesForYear(yearData, allCategories)
-                        val categoriesToShow = filterCategories(allCategories, relevantCategoryIds)
-                        val filteredYearData = filterYearDataForRelevantCategories(yearData, relevantCategoryIds)
-                        val yearSummary = calculateYearSummaryStats(filteredYearData, currentState.currentYear)
-                        val pieChartData = preparePieChartDataForYear(filteredYearData, categoriesToShow)
-
-                        val initialSelectedIds = categoriesToShow.map { it.id }.toSet()
-                        val timeSeriesData = prepareTimeSeriesDataForYear(filteredYearData, initialSelectedIds)
-
+                        val rawData = loadYearData(currentState.currentYear, allCategories.map { it.id })
+                        val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processYearData(rawData, allCategories)
+                        val summary = calculateYearSummaryStats(filteredData, currentState.currentYear)
+                        val timeSeriesData = prepareTimeSeriesDataForYear(filteredData, initialSelectedIds)
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                yearData = filteredYearData,
+                                yearData = filteredData,
                                 categories = categoriesToShow,
-                                yearSummary = yearSummary,
+                                yearSummary = summary,
                                 pieChartData = pieChartData,
                                 timeSeriesData = timeSeriesData,
                                 filteredTimeSeriesData = timeSeriesData,
@@ -516,35 +524,15 @@ class StatisticsViewModel @Inject constructor(
             ) }
     }
 
-    private fun filterMonthDataForRelevantCategories(
-        monthData: List<DayStatistics>,
+    private fun filterDayDataForRelevantCategories(
+        data: List<DayStatistics>,
         relevantCategoryIds: Set<Int>
     ): List<DayStatistics> {
-        return monthData.map { dayData ->
+        return data.map { dayData ->
             val filteredSelections = dayData.categorySelections
-                .filterKeys { categoryId -> categoryId in relevantCategoryIds }
-
-            val newTotalSelected = filteredSelections.values.count { it }
-
+                .filterKeys { it in relevantCategoryIds }
             dayData.copy(
-                totalSelected = newTotalSelected,
-                categorySelections = filteredSelections
-            )
-        }
-    }
-
-    private fun filterWeekDataForRelevantCategories(
-        weekData: List<DayStatistics>,
-        relevantCategoryIds: Set<Int>
-    ): List<DayStatistics> {
-        return weekData.map { dayData ->
-            val filteredSelections = dayData.categorySelections
-                .filterKeys { categoryId -> categoryId in relevantCategoryIds }
-
-            val newTotalSelected = filteredSelections.values.count { it }
-
-            dayData.copy(
-                totalSelected = newTotalSelected,
+                totalSelected = filteredSelections.values.count { it },
                 categorySelections = filteredSelections
             )
         }
@@ -645,15 +633,14 @@ class StatisticsViewModel @Inject constructor(
         )
     }
 
-    // Подготовка данных для круговой диаграммы (остается без изменений)
-    private fun preparePieChartDataForMonth(
-        monthData: List<DayStatistics>,
+    private fun preparePieChartDataForDays(
+        data: List<DayStatistics>,
         categories: List<CategoryStats>
     ): List<PieChartItem> {
         if (categories.isEmpty()) return emptyList()
 
         val categoryCounts = mutableMapOf<Int, Int>()
-        monthData.forEach { day ->
+        data.forEach { day ->
             if (day.totalSelected > 0) {
                 day.categorySelections.forEach { (categoryId, isSelected) ->
                     if (isSelected) {
@@ -664,41 +651,11 @@ class StatisticsViewModel @Inject constructor(
         }
 
         return categories.mapIndexed { index, category ->
-            val count = categoryCounts[category.id] ?: 0
             PieChartItem(
                 fallbackName = category.name,
                 systemKey = category.nameKey,
                 isSystem = category.isSystem,
-                value = count.toFloat(),
-                paletteIndex = index,
-            )
-        }.filter { it.value > 0 }
-    }
-
-    private fun preparePieChartDataForWeek(
-        weekData: List<DayStatistics>,
-        categories: List<CategoryStats>
-    ): List<PieChartItem> {
-        if (categories.isEmpty()) return emptyList()
-
-        val categoryCounts = mutableMapOf<Int, Int>()
-        weekData.forEach { day ->
-            if (day.totalSelected > 0) {
-                day.categorySelections.forEach { (categoryId, isSelected) ->
-                    if (isSelected) {
-                        categoryCounts[categoryId] = categoryCounts.getOrDefault(categoryId, 0) + 1
-                    }
-                }
-            }
-        }
-
-        return categories.mapIndexed { index, category ->
-            val count = categoryCounts[category.id] ?: 0
-            PieChartItem(
-                fallbackName = category.name,
-                systemKey = category.nameKey,
-                isSystem = category.isSystem,
-                value = count.toFloat(),
+                value = (categoryCounts[category.id] ?: 0).toFloat(),
                 paletteIndex = index,
             )
         }.filter { it.value > 0 }

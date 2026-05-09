@@ -175,31 +175,15 @@ class CategoryRepository @Inject constructor(
 
     // Остальные методы остаются без изменений
     fun observeAll(): Flow<List<CategoryEntity>> {
-        return dao.observeAll().map { categories ->
-            // Сначала пользовательские категории (новые сверху), затем системные
-            val userCategories = categories
-                .filter { !it.isSystem }
-                .sortedByDescending { it.sortOrder } // Новые пользовательские категории сверху
-
-            val systemCategories = categories
-                .filter { it.isSystem }
-                .sortedBy { it.sortOrder } // Системные в оригинальном порядке
-
-            userCategories + systemCategories
-        }
+        return dao.observeAll().map { sortCategories(it) }
     }
 
     // Обновим метод getAll для правильной сортировки
-    suspend fun getAll(): List<CategoryEntity> {
-        val categories = dao.getAll()
-        val userCategories = categories
-            .filter { !it.isSystem }
-            .sortedByDescending { it.sortOrder }
+    suspend fun getAll(): List<CategoryEntity> = sortCategories(dao.getAll())
 
-        val systemCategories = categories
-            .filter { it.isSystem }
-            .sortedBy { it.sortOrder }
-
+    private fun sortCategories(categories: List<CategoryEntity>): List<CategoryEntity> {
+        val userCategories = categories.filter { !it.isSystem }.sortedByDescending { it.sortOrder }
+        val systemCategories = categories.filter { it.isSystem }.sortedBy { it.sortOrder }
         return userCategories + systemCategories
     }
 
@@ -221,18 +205,7 @@ class CategoryRepository @Inject constructor(
 
     // Убедимся, что observeVisibleCategories() возвращает только видимые
     fun observeVisibleCategories(): Flow<List<CategoryEntity>> {
-        return dao.observeVisibleCategories().map { categories ->
-            // Та же логика сортировки
-            val userCategories = categories
-                .filter { !it.isSystem }
-                .sortedByDescending { it.sortOrder }
-
-            val systemCategories = categories
-                .filter { it.isSystem }
-                .sortedBy { it.sortOrder }
-
-            userCategories + systemCategories
-        }
+        return dao.observeVisibleCategories().map { sortCategories(it) }
     }
 
     //suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()

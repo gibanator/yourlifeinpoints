@@ -66,6 +66,7 @@ fun AppNavHost(
             )
         }
 
+             /*
         composable("categories") {
             CategoriesScreen(
                 onBack = { navController.popBackStack() },
@@ -77,6 +78,8 @@ fun AppNavHost(
                 }
             )
         }
+
+             */
         composable("registration") {
             RegistrationScreen(
                 onBack = { navController.popBackStack() },
