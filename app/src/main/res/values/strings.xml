@@ -63,10 +63,14 @@
     <!-- Registration -->
     <string name="registration_title">Registration</string>
     <string name="registration_email_label">Email</string>
+    <string name="registration_username_label">Username</string>
     <string name="registration_password_label">Password</string>
+    <string name="registration_confirm_password_label">Confirm Password</string>
     <string name="registration_button">Register</string>
     <string name="registration_success">Registration successful</string>
     <string name="registration_error_required">Email and password are required</string>
+    <string name="registration_error_all_required">All fields are required</string>
+    <string name="registration_error_password_mismatch">Passwords don\'t match</string>
     <string name="registration_info_card">By registering, you will be able to synchronize your data across multiple devices.</string>
 
     <!-- Success Messages -->

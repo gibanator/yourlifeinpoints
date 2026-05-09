@@ -63,10 +63,14 @@
     <!-- Registration -->
     <string name="registration_title">Регистрация</string>
     <string name="registration_email_label">Email</string>
+    <string name="registration_username_label">Имя пользователя</string>
     <string name="registration_password_label">Пароль</string>
+    <string name="registration_confirm_password_label">Подтвердите пароль</string>
     <string name="registration_button">Зарегистрироваться</string>
     <string name="registration_success">Регистрация прошла успешно</string>
     <string name="registration_error_required">Email и пароль обязательны</string>
+    <string name="registration_error_all_required">Все поля обязательны</string>
+    <string name="registration_error_password_mismatch">Пароли не совпадают</string>
     <string name="registration_info_card">Зарегистрировавшись, вы сможете синхронизировать свои данные между несколькими устройствами.</string>
 
     <!-- Success Messages -->

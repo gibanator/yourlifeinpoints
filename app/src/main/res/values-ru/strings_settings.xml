@@ -87,6 +87,14 @@
     <string name="notification_test_notif_title">Тестовое уведомление 🧪</string>
     <string name="notification_test_notif_message">Это тестовое уведомление, чтобы убедиться, что всё работает!</string>
 
+    <!-- Auth Section -->
+    <string name="auth_section_title">Аккаунт</string>
+    <string name="auth_register">Зарегистрироваться</string>
+    <string name="auth_login">Войти</string>
+    <string name="auth_logout">Выйти из аккаунта</string>
+    <string name="login_title">Вход</string>
+    <string name="login_success">Вход выполнен успешно</string>
+
     <string name="change">Изменить</string>
     <string name="select_time">Выберите время</string>
     <string name="hour">Часы</string>
