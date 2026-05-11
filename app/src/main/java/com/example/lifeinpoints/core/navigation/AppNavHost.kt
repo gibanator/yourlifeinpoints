@@ -1,9 +1,11 @@
 package com.example.lifeinpoints.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,6 +23,7 @@ import com.example.lifeinpoints.categories.comment_templates.CommentTemplatesCat
 import com.example.lifeinpoints.categories.comment_templates.EditCommentTemplatesScreen
 import com.example.lifeinpoints.daily_checkup.navigation.DailyCheckupNavHost
 import com.example.lifeinpoints.daily_checkup.ui.DailyCheckupViewModel
+import com.example.lifeinpoints.login.LoginScreen
 import com.example.lifeinpoints.notifications.NotificationSettingsScreen
 import com.example.lifeinpoints.registration.RegistrationScreen
 import com.example.lifeinpoints.statistics.StatisticsScreen
@@ -34,6 +37,7 @@ fun AppNavHost(
     onShowSnackbar: (String) -> Unit = {}
 ) {
     val registrationSuccessMessage = stringResource(R.string.registration_success)
+    val loginSuccessMessage = stringResource(R.string.login_success)
     val categoryAddedMessage = stringResource(R.string.category_added_success)
     val categoryUpdatedMessage = stringResource(R.string.category_updated_success)
     val categoryDeletedMessage = stringResource(R.string.category_deleted_success)
@@ -66,17 +70,6 @@ fun AppNavHost(
             )
         }
 
-        composable("categories") {
-            CategoriesScreen(
-                onBack = { navController.popBackStack() },
-                onAddCategory = {
-                    navController.navigate("add_category")
-                },
-                onEditCategory = { categoryId ->
-                    navController.navigate("edit_category/$categoryId")
-                }
-            )
-        }
         composable("registration") {
             RegistrationScreen(
                 onBack = { navController.popBackStack() },
@@ -87,21 +80,26 @@ fun AppNavHost(
             )
         }
 
-        composable(Routes.SETTINGS) { // WRONG SETTINGS???
+        composable("login") {
+            LoginScreen(
+                onBack = { navController.popBackStack() },
+                onLoginSuccess = {
+                    navController.popBackStack()
+                    onShowSnackbar(loginSuccessMessage)
+                }
+            )
+        }
+
+        composable(Routes.SETTINGS) {
+            val isLoggedIn by settingsVm.isLoggedIn.collectAsStateWithLifecycle()
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onCategoriesClick = {
-                    navController.navigate("categories")
-                },
-                onVisibilityClick = {
-                    navController.navigate("category_visibility")
-                },
-                onTemplatesClick = {
-                    navController.navigate("comment_templates")
-                },
-                onRegistrationClick = {
-                    navController.navigate("registration")
-                },
+                onCategoriesClick = { navController.navigate("categories") },
+                onVisibilityClick = { navController.navigate("category_visibility") },
+                onTemplatesClick = { navController.navigate("comment_templates") },
+                onRegisterClick = { navController.navigate("registration") },
+                onLoginClick = { navController.navigate("login") },
+                isLoggedIn = isLoggedIn,
                 navController = navController,
                 vm = settingsVm
             )
@@ -110,8 +108,6 @@ fun AppNavHost(
         composable(Routes.STATISTICS) {
             StatisticsScreen()
         }
-
-        // Добавим новый composable:
 
         composable(Routes.ADD_CATEGORY) {
             AddCategoryScreen(
@@ -133,7 +129,6 @@ fun AppNavHost(
             )
         }
 
-        // AppNavHost.kt - добавим новый маршрут
         composable("edit_category/{categoryId}") { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId")?.toIntOrNull() ?: 0
             EditCategoryScreen(
@@ -157,7 +152,6 @@ fun AppNavHost(
             )
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments!!.getInt("categoryId")
-
             EditCommentTemplatesScreen(
                 categoryId = categoryId,
                 onBack = { navController.popBackStack() }
@@ -167,19 +161,14 @@ fun AppNavHost(
         composable("categories") {
             CategoriesScreen(
                 onBack = { navController.popBackStack() },
-                onAddCategory = {
-                    navController.navigate("add_category")
-                },
+                onAddCategory = { navController.navigate("add_category") },
                 onEditCategory = { categoryId ->
                     navController.navigate("edit_category/$categoryId")
                 },
-                onManageVisibility = { // Добавим новый параметр
-                    navController.navigate("category_visibility")
-                }
+                onManageVisibility = { navController.navigate("category_visibility") }
             )
         }
 
-// Добавим новый маршрут для управления видимостью
         composable("category_visibility") {
             CategoryVisibilityScreen(
                 onBack = { navController.popBackStack() }
@@ -195,7 +184,6 @@ fun AppNavHost(
             )
         }
 
-        // Настройки уведомлений
         composable("notification_settings") {
             NotificationSettingsScreen(
                 onBack = { navController.popBackStack() }

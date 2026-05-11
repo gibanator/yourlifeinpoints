@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.registration
+package com.example.lifeinpoints.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,29 +13,27 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface RegisterEvent {
-    data object Success : RegisterEvent
+sealed interface LoginEvent {
+    data object Success : LoginEvent
 }
 
-data class RegisterUiState(
+data class LoginUiState(
     val email: String = "",
-    val username: String = "",
     val password: String = "",
-    val confirmPassword: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val repository: AuthRepository,
     tokenStorage: TokenStorage
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(RegisterUiState())
+    private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _events = MutableSharedFlow<RegisterEvent>()
+    private val _events = MutableSharedFlow<LoginEvent>()
     val events = _events.asSharedFlow()
 
     val token = tokenStorage.token
@@ -44,45 +42,27 @@ class RegisterViewModel @Inject constructor(
         _uiState.update { it.copy(email = value, errorMessage = null) }
     }
 
-    fun onUsernameChanged(value: String) {
-        _uiState.update { it.copy(username = value, errorMessage = null) }
-    }
-
     fun onPasswordChanged(value: String) {
         _uiState.update { it.copy(password = value, errorMessage = null) }
     }
 
-    fun onConfirmPasswordChanged(value: String) {
-        _uiState.update { it.copy(confirmPassword = value, errorMessage = null) }
-    }
-
-    fun register() {
+    fun login() {
         val state = _uiState.value
 
-        when {
-            state.email.isBlank() || state.username.isBlank() || state.password.isBlank() || state.confirmPassword.isBlank() -> {
-                _uiState.update { it.copy(errorMessage = "All fields are required") }
-                return
-            }
-            state.password != state.confirmPassword -> {
-                _uiState.update { it.copy(errorMessage = "Passwords don't match") }
-                return
-            }
+        if (state.email.isBlank() || state.password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Email and password are required") }
+            return
         }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                repository.register(
-                    email = state.email.trim(),
-                    username = state.username.trim(),
-                    password = state.password
-                )
+                repository.login(email = state.email.trim(), password = state.password)
                 _uiState.update { it.copy(isLoading = false) }
-                _events.emit(RegisterEvent.Success)
+                _events.emit(LoginEvent.Success)
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.message ?: "Registration failed")
+                    it.copy(isLoading = false, errorMessage = e.message ?: "Login failed")
                 }
             }
         }

@@ -7,6 +7,10 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+.kotlin/errors/
+hs_err_pid*.log
+replay_pid*.log
+.idea/deploymentTargetSelector.xml
 .DS_Store
 /build
 /captures

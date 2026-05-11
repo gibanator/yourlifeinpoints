@@ -1,4 +1,4 @@
-package com.example.lifeinpoints.registration
+package com.example.lifeinpoints.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,15 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,36 +34,30 @@ import com.example.lifeinpoints.core.ui.AppTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(
+fun LoginScreen(
     onBack: () -> Unit,
-    onRegisterSuccess: () -> Unit,
-    vm: RegisterViewModel = hiltViewModel()
+    onLoginSuccess: () -> Unit,
+    vm: LoginViewModel = hiltViewModel()
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
     val token by vm.token.collectAsStateWithLifecycle(initialValue = null)
 
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
             when (event) {
-                RegisterEvent.Success -> onRegisterSuccess()
+                LoginEvent.Success -> onLoginSuccess()
             }
         }
     }
 
     LaunchedEffect(token) {
-        if (token != null) onRegisterSuccess()
+        if (token != null) onLoginSuccess()
     }
-
-    val allFieldsFilled = uiState.email.isNotBlank() &&
-            uiState.username.isNotBlank() &&
-            uiState.password.isNotBlank() &&
-            uiState.confirmPassword.isNotBlank()
 
     Scaffold(
         topBar = {
             AppTopAppBar(
-                title = { Text(stringResource(R.string.registration_title)) },
+                title = { Text(stringResource(R.string.login_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -75,13 +65,13 @@ fun RegistrationScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { vm.register() },
-                        enabled = !uiState.isLoading && allFieldsFilled
+                        onClick = { vm.login() },
+                        enabled = !uiState.isLoading && uiState.email.isNotBlank() && uiState.password.isNotBlank()
                     ) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         } else {
-                            Icon(Icons.Default.Check, contentDescription = "Register")
+                            Icon(Icons.Default.Check, contentDescription = "Log in")
                         }
                     }
                 }
@@ -92,38 +82,13 @@ fun RegistrationScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(scrollState)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.registration_info_card),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = vm::onEmailChanged,
                 label = { Text(stringResource(R.string.registration_email_label)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                isError = uiState.errorMessage != null
-            )
-
-            OutlinedTextField(
-                value = uiState.username,
-                onValueChange = vm::onUsernameChanged,
-                label = { Text(stringResource(R.string.registration_username_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -137,19 +102,8 @@ fun RegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                isError = uiState.errorMessage != null
-            )
-
-            OutlinedTextField(
-                value = uiState.confirmPassword,
-                onValueChange = vm::onConfirmPasswordChanged,
-                label = { Text(stringResource(R.string.registration_confirm_password_label)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { vm.register() }),
+                keyboardActions = KeyboardActions(onDone = { vm.login() }),
                 isError = uiState.errorMessage != null
             )
 

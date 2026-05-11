@@ -7,11 +7,17 @@ class AuthRepository @Inject constructor(
     private val authApi: AuthApi,
     private val tokenStorage: TokenStorage
 ) {
-    suspend fun register(email: String, password: String) {
-        val response = authApi.register(
-            RegisterRequest(email, password)
-        )
-
+    suspend fun register(email: String, username: String, password: String) {
+        val response = authApi.register(RegisterRequest(email, username, password))
         tokenStorage.saveToken(response.token)
+    }
+
+    suspend fun login(email: String, password: String) {
+        val response = authApi.login(LoginRequest(email, password))
+        tokenStorage.saveToken(response.token)
+    }
+
+    suspend fun logout() {
+        tokenStorage.clearToken()
     }
 }

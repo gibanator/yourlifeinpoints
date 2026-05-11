@@ -46,11 +46,6 @@ class DailyCheckupViewModel @Inject constructor(
     private var initJob: Job? = null
 
     init {
-        // Инициализируем системные категории при создании ViewModel
-        viewModelScope.launch {
-            categoryRepository.initializeSystemCategories()
-        }
-
         val dateStr = savedStateHandle.get<String>("date")
         val today = dateStr?.let(LocalDate::parse) ?: LocalDate.now()
 
