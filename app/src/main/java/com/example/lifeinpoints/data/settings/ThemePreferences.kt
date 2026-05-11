@@ -18,7 +18,9 @@ val Context.dataStore by preferencesDataStore(
 object SettingsPrefs {
     private val THEME_KEY = stringPreferencesKey("theme_type")
     private val GAME_MODE_KEY = booleanPreferencesKey("game_mode_enabled")
+    private val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
 
+    private val THEME_SELECTED_KEY = booleanPreferencesKey("theme_selected")
     // Theme
     // com/example/lifeinpoints/data/settings/ThemePrefs.kt
     fun getTheme(context: Context): Flow<ThemeType> =
@@ -49,6 +51,30 @@ object SettingsPrefs {
     suspend fun setGameMode(context: Context, enabled: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[GAME_MODE_KEY] = enabled
+        }
+    }
+
+    // Onboarding
+    fun getOnboardingCompleted(context: Context): Flow<Boolean> =
+        context.dataStore.data.map { prefs ->
+            prefs[ONBOARDING_COMPLETED_KEY] ?: false
+        }
+
+    suspend fun setOnboardingCompleted(context: Context, completed: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[ONBOARDING_COMPLETED_KEY] = completed
+        }
+    }
+
+    // Флаг, что тема уже была выбрана
+    fun getThemeSelected(context: Context): Flow<Boolean> =
+        context.dataStore.data.map { prefs ->
+            prefs[THEME_SELECTED_KEY] ?: false
+        }
+
+    suspend fun setThemeSelected(context: Context, selected: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[THEME_SELECTED_KEY] = selected
         }
     }
 }
