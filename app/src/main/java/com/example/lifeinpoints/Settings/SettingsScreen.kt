@@ -38,10 +38,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
+import com.example.lifeinpoints.core.ui.AutoSizeText
 import com.example.lifeinpoints.core.ui.theme.ThemeType
 import androidx.compose.ui.unit.sp
 
@@ -196,13 +198,14 @@ fun AuthCard(
                         .weight(1f)
                         .fillMaxHeight()
                         .clickable(onClick = onRegisterClick)
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = 16.dp, horizontal = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = stringResource(R.string.auth_register),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
                 }
 
@@ -213,13 +216,14 @@ fun AuthCard(
                         .weight(1f)
                         .fillMaxHeight()
                         .clickable(onClick = onLoginClick)
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = 16.dp, horizontal = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = stringResource(R.string.auth_login),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
