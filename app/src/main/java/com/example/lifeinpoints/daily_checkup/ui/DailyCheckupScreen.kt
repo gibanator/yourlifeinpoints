@@ -21,9 +21,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -32,9 +35,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import com.example.lifeinpoints.aiScreen.AiModeScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -172,6 +178,11 @@ fun DailyCheckupScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
+                    AiModeCard(
+                        onClick = { vm.showAiMode() },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
                     DayCompletionCard(
                         isDayEnded = uiState.isDayEnded,
                         onToggleDayEnded = {
@@ -212,6 +223,39 @@ fun DailyCheckupScreen(
                 onResetSkills = { levelVm.resetSkills() }
             )
         }
+
+        // AI режим — всплывающее окно снизу
+        if (uiState.isAiModeVisible) {
+            ModalBottomSheet(
+                onDismissRequest = { vm.hideAiMode() },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            ) {
+                AiModeScreen(onBack = { vm.hideAiMode() })
+            }
+        }
+
+        // Альтернатива: плавающее диалоговое окно (не на весь экран, закрывается по тапу снаружи)
+        // Раскомментируй этот блок и закомментируй ModalBottomSheet выше, чтобы переключиться.
+        // Также нужно раскомментировать импорты:
+        //   import androidx.compose.ui.window.Dialog
+        //   import androidx.compose.ui.window.DialogProperties
+        //
+        // if (uiState.isAiModeVisible) {
+        //     Dialog(
+        //         onDismissRequest = { vm.hideAiMode() },
+        //         properties = DialogProperties(usePlatformDefaultWidth = false)
+        //     ) {
+        //         Card(
+        //             modifier = Modifier
+        //                 .fillMaxWidth(0.9f)
+        //                 .padding(vertical = 24.dp),
+        //             shape = MaterialTheme.shapes.large,
+        //             elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+        //         ) {
+        //             AiModeScreen(onBack = { vm.hideAiMode() })
+        //         }
+        //     }
+        // }
     }
 }
 
@@ -495,6 +539,51 @@ fun CategoryRow(
                     onClick = onCategoryClick
                 )
         )
+    }
+}
+
+@Composable
+fun AiModeCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 16.dp)
+                .clickable { onClick() },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            /*Icon(
+                imageVector = Icons.Filled.AutoAwesome,
+                contentDescription = null,
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+А
+             */
+            Text(
+                text = "AI режим",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Filled.AutoAwesome,
+                contentDescription = null,
+                tint = Color.White
+            )
+        }
     }
 }
 

@@ -387,4 +387,12 @@ class DailyCheckupViewModel @Inject constructor(
     fun levelUpEventConsumed() {
         _levelUpEvent.value = null
     }
+
+    fun showAiMode() {
+        _uiState.update { it.copy(isAiModeVisible = true) }
+    }
+
+    fun hideAiMode() {
+        _uiState.update { it.copy(isAiModeVisible = false) }
+    }
 }

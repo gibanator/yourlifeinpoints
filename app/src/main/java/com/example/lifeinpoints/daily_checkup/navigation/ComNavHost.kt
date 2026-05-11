@@ -18,7 +18,6 @@ fun DailyCheckupNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     dailyVm: DailyCheckupViewModel = hiltViewModel(),
-    // Передаем необходимые параметры из родительского компонента
 ) {
     NavHost(
         navController = navController,

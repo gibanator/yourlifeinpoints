@@ -37,5 +37,7 @@ data class DailyCheckupUiState (
     val commentDrafts: Map<Int, String> = emptyMap(),
     val savedComments: Map<Int, String?> = emptyMap(),
 
-    val templatesByCategory: Map<Int, List<String>> = emptyMap()
+    val templatesByCategory: Map<Int, List<String>> = emptyMap(),
+
+    val isAiModeVisible: Boolean = false
 )
