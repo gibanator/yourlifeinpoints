@@ -3,8 +3,26 @@
     <string name="to_today_button_text">К сегодняшнему дню</string>
 
     <string name="comments_button_text">Комментарии</string>
+    <string name="voice_button_text">Голосовая заметка</string>
     <string name="end_day_button_text">Завершить день</string>
     <string name="day_ended_button_text">День завершен!</string>
 
     <string name="comment_placeholder_text">Введите комментарий…</string>
+
+    <string name="voice_recognition_title">Распознавание речи</string>
+    <string name="voice_recognition_permission_text">Для распознавания речи нужен доступ к микрофону.</string>
+    <string name="voice_recognition_request_permission">Разрешить микрофон</string>
+    <string name="voice_recognition_unavailable">Распознавание речи недоступно на этом устройстве.</string>
+    <string name="voice_recognition_listening">Слушаю…</string>
+    <string name="voice_recognition_ready">Нажмите Старт и говорите.</string>
+    <string name="voice_recognition_start">Старт</string>
+    <string name="voice_recognition_stop">Стоп</string>
+    <string name="voice_recognition_clear">Очистить</string>
+    <string name="voice_recognition_transcript_placeholder">Распознанный текст появится здесь.</string>
+    <string name="voice_recognition_error_no_match">Не удалось распознать речь. Попробуйте еще раз.</string>
+    <string name="voice_recognition_error_audio">Ошибка записи звука. Попробуйте еще раз.</string>
+    <string name="voice_recognition_error_network">Ошибка сети при распознавании речи.</string>
+    <string name="voice_recognition_error_permission">Доступ к микрофону запрещен.</string>
+    <string name="voice_recognition_error_busy">Распознаватель занят. Попробуйте еще раз.</string>
+    <string name="voice_recognition_error_generic">Распознавание речи не удалось. Попробуйте еще раз.</string>
 </resources>

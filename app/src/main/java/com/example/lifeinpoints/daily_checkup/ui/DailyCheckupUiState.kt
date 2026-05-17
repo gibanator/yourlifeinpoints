@@ -39,5 +39,6 @@ data class DailyCheckupUiState (
 
     val templatesByCategory: Map<Int, List<String>> = emptyMap(),
 
-    val isAiModeVisible: Boolean = false
+    val isAiModeVisible: Boolean = false,
+    val isVoiceRecognitionVisible: Boolean = false
 )

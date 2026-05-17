@@ -17,3 +17,5 @@ replay_pid*.log
 .externalNativeBuild
 .cxx
 local.properties
+AGENTS.md
+google-services.json
