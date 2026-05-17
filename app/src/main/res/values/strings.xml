@@ -113,5 +113,11 @@
     <string name="theme_preview_light_stone_title">Light Stone</string>
     <string name="theme_preview_light_stone_subtitle">Always use light stone theme</string>
 
+    <!-- AI Mode Screen -->
+    <string name="ai_mode_screen_title">AI Mode</string>
+    <string name="ai_mode_input_placeholder">Enter text…</string>
+    <string name="ai_mode_send_button">Send</string>
+    <string name="ai_mode_back_content_description">Back</string>
+    <string name="ai_mode_mic_content_description">Record voice</string>
 
 </resources>
