@@ -3,7 +3,6 @@ package com.example.lifeinpoints.registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.remote.auth.AuthRepository
-import com.example.lifeinpoints.data.remote.auth.TokenStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,8 +27,7 @@ data class RegisterUiState(
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val repository: AuthRepository,
-    tokenStorage: TokenStorage
+    private val repository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -37,8 +35,6 @@ class RegisterViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<RegisterEvent>()
     val events = _events.asSharedFlow()
-
-    val token = tokenStorage.token
 
     fun onEmailChanged(value: String) {
         _uiState.update { it.copy(email = value, errorMessage = null) }

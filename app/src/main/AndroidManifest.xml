@@ -11,6 +11,9 @@
     <!-- Разрешение на подключение к интернету, чтобы отправлять запросы -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Разрешение на распознавание речи через микрофон -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <application
         android:networkSecurityConfig="@xml/network_security_rules"
         android:allowBackup="true"

@@ -395,4 +395,12 @@ class DailyCheckupViewModel @Inject constructor(
     fun hideAiMode() {
         _uiState.update { it.copy(isAiModeVisible = false) }
     }
+
+    fun showVoiceRecognition() {
+        _uiState.update { it.copy(isVoiceRecognitionVisible = true) }
+    }
+
+    fun hideVoiceRecognition() {
+        _uiState.update { it.copy(isVoiceRecognitionVisible = false) }
+    }
 }

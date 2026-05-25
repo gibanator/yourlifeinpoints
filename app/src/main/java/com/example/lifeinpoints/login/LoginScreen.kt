@@ -40,7 +40,6 @@ fun LoginScreen(
     vm: LoginViewModel = hiltViewModel()
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
-    val token by vm.token.collectAsStateWithLifecycle(initialValue = null)
 
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
@@ -48,10 +47,6 @@ fun LoginScreen(
                 LoginEvent.Success -> onLoginSuccess()
             }
         }
-    }
-
-    LaunchedEffect(token) {
-        if (token != null) onLoginSuccess()
     }
 
     Scaffold(
