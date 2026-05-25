@@ -3,7 +3,7 @@ package com.example.lifeinpoints.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.core.ui.theme.ThemeType
-import com.example.lifeinpoints.data.remote.auth.TokenStorage
+import com.example.lifeinpoints.data.remote.auth.AuthRepository
 import com.example.lifeinpoints.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repo: SettingsRepository,
-    private val tokenStorage: TokenStorage
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     val currentTheme: StateFlow<ThemeType> = repo.currentTheme.stateIn(
@@ -31,7 +31,7 @@ class SettingsViewModel @Inject constructor(
         initialValue = true
     )
 
-    val isLoggedIn: StateFlow<Boolean> = tokenStorage.token
+    val isLoggedIn: StateFlow<Boolean> = authRepository.currentUser
         .map { it != null }
         .stateIn(
             scope = viewModelScope,
@@ -50,6 +50,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun logout() {
-        viewModelScope.launch { tokenStorage.clearToken() }
+        authRepository.logout()
     }
 }

@@ -4,6 +4,7 @@ package com.example.lifeinpoints.di
 import android.content.Context
 import com.example.lifeinpoints.notifications.NotificationPreferences
 import com.example.lifeinpoints.notifications.NotificationScheduler
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,5 +26,11 @@ object NotificationModule {
     @Singleton
     fun provideNotificationScheduler(@ApplicationContext context: Context): NotificationScheduler {
         return NotificationScheduler(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
     }
 }

@@ -45,7 +45,6 @@ fun RegistrationScreen(
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-    val token by vm.token.collectAsStateWithLifecycle(initialValue = null)
 
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
@@ -53,10 +52,6 @@ fun RegistrationScreen(
                 RegisterEvent.Success -> onRegisterSuccess()
             }
         }
-    }
-
-    LaunchedEffect(token) {
-        if (token != null) onRegisterSuccess()
     }
 
     val allFieldsFilled = uiState.email.isNotBlank() &&

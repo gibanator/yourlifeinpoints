@@ -18,4 +18,4 @@ replay_pid*.log
 .cxx
 local.properties
 AGENTS.md
-google-services.json
+app/google-services.json

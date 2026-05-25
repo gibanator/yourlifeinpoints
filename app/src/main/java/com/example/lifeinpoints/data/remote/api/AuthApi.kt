@@ -1,15 +1,12 @@
 package com.example.lifeinpoints.data.remote.api
 
-import com.example.lifeinpoints.data.remote.auth.AuthResponse
-import com.example.lifeinpoints.data.remote.auth.LoginRequest
-import com.example.lifeinpoints.data.remote.auth.RegisterRequest
-import retrofit2.http.Body
-import retrofit2.http.POST
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Header
 
 interface AuthApi {
-    @POST("/api/v1/auth/register")
-    suspend fun register(@Body request: RegisterRequest): AuthResponse
-
-    @POST("/api/v1/auth/login")
-    suspend fun login(@Body request: LoginRequest): AuthResponse
+    @GET("/me")
+    suspend fun syncMe(
+        @Header("Authorization") authorization: String
+    ): Response<Unit>
 }
