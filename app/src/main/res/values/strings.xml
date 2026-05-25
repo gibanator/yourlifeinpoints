@@ -78,6 +78,16 @@
     <string name="category_updated_success">Category updated successfully</string>
     <string name="category_deleted_success">Category deleted successfully</string>
 
+    <!-- Error Messages -->
+    <string name="error_user_not_signed_in">User is not signed in</string>
+    <string name="error_firebase_token_missing">Firebase ID token is missing</string>
+    <string name="error_categories_load_failed">Failed to load categories</string>
+    <string name="error_category_not_found">Category not found</string>
+    <string name="error_category_create_failed">Failed to create category</string>
+    <string name="error_category_create_failed_http">Failed to create category: HTTP %1$d</string>
+    <string name="error_category_update_failed_http">Failed to update category: HTTP %1$d</string>
+    <string name="error_category_delete_failed_http">Failed to delete category: HTTP %1$d</string>
+
     <!-- Learn screen -->
     <string name="start_sc_title">Welcome to Life in Points!</string>
     <string name="start_sc_text">Track your daily activities and level up your character.</string>

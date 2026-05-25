@@ -51,12 +51,8 @@ class DailyCheckupViewModel @Inject constructor(
 
         Log.d("VM", "init(), vmId=$id, dateArg=$dateStr, parsed=$today")
 
-        // Подписываемся на изменения видимых категорий
         viewModelScope.launch {
-            categoryRepository.observeVisibleCategories().collect { _ ->
-                // Обновляем состояние, когда меняются видимые категории
-                initStateForDay(today)
-            }
+            initStateForDay(today)
         }
 
         viewModelScope.launch {
@@ -106,7 +102,11 @@ class DailyCheckupViewModel @Inject constructor(
         val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
         val visibleCategories = categoryRepository
             .getVisibleCategoriesCreatedBefore(selectedDayMillis)
-            .map { CategoryUi(id = it.id, name = it.name, isSystem = it.isSystem, nameKey = it.nameKey) }
+            .mapNotNull { category ->
+                category.id?.let { id ->
+                    CategoryUi(id = id, name = category.name, isSystem = false, nameKey = null)
+                }
+            }
 
         val visibleIds = visibleCategories.map { category -> category.id }.toSet()
 
