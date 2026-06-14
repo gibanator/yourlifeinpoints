@@ -13,6 +13,10 @@ import com.example.lifeinpoints.data.level.LevelProgressDao
 import com.example.lifeinpoints.data.level.LevelProgressEntity
 import com.example.lifeinpoints.data.level.SkillPointsDao
 import com.example.lifeinpoints.data.level.SkillPointsEntity
+import com.example.lifeinpoints.data.target.TargetDao
+import com.example.lifeinpoints.data.target.TargetEntity
+import com.example.lifeinpoints.data.target.TargetSelectionDao
+import com.example.lifeinpoints.data.target.TargetSelectionEntity
 
 @Database(
     entities = [
@@ -20,10 +24,12 @@ import com.example.lifeinpoints.data.level.SkillPointsEntity
         DailyCategoryProgressEntity::class,
         DayCompletionEntity::class,
         CommentTemplateEntity::class,
-        LevelProgressEntity::class, // Добавляем новую сущность
-        SkillPointsEntity::class    // Добавляем сущность очков навыков
+        LevelProgressEntity::class,
+        SkillPointsEntity::class,
+        TargetEntity::class,
+        TargetSelectionEntity::class
     ],
-    version = 18, // Увеличиваем версию
+    version = 21,
     exportSchema = false
 )
 abstract class CategoryDatabase : RoomDatabase() {
@@ -31,6 +37,8 @@ abstract class CategoryDatabase : RoomDatabase() {
     abstract fun dailyProgressDao(): DailyCategoryProgressDao
     abstract fun dayCompletionDao(): DayCompletionDao
     abstract fun commentTemplateDao(): CommentTemplateDao
-    abstract fun levelProgressDao(): LevelProgressDao // Добавляем DAO уровней
-    abstract fun skillPointsDao(): SkillPointsDao // Добавляем DAO очков навыков
+    abstract fun levelProgressDao(): LevelProgressDao
+    abstract fun skillPointsDao(): SkillPointsDao
+    abstract fun targetDao(): TargetDao
+    abstract fun targetSelectionDao(): TargetSelectionDao
 }

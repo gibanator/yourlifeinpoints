@@ -10,6 +10,15 @@ data class CategoryUi(
     val nameKey: String?
     // color etc
 )
+
+data class TargetUi(
+    val id: Int,
+    val name: String,
+    val nameKey: String?,
+    val days: Int,
+    val daysSelected: Int = 0,
+    val deadline: LocalDate?
+)
 /**
  * Represents a day in the week bar.
  *
@@ -39,5 +48,9 @@ data class DailyCheckupUiState (
 
     val templatesByCategory: Map<Int, List<String>> = emptyMap(),
 
-    val isAiModeVisible: Boolean = false
+    val isAiModeVisible: Boolean = false,
+
+    val targets: List<TargetUi> = emptyList(),
+    val selectedTargets: Set<Int> = emptySet(),
+    val completedTargets: List<TargetUi> = emptyList()
 )

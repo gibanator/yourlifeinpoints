@@ -1,9 +1,12 @@
 package com.example.lifeinpoints.daily_checkup.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -27,8 +30,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,10 +41,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import com.example.lifeinpoints.aiScreen.AiModeScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,12 +58,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -73,6 +79,7 @@ import kotlinx.coroutines.flow.filter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+//@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyCheckupScreen(
@@ -93,6 +100,9 @@ fun DailyCheckupScreen(
 
     // Состояние для открытия экрана прокачки
     var showSkillScreen by remember { mutableStateOf(false) }
+    var showAddTargetSheet by remember { mutableStateOf(false) }
+    var editingTarget by remember { mutableStateOf<TargetUi?>(null) }
+    var showCompletedTargets by remember { mutableStateOf(false) }
 
     // Состояние для скролла всего экрана
     val scrollState = rememberScrollState()
@@ -125,77 +135,141 @@ fun DailyCheckupScreen(
         }
     ) { paddingValues ->
         val layoutDirection = LocalLayoutDirection.current
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     start = paddingValues.calculateStartPadding(layoutDirection),
                     end = paddingValues.calculateEndPadding(layoutDirection)
-                    // no bottom padding
                 )
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .fillMaxSize()
         ) {
-            WeekBarWithButtons(
-                days = uiState.currentWeek,
-                onDaySelected = vm::onDaySelected,
-                toPrevWeek = vm::toPrevWeek,
-                toNextWeek = vm::toNextWeek,
-            )
+            val hPad = maxWidth * 0.04f
+            val vGap = maxHeight * 0.015f
 
-            HorizontalPager(
-                state = pagerState,
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                pageSpacing = 16.dp
-            ) {_ ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Полоска XP (только если включен Game Mode)
-                    if (gameModeEnabled) {
-                        XpProgressBar(
-                            levelState = levelState,
-                            onClick = {
-                                showSkillScreen = true
-                            },
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(vGap)
+            ) {
+                WeekBarWithButtons(
+                    days = uiState.currentWeek,
+                    onDaySelected = vm::onDaySelected,
+                    toPrevWeek = vm::toPrevWeek,
+                    toNextWeek = vm::toNextWeek,
+                )
+
+                HorizontalPager(
+                    state = pagerState,
+                    contentPadding = PaddingValues(horizontal = hPad),
+                    pageSpacing = hPad
+                ) { _ ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState),
+                        verticalArrangement = Arrangement.spacedBy(vGap)
+                    ) {
+                        if (gameModeEnabled) {
+                            XpProgressBar(
+                                levelState = levelState,
+                                onClick = { showSkillScreen = true },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        CategoryListCard(
+                            categories = uiState.orderedCategories,
+                            selectedCategories = uiState.selectedCategories,
+                            isDayEnded = uiState.isDayEnded,
+                            isMultiplierMode = uiState.isMultiplierMode,
+                            onCategoryClick = { id -> vm.toggleCategory(id) },
+                            onToggleMultiplierMode = { vm.toggleMultiplierMode() },
+                            onAddComment = onNavigateToComments,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        TargetListCard(
+                            targets = uiState.targets,
+                            selectedTargets = uiState.selectedTargets,
+                            isDayEnded = uiState.isDayEnded,
+                            completedCount = uiState.completedTargets.size,
+                            onTargetClick = { id -> vm.toggleTarget(id) },
+                            onTargetSettingsClick = { target -> editingTarget = target },
+                            onAddTarget = { showAddTargetSheet = true },
+                            onViewCompleted = { showCompletedTargets = true },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        AiModeCard(
+                            onClick = { vm.showAiMode() },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        DayCompletionCard(
+                            isDayEnded = uiState.isDayEnded,
+                            onToggleDayEnded = {
+                                vm.toggleDayEnded()
+                                vm.saveProgress()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = vGap * 2)
+                        )
                     }
-                    // Карточка с категориями - теперь без внутреннего скролла
-                    CategoryListCard(
-                        categories = uiState.orderedCategories,
-                        selectedCategories = uiState.selectedCategories,
-                        isDayEnded = uiState.isDayEnded,
-                        isMultiplierMode = uiState.isMultiplierMode,
-                        onCategoryClick = { id ->
-                            vm.toggleCategory(id)
-                        },
-                        onToggleMultiplierMode = { vm.toggleMultiplierMode() },
-                        onAddComment = onNavigateToComments,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    AiModeCard(
-                        onClick = { vm.showAiMode() },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    DayCompletionCard(
-                        isDayEnded = uiState.isDayEnded,
-                        onToggleDayEnded = {
-                            vm.toggleDayEnded()
-                            vm.saveProgress()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp) //start = 12.dp, end = 12.dp)
-                    )
                 }
             }
+        }
 
+        val targetGoalEvents by vm.targetGoalReachedEvent.collectAsState()
+        targetGoalEvents.firstOrNull()?.let { target ->
+            TargetGoalReachedDialog(
+                target = target,
+                remainingCount = targetGoalEvents.size,
+                completedTargetsCount = uiState.completedTargets.size,
+                onComplete = { vm.completeTargetAndNext(target.id) },
+                onExtend = { days -> vm.extendTargetAndNext(target.id, days) },
+                onDismiss = { vm.consumeNextTargetGoalEvent() },
+                onViewCompleted = { showCompletedTargets = true }
+            )
+        }
+
+        if (showCompletedTargets) {
+            AlertDialog(
+                onDismissRequest = { showCompletedTargets = false },
+                title = {
+                    Text(
+                        text = stringResource(R.string.completed_targets_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
+                text = {
+                    if (uiState.completedTargets.isEmpty()) {
+                        Text(stringResource(R.string.no_completed_targets), style = MaterialTheme.typography.bodyMedium)
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            uiState.completedTargets.forEach { t ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "• ${t.name}  (${t.daysSelected}/${t.days})",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    IconButton(onClick = { vm.deleteTarget(t.id) }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Delete,
+                                            contentDescription = stringResource(R.string.delete),
+                                            tint = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showCompletedTargets = false }) { Text(stringResource(R.string.close_button)) }
+                }
+            )
         }
 
         // Диалог повышения уровня (если сработало событие)
@@ -222,6 +296,41 @@ fun DailyCheckupScreen(
                 },
                 onResetSkills = { levelVm.resetSkills() }
             )
+        }
+
+        if (showAddTargetSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showAddTargetSheet = false },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            ) {
+                AddTargetSheet(
+                    onDismiss = { showAddTargetSheet = false },
+                    onConfirm = { name, days, deadline ->
+                        vm.addTarget(name, days, deadline)
+                        showAddTargetSheet = false
+                    }
+                )
+            }
+        }
+
+        editingTarget?.let { target ->
+            ModalBottomSheet(
+                onDismissRequest = { editingTarget = null },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            ) {
+                EditTargetSheet(
+                    target = target,
+                    onDismiss = { editingTarget = null },
+                    onConfirm = { name, days, deadline ->
+                        vm.updateTarget(target.id, name, days, deadline)
+                        editingTarget = null
+                    },
+                    onDelete = {
+                        vm.deleteTarget(target.id)
+                        editingTarget = null
+                    }
+                )
+            }
         }
 
         // AI режим — всплывающее окно снизу
@@ -270,7 +379,7 @@ fun LevelUpDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "🎉 Поздравляем!",
+                text = stringResource(R.string.level_up_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -278,16 +387,16 @@ fun LevelUpDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Вы достигли уровня $level!",
+                    text = stringResource(R.string.level_up_reached, level),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "Вы получили 5 очков навыков.",
+                    text = stringResource(R.string.level_up_skill_points),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 if (unspentSkillPoints > 0) {
                     Text(
-                        text = "Всего нераспределенных очков: $unspentSkillPoints",
+                        text = stringResource(R.string.level_up_unspent_points, unspentSkillPoints),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -303,7 +412,7 @@ fun LevelUpDialog(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Позже")
+                    Text(stringResource(R.string.later_button))
                 }
 
                 Button(
@@ -313,7 +422,7 @@ fun LevelUpDialog(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Распределить")
+                    Text(stringResource(R.string.distribute_button))
                 }
             }
         }
@@ -334,7 +443,7 @@ fun WeekBarWithButtons(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(onClick = toPrevWeek) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous week")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.prev_week_description))
         }
 
         Row(
@@ -382,7 +491,7 @@ fun WeekBarWithButtons(
         }
 
         IconButton(onClick = toNextWeek) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next week")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.next_week_description))
         }
     }
 }
@@ -409,6 +518,11 @@ fun CategoryListCard(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Text(
+                text = stringResource(R.string.card_title_productivity_points),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             // Список категорий - теперь без внутреннего скролла
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -437,21 +551,77 @@ fun CategoryListCard(
 }
 
 @Composable
-fun ActionButtonsRow(
-    selectedCount: Int,
-    totalCount: Int,
-    onToggleMultiplierMode: () -> Unit,
-    onAddComment: () -> Unit,
+fun TargetListCard(
+    targets: List<TargetUi>,
+    selectedTargets: Set<Int>,
+    isDayEnded: Boolean,
+    completedCount: Int,
+    onTargetClick: (Int) -> Unit,
+    onTargetSettingsClick: (TargetUi) -> Unit,
+    onAddTarget: () -> Unit,
+    onViewCompleted: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    BoxWithConstraints(modifier = modifier) {
+        val gap = maxWidth * 0.03f
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            shape = MaterialTheme.shapes.small
+        ){
+            Column(
+                modifier = Modifier.padding(gap),
+                verticalArrangement = Arrangement.spacedBy(gap)
+            ) {
+                Text(
+                    text = stringResource(R.string.card_title_goals),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    targets.forEach { target ->
+                        TargetRow(
+                            target = target,
+                            isSelected = target.id in selectedTargets,
+                            isDayEnded = isDayEnded,
+                            onTargetClick = { onTargetClick(target.id) },
+                            onSettingsClick = { onTargetSettingsClick(target) }
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    TargetActionCard(
+                        text = stringResource(R.string.add_target_button),
+                        onClick = onAddTarget,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TargetActionCard(
+                        text = if (completedCount > 0) stringResource(R.string.view_completed_with_count, completedCount) else stringResource(R.string.view_completed),
+                        onClick = onViewCompleted,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TargetActionCard(
+    text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    BoxWithConstraints(modifier = modifier) {
+        val vertPad = maxWidth * 0.044f
+        val textSize = with(LocalDensity.current) { (maxWidth * 0.078f).toSp() }
         Card(
-            modifier = Modifier
-                .weight(1f)
-                .clickable(onClick = onAddComment),
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(
@@ -462,47 +632,144 @@ fun ActionButtonsRow(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = vertPad)
             ) {
                 Text(
-                    text = stringResource(R.string.comments_button_text),
-                    fontSize = 14.sp,
+                    text = text,
+                    fontSize = textSize,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
+    }
+}
 
-        Card(
+@Composable
+fun TargetRow(
+    target: TargetUi,
+    isSelected: Boolean,
+    isDayEnded: Boolean,
+    onTargetClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val rowHeight = maxWidth * 0.15f
+        val iconSize = rowHeight * 0.84f
+        val iconEndPad = maxWidth * 0.02f
+
+        val urgencyColor: Color? = target.deadline?.let { deadline ->
+            val daysUntilDeadline = (deadline.toEpochDay() - java.time.LocalDate.now().toEpochDay() + 1).toInt()
+            val daysRemaining = target.days - target.daysSelected
+            val diff = daysUntilDeadline - daysRemaining
+            when {
+                diff < 0 -> MaterialTheme.colorScheme.errorContainer
+                diff < 3 -> Color(0xFFFFE0B2)
+                else -> null
+            }
+        }
+
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .clickable(onClick = onToggleMultiplierMode),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = MaterialTheme.shapes.small,
-            colors = CardDefaults.cardColors(
-                containerColor = if (selectedCount > 0) {
-                    MaterialTheme.colorScheme.primary   // золотой
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant
-                }
-            )
+                .fillMaxWidth()
+                .heightIn(min = rowHeight),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
+            NumberTargetCard(
+                current = target.daysSelected,
+                total = target.days,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .size(iconSize)
+                    .padding(end = iconEndPad)
+                    .clickable(onClick = onSettingsClick)
+            )
+            CategoryListItem(
+                category = target.name,
+                isSelected = isSelected,
+                height = iconSize,
+                urgencyColor = urgencyColor,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(enabled = !isDayEnded, onClick = onTargetClick)
+            )
+        }
+    }
+}
+
+@Composable
+fun ActionButtonsRow(
+    selectedCount: Int,
+    totalCount: Int,
+    onToggleMultiplierMode: () -> Unit,
+    onAddComment: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val gap = maxWidth * 0.033f
+        val vertPad = maxWidth * 0.022f
+        val textSize = with(LocalDensity.current) { (maxWidth * 0.039f).toSp() }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(gap)
+        ) {
+            Card(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onAddComment),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.small,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             ) {
-                Text(
-                    text = "$selectedCount/$totalCount",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (selectedCount > 0) {
-                        Color.White
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = vertPad)
+                ) {
+                    Text(
+                        text = stringResource(R.string.comments_button_text),
+                        fontSize = textSize,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onToggleMultiplierMode),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.small,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (selectedCount > 0) {
+                        MaterialTheme.colorScheme.primary
                     } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                        MaterialTheme.colorScheme.surfaceVariant
                     }
                 )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = vertPad)
+                ) {
+                    Text(
+                        text = "$selectedCount/$totalCount",
+                        fontSize = textSize,
+                        fontWeight = FontWeight.Bold,
+                        color = if (selectedCount > 0) {
+                            Color.White
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
             }
         }
     }
@@ -516,29 +783,35 @@ fun CategoryRow(
     onCategoryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 60.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        NumberCard(
-            number = if (isSelected) "1" else "0",
-            modifier = Modifier
-                .size(50.dp)
-                .padding(end = 8.dp)
-        )
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val rowHeight = maxWidth * 0.15f
+        val iconSize = rowHeight * 0.84f
+        val iconEndPad = maxWidth * 0.02f
 
-        CategoryListItem(
-            category = category,
-            isSelected = isSelected,
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .clickable(
-                    enabled = !isDayEnded,
-                    onClick = onCategoryClick
-                )
-        )
+                .fillMaxWidth()
+                .heightIn(min = rowHeight),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            NumberCard(
+                number = if (isSelected) "1" else "0",
+                modifier = Modifier
+                    .size(iconSize)
+                    .padding(end = iconEndPad)
+            )
+            CategoryListItem(
+                category = category,
+                isSelected = isSelected,
+                height = iconSize,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(
+                        enabled = !isDayEnded,
+                        onClick = onCategoryClick
+                    )
+            )
+        }
     }
 }
 
@@ -547,42 +820,40 @@ fun AiModeCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = MaterialTheme.shapes.small,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 16.dp)
-                .clickable { onClick() },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+    BoxWithConstraints(modifier = modifier) {
+        val pad = maxWidth * 0.044f
+        val spacerW = maxWidth * 0.022f
+        val textSize = with(LocalDensity.current) { (maxWidth * 0.056f).toSp() }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            shape = MaterialTheme.shapes.small,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
         ) {
-            /*Icon(
-                imageVector = Icons.Filled.AutoAwesome,
-                contentDescription = null,
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-А
-             */
-            Text(
-                text = "AI режим",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Filled.AutoAwesome,
-                contentDescription = null,
-                tint = Color.White
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = pad, horizontal = pad)
+                    .clickable { onClick() },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.ai_mode_screen_title),
+                    fontSize = textSize,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.width(spacerW))
+                Icon(
+                    imageVector = Icons.Filled.AutoAwesome,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         }
     }
 }
@@ -628,15 +899,17 @@ fun CategoryListItem(
     category: String,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
+    height: Dp = 50.dp,
+    urgencyColor: Color? = null,
 ) {
-    val cardColor = if (isSelected) {
-        MaterialTheme.colorScheme.primary   // золотой в Stone, фиолетовый в остальных
-    } else {
-        MaterialTheme.colorScheme.surface
+    val cardColor = when {
+        isSelected -> MaterialTheme.colorScheme.primary
+        urgencyColor != null -> urgencyColor
+        else -> MaterialTheme.colorScheme.surface
     }
 
     Card(
-        modifier = modifier.height(50.dp),
+        modifier = modifier.height(height),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = MaterialTheme.shapes.small
     ) {
@@ -670,35 +943,56 @@ fun NumberCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = MaterialTheme.shapes.small
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .aspectRatio(1f)
         ) {
-            Text(
-                text = number,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary   // золотой
-            )
+            val fontSize = (maxWidth.value * 0.36f).sp
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text(
+                    text = number,
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
 
-@Preview(
-    showBackground = true, locale = "ru", widthDp = 360, heightDp = 70,
-    backgroundColor = 0xFFFF5722
-)
+
 @Composable
-private fun Preview_CategoryListItem_Ru() {
-    MaterialTheme {
-        CategoryRow(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 30.dp),
-            isDayEnded = true,
-            category = "aaa",
-            isSelected = false,
-            onCategoryClick = {}
-        )
+fun NumberTargetCard(
+    current: Int,
+    total: Int,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.small
+    ) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
+        ) {
+            val fontSize = (maxWidth.value * 0.28f).sp
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text(
+                    text = "$current/$total",
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }
