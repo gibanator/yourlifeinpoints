@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 
 interface AuthApi {
-    @GET("/me")
+    @GET("/api/v1/me")
     suspend fun syncMe(
         @Header("Authorization") authorization: String
     ): Response<Unit>

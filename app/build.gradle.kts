@@ -77,6 +77,9 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // WorkManager для уведомлений по расписанию
     implementation("androidx.work:work-runtime-ktx:2.9.0")

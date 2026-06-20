@@ -94,6 +94,8 @@
     <string name="auth_logout">Выйти из аккаунта</string>
     <string name="login_title">Вход</string>
     <string name="login_success">Вход выполнен успешно</string>
+    <string name="login_google_button">Войти через Google</string>
+    <string name="login_google_error">Не удалось войти через Google. Попробуйте ещё раз.</string>
 
     <string name="change">Изменить</string>
     <string name="select_time">Выберите время</string>

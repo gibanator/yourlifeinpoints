@@ -51,8 +51,11 @@ class DailyCheckupViewModel @Inject constructor(
 
         Log.d("VM", "init(), vmId=$id, dateArg=$dateStr, parsed=$today")
 
-        viewModelScope.launch {
-            initStateForDay(today)
+        _uiState.update {
+            it.copy(
+                selectedDate = today,
+                currentWeek = mapToUi(weekDatesOf(today), today)
+            )
         }
 
         viewModelScope.launch {
@@ -70,6 +73,10 @@ class DailyCheckupViewModel @Inject constructor(
                 _uiState.update { it.copy(templatesByCategory = map) }
             }
         }
+    }
+
+    fun refreshCurrentDay() {
+        loadDay(_uiState.value.selectedDate)
     }
 
     /**

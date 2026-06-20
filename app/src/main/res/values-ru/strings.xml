@@ -72,6 +72,8 @@
     <string name="registration_error_all_required">Все поля обязательны</string>
     <string name="registration_error_password_mismatch">Пароли не совпадают</string>
     <string name="registration_info_card">Зарегистрировавшись, вы сможете синхронизировать свои данные между несколькими устройствами.</string>
+    <string name="registration_google_button">Зарегистрироваться через Google</string>
+    <string name="registration_google_error">Не удалось войти через Google. Попробуйте ещё раз.</string>
 
     <!-- Success Messages -->
     <string name="category_added_success">Категория создана успешно</string>
@@ -87,6 +89,8 @@
     <string name="error_category_create_failed_http">Не удалось создать категорию: HTTP %1$d</string>
     <string name="error_category_update_failed_http">Не удалось обновить категорию: HTTP %1$d</string>
     <string name="error_category_delete_failed_http">Не удалось удалить категорию: HTTP %1$d</string>
+    <string name="error_progress_load_failed_http">Не удалось загрузить прогресс: HTTP %1$d</string>
+    <string name="error_progress_save_failed_http">Не удалось сохранить прогресс: HTTP %1$d</string>
 
     <!-- Learn screen -->
     <string name="start_sc_title">Добро пожаловать в Life in Points!</string>
