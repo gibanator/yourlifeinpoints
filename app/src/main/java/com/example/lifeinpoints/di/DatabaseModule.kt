@@ -10,6 +10,8 @@ import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgress
 import com.example.lifeinpoints.data.daycompletion.DayCompletionDao
 import com.example.lifeinpoints.data.level.LevelProgressDao
 import com.example.lifeinpoints.data.level.SkillPointsDao
+import com.example.lifeinpoints.data.target.TargetDao
+import com.example.lifeinpoints.data.target.TargetSelectionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,4 +47,10 @@ object DatabaseModule {
 
     @Provides
     fun provideSkillPointsDao(db: CategoryDatabase): SkillPointsDao = db.skillPointsDao()
+
+    @Provides
+    fun provideTargetDao(db: CategoryDatabase): TargetDao = db.targetDao()
+
+    @Provides
+    fun provideTargetSelectionDao(db: CategoryDatabase): TargetSelectionDao = db.targetSelectionDao()
 }
