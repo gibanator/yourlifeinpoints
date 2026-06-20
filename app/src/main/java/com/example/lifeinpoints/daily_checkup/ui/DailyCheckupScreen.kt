@@ -31,6 +31,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.TextButton
@@ -340,6 +341,15 @@ fun DailyCheckupScreen(
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             ) {
                 AiModeScreen(onBack = { vm.hideAiMode() })
+            }
+        }
+
+        if (uiState.isVoiceRecognitionVisible) {
+            ModalBottomSheet(
+                onDismissRequest = { vm.hideVoiceRecognition() },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            ) {
+                VoiceRecognitionScreen()
             }
         }
 
@@ -854,6 +864,43 @@ fun AiModeCard(
                     tint = Color.White
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun VoiceRecognitionCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 16.dp)
+                .clickable { onClick() },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(R.string.voice_button_text),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Filled.Mic,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }

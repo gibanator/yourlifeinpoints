@@ -3,7 +3,6 @@ package com.example.lifeinpoints.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.remote.auth.AuthRepository
-import com.example.lifeinpoints.data.remote.auth.TokenStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +25,7 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repository: AuthRepository,
-    tokenStorage: TokenStorage
+    private val repository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -35,8 +33,6 @@ class LoginViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<LoginEvent>()
     val events = _events.asSharedFlow()
-
-    val token = tokenStorage.token
 
     fun onEmailChanged(value: String) {
         _uiState.update { it.copy(email = value, errorMessage = null) }
@@ -66,5 +62,24 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun loginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                repository.loginWithGoogle(idToken)
+                _uiState.update { it.copy(isLoading = false) }
+                _events.emit(LoginEvent.Success)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = e.message ?: "Google login failed")
+                }
+            }
+        }
+    }
+
+    fun onGoogleLoginError(message: String) {
+        _uiState.update { it.copy(errorMessage = message) }
     }
 }

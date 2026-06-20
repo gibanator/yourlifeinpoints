@@ -4,6 +4,7 @@ package com.example.lifeinpoints.statistics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifeinpoints.data.category.CategoryRepository
+import com.example.lifeinpoints.data.remote.category.CategoryDto
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
@@ -14,7 +15,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -46,24 +46,8 @@ class StatisticsViewModel @Inject constructor(
 
 
     init {
-        setupCategorySubscription()
         setupDayCompletionSubscription()
         loadStatistics()
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun setupCategorySubscription() {
-        combine(
-            categoryRepository.observeAll(),
-            _forceRefresh
-        ) { categories, _ ->
-            categories
-        }
-            .debounce(300)
-            .onEach { categories ->
-                reloadStatistics(categories)
-            }
-            .launchIn(viewModelScope)
     }
 
     @OptIn(FlowPreview::class)
@@ -153,7 +137,7 @@ class StatisticsViewModel @Inject constructor(
 
     private fun processDayData(
         rawData: List<DayStatistics>,
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+        allCategories: List<CategoryDto>
     ): Processed<List<DayStatistics>> {
         val relevantIds = findRelevantCategories(rawData, allCategories)
         val categoriesToShow = filterCategories(allCategories, relevantIds)
@@ -163,7 +147,7 @@ class StatisticsViewModel @Inject constructor(
 
     private fun processYearData(
         rawData: List<MonthStatistics>,
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+        allCategories: List<CategoryDto>
     ): Processed<List<MonthStatistics>> {
         val relevantIds = findRelevantCategoriesForYear(rawData, allCategories)
         val categoriesToShow = filterCategories(allCategories, relevantIds)
@@ -172,7 +156,7 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private fun reloadStatistics(
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+        allCategories: List<CategoryDto>
     ) {
         viewModelScope.launch {
             try {
@@ -180,7 +164,7 @@ class StatisticsViewModel @Inject constructor(
 
                 when (currentState.viewType) {
                     ViewType.MONTH -> {
-                        val rawData = loadMonthData(currentState.currentMonth, allCategories.map { it.id })
+                        val rawData = loadMonthData(currentState.currentMonth, allCategories.mapNotNull { it.id })
                         val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
                         val summary = calculateMonthSummaryStats(filteredData, currentState.currentMonth)
                         val timeSeriesData = prepareTimeSeriesDataForMonth(filteredData, initialSelectedIds)
@@ -198,7 +182,7 @@ class StatisticsViewModel @Inject constructor(
                         }
                     }
                     ViewType.WEEK -> {
-                        val rawData = loadWeekData(currentState.currentWeekStart, allCategories.map { it.id })
+                        val rawData = loadWeekData(currentState.currentWeekStart, allCategories.mapNotNull { it.id })
                         val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
                         val summary = calculateWeekSummaryStats(filteredData, currentState.currentWeekStart)
                         val timeSeriesData = prepareTimeSeriesDataForWeek(filteredData, initialSelectedIds)
@@ -216,7 +200,7 @@ class StatisticsViewModel @Inject constructor(
                         }
                     }
                     ViewType.YEAR -> {
-                        val rawData = loadYearData(currentState.currentYear, allCategories.map { it.id })
+                        val rawData = loadYearData(currentState.currentYear, allCategories.mapNotNull { it.id })
                         val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processYearData(rawData, allCategories)
                         val summary = calculateYearSummaryStats(filteredData, currentState.currentYear)
                         val timeSeriesData = prepareTimeSeriesDataForYear(filteredData, initialSelectedIds)
@@ -467,13 +451,13 @@ class StatisticsViewModel @Inject constructor(
 
     private fun findRelevantCategories(
         data: List<DayStatistics>,
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+        allCategories: List<CategoryDto>
     ): Set<Int> {
         val relevantCategoryIds = mutableSetOf<Int>()
 
         allCategories
-            .filter { it.isVisible }
-            .forEach { relevantCategoryIds.add(it.id) }
+            .filter { it.visible }
+            .forEach { category -> category.id?.let { relevantCategoryIds.add(it) } }
 
         data.forEach { dayData ->
             if (dayData.totalSelected > 0) {
@@ -490,13 +474,13 @@ class StatisticsViewModel @Inject constructor(
 
     private fun findRelevantCategoriesForYear(
         yearData: List<MonthStatistics>,
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>
+        allCategories: List<CategoryDto>
     ): Set<Int> {
         val relevantCategoryIds = mutableSetOf<Int>()
 
         allCategories
-            .filter { it.isVisible }
-            .forEach { relevantCategoryIds.add(it.id) }
+            .filter { it.visible }
+            .forEach { category -> category.id?.let { relevantCategoryIds.add(it) } }
 
         yearData.forEach { monthData ->
             monthData.categorySums.forEach { (categoryId, sum) ->
@@ -510,17 +494,17 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private fun filterCategories(
-        allCategories: List<com.example.lifeinpoints.data.category.CategoryEntity>,
+        allCategories: List<CategoryDto>,
         relevantCategoryIds: Set<Int>
     ): List<CategoryStats> {
         return allCategories
             .filter { category -> category.id in relevantCategoryIds }
             .map { category -> CategoryStats(
-                id = category.id,
+                id = category.id ?: 0,
                 name = category.name,
-                nameKey = category.nameKey,
-                isVisible = category.isVisible,
-                isSystem = category.isSystem
+                nameKey = null,
+                isVisible = category.visible,
+                isSystem = false
             ) }
     }
 

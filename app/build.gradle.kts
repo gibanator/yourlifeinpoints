@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -72,6 +73,13 @@ dependencies {
     // Retrofit для запросов в API (бэкенд)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // WorkManager для уведомлений по расписанию
     implementation("androidx.work:work-runtime-ktx:2.9.0")

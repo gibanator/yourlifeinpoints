@@ -82,13 +82,14 @@ fun CategoryVisibilityScreen(
                 items(categoriesState.categories) { category ->
                     CategoryVisibilityItem(
                         category = category,
-                        onVisibilityChanged = { isVisible ->
+                        enabled = category.id !in categoriesState.switchingCategoryIds,
+                        onVisibilitySwitch = {
                             coroutineScope.launch {
-                                // Изменяем видимость категории
-                                viewModel.setCategoryVisibility(category.id, isVisible)
+                                val result = viewModel.switchCategoryVisibility(category.id)
 
-                                // Принудительно обновляем статистику
-                                statisticsViewModel.forceRefresh()
+                                if (result.isSuccess) {
+                                    statisticsViewModel.forceRefresh()
+                                }
                             }
                         }
                     )
@@ -102,7 +103,8 @@ fun CategoryVisibilityScreen(
 @Composable
 fun CategoryVisibilityItem(
     category: CategoryUiItem,
-    onVisibilityChanged: (Boolean) -> Unit
+    enabled: Boolean,
+    onVisibilitySwitch: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -139,10 +141,10 @@ fun CategoryVisibilityItem(
             // Переключатель видимости
             Switch(
                 checked = category.isVisible,
-                onCheckedChange = { newVisibility ->
-                    onVisibilityChanged(newVisibility)
+                onCheckedChange = {
+                    onVisibilitySwitch()
                 },
-                enabled = true
+                enabled = enabled
             )
         }
     }

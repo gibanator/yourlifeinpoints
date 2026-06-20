@@ -53,4 +53,7 @@ data class DailyCheckupUiState (
     val targets: List<TargetUi> = emptyList(),
     val selectedTargets: Set<Int> = emptySet(),
     val completedTargets: List<TargetUi> = emptyList()
+
+    val isVoiceRecognitionVisible: Boolean = false
 )
+

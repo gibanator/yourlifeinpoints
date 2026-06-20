@@ -31,8 +31,8 @@ class CommentTemplatesViewModel @Inject constructor(
         viewModelScope.launch {
             categoriesRepository.getById(categoryId)?.let { category ->
                 _categoryName.value = category.name
-                _categoryNameKey.value = category.nameKey
-                _isSystem.value = category.isSystem
+                _categoryNameKey.value = null
+                _isSystem.value = false
             }
         }
     }

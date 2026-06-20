@@ -3,8 +3,26 @@
     <string name="to_today_button_text">To today</string>
 
     <string name="comments_button_text">Add/Edit comments</string>
+    <string name="voice_button_text">Voice note</string>
     <string name="end_day_button_text">End the day</string>
     <string name="day_ended_button_text">Day completed!</string>
 
     <string name="comment_placeholder_text">Add your commentary…</string>
+
+    <string name="voice_recognition_title">Voice recognition</string>
+    <string name="voice_recognition_permission_text">Microphone permission is required to recognize your speech.</string>
+    <string name="voice_recognition_request_permission">Allow microphone</string>
+    <string name="voice_recognition_unavailable">Speech recognition is not available on this device.</string>
+    <string name="voice_recognition_listening">Listening…</string>
+    <string name="voice_recognition_ready">Tap Start and speak.</string>
+    <string name="voice_recognition_start">Start</string>
+    <string name="voice_recognition_stop">Stop</string>
+    <string name="voice_recognition_clear">Clear</string>
+    <string name="voice_recognition_transcript_placeholder">Recognized text will appear here.</string>
+    <string name="voice_recognition_error_no_match">I could not recognize speech. Try again.</string>
+    <string name="voice_recognition_error_audio">Audio recording error. Try again.</string>
+    <string name="voice_recognition_error_network">Network error during speech recognition.</string>
+    <string name="voice_recognition_error_permission">Microphone permission was denied.</string>
+    <string name="voice_recognition_error_busy">Speech recognizer is busy. Try again.</string>
+    <string name="voice_recognition_error_generic">Speech recognition failed. Try again.</string>
 </resources>

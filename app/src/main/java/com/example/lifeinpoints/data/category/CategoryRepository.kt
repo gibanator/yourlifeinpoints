@@ -1,218 +1,203 @@
-// com.example.lifeinpoints.data.category/CategoryRepository.kt
 package com.example.lifeinpoints.data.category
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import android.content.Context
+import android.util.Log
+import com.example.lifeinpoints.R
+import com.example.lifeinpoints.data.remote.api.CategoryApi
+import com.example.lifeinpoints.data.remote.category.CategoryCreateRequest
+import com.example.lifeinpoints.data.remote.category.CategoryDto
+import com.example.lifeinpoints.data.remote.category.CategoryUpdateRequest
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-@Singleton // Добавляем аннотацию Singleton
+@Singleton
 class CategoryRepository @Inject constructor(
-    private val dao: CategoryDao
+    private val categoryApi: CategoryApi,
+    private val firebaseAuth: FirebaseAuth,
+    @ApplicationContext private val context: Context
 ) {
+    private val categories = MutableStateFlow<List<CategoryDto>>(emptyList())
 
-    // Системные категории, которые нельзя удалить/редактировать
-    private val systemCategories = listOf(
-        CategoryEntity(
-            id=1,
-            name="",
-            nameKey="networking",
-            color="#FF6B6B",
-            sortOrder=0,
-            isSystem=true,
-            isVisible=true,
-            createdAt=0L
-        ),
-        CategoryEntity(
-            id=2,
-            name="",
-            nameKey="education",
-            color="#4ECDC4",
-            sortOrder=1,
-            isSystem=true,
-            isVisible=true,
-            createdAt=0L
-        ),
-        CategoryEntity(
-            id=3,
-            name="",
-            nameKey="work",
-            color="#45B7D1",
-            sortOrder=2,
-            isSystem=true,
-            isVisible=true,
-            createdAt=0L),
-        CategoryEntity(
-            id=4,
-            name="",
-            nameKey="health",
-            color="#96CEB4",
-            sortOrder=3,
-            isSystem=true,
-            isVisible=true,
-            createdAt=0L
-        ),
-        CategoryEntity(
-            id=5,
-            name="",
-            nameKey="personal_life",
-            color="#FFEAA7",
-            sortOrder=4,
-            isSystem=true,
-            isVisible=true,
-            createdAt=0L
-        ),
-    )
-
-    // Инициализация системных категорий при первом запуске
     suspend fun initializeSystemCategories() {
-        try {
-            val existingCategories = dao.getAll()
-
-            // Добавляем системные категории, если их еще нет
-            systemCategories.forEach { systemCategory ->
-                val exists = existingCategories.any { it.id == systemCategory.id }
-                if (!exists) {
-                    dao.insert(systemCategory)
-                }
-            }
-        } catch (e: Exception) {
-            // Логируем ошибку, но не прерываем выполнение
-            println("Error initializing system categories: ${e.message}")
-        }
+        refreshCategoriesIfSignedIn()
     }
 
-    // Остальные методы остаются без изменений...
-    // Обновим метод addCategory - новые категории должны получать максимальный sortOrder
-    suspend fun addCategory(
-        name: String,
-        createdAt: Long
-    ): Result<Unit> {
-        return try {
-            val existingCount = dao.countByName(name)
-            if (existingCount > 0) {
-                Result.failure(Exception("Category '$name' already exists"))
-            } else {
-                val allCategories = dao.getAll()
+    suspend fun addCategory(name: String, createdAt: Long): Result<Unit> {
+        return runCatching {
+            val trimmedName = name.trim()
+            val response = categoryApi.createCategory(
+                authorization = authHeader(),
+                request = CategoryCreateRequest(name = trimmedName)
+            )
+            ensureSuccessful(
+                code = response.code(),
+                isSuccessful = response.isSuccessful,
+                message = context.getString(R.string.error_category_create_failed_http, response.code())
+            )
 
+            val createdId = response.body()?.id?.takeIf { it > 0 }
+                ?: throw IOException(context.getString(R.string.error_category_create_failed))
 
-                val userCategories = allCategories.filter { !it.isSystem }
-                val maxUserSortOrder = userCategories.maxByOrNull { it.sortOrder }?.sortOrder ?: 4
-
-
-                val newCategory = CategoryEntity(
-                    name = name.trim(),
-                    color = getDefaultColor(allCategories.size),
-                    sortOrder = maxUserSortOrder + 1,
-                    isSystem = false,
-                    createdAt = createdAt
+            categories.value = sortCategories(
+                categories.value + CategoryDto(
+                    id = createdId,
+                    name = trimmedName,
+                    active = true,
+                    visible = true
                 )
-
-
-                dao.insert(newCategory)
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+            )
         }
     }
 
-    // При обновлении проверяем, не системная ли категория
-    suspend fun updateCategory(category: CategoryEntity): Result<Unit> {
-        return try {
-            if (category.isSystem) {
-                // Для системных категорий разрешаем только изменение видимости
-                // Проверяем, не пытаемся ли изменить имя системной категории
-                val existingCategory = dao.getById(category.id)
-                if (existingCategory != null && existingCategory.name != category.name) {
-                    Result.failure(Exception("Cannot edit name of system category"))
+    suspend fun updateCategory(
+        categoryId: Int,
+        name: String,
+        active: Boolean,
+        visible: Boolean
+    ): Result<Unit> {
+        return runCatching {
+            val trimmedName = name.trim()
+            val response = categoryApi.updateCategory(
+                authorization = authHeader(),
+                id = categoryId,
+                request = CategoryUpdateRequest(
+                    name = trimmedName,
+                    active = active,
+                    visible = visible
+                )
+            )
+            ensureSuccessful(
+                code = response.code(),
+                isSuccessful = response.isSuccessful,
+                message = context.getString(R.string.error_category_update_failed_http, response.code())
+            )
+
+            categories.value = categories.value.map { category ->
+                if (category.id == categoryId) {
+                    category.copy(name = trimmedName, active = active, visible = visible)
                 } else {
-                    dao.update(category)
-                    Result.success(Unit)
+                    category
                 }
-            } else {
-                // Для пользовательских категорий проверяем дубликаты имени
-                val existingCategories = dao.getAll()
-                val duplicate = existingCategories.any {
-                    it.id != category.id && it.name.equals(category.name, ignoreCase = true)
-                }
+            }
+        }
+    }
 
-                if (duplicate) {
-                    Result.failure(Exception("Category '${category.name}' already exists"))
+    suspend fun deleteCategory(categoryId: Int): Result<Unit> {
+        return runCatching {
+            val response = categoryApi.deleteCategory(
+                authorization = authHeader(),
+                id = categoryId
+            )
+            Log.d("CategoryDebug", "delete id = $categoryId")
+
+            Log.d("CategoryDebug", "delete code = ${response.code()}")
+
+            Log.d("CategoryDebug", "delete successful = ${response.isSuccessful}")
+
+            Log.d("CategoryDebug", "delete error = ${response.errorBody()?.string()}")
+            ensureSuccessful(
+                code = response.code(),
+                isSuccessful = response.isSuccessful,
+                message = context.getString(R.string.error_category_delete_failed_http, response.code())
+            )
+
+            categories.value = categories.value.filterNot { it.id == categoryId }
+        }
+    }
+
+    suspend fun switchCategoryVisibility(categoryId: Int): Result<Boolean> {
+        return runCatching {
+            val response = categoryApi.switchCategoryVisibility(
+                authorization = authHeader(),
+                id = categoryId
+            )
+            val responseId = response.id?.takeIf { it > 0 } ?: categoryId
+            categories.value = categories.value.map { category ->
+                if (category.id == responseId) {
+                    category.copy(visible = response.visible)
                 } else {
-                    dao.update(category)
-                    Result.success(Unit)
+                    category
                 }
             }
-        } catch (e: Exception) {
-            Result.failure(e)
+            response.visible
         }
     }
 
-    // При удалении проверяем, не системная ли категория
-    suspend fun deleteCategory(category: CategoryEntity): Result<Unit> {
-        return try {
-            if (category.isSystem) {
-                Result.failure(Exception("Cannot delete system category"))
-            } else {
-                dao.delete(category)
-                Result.success(Unit)
+    suspend fun getById(id: Int): CategoryDto? {
+        return categories.value.firstOrNull { it.id == id }
+            ?: run {
+                refreshCategoriesIfSignedIn()
+                categories.value.firstOrNull { it.id == id }
             }
-        } catch (e: Exception) {
-            Result.failure(e)
+    }
+
+    suspend fun getAll(): List<CategoryDto> {
+        refreshCategoriesIfSignedIn()
+        return sortCategories(categories.value)
+    }
+
+    suspend fun getVisibleCategoriesCreatedBefore(fromTime: Long): List<CategoryDto> {
+        refreshCategoriesIfSignedIn()
+        return sortCategories(categories.value.filter { it.active && it.visible })
+    }
+
+    private suspend fun refreshCategoriesIfSignedIn() {
+        val authorization = authHeaderOrNull()
+        if (authorization == null) {
+            categories.value = emptyList()
+            return
+        }
+        val remoteCategories = categoryApi.getCategories(authorization)
+        remoteCategories.forEach {
+            Log.d("Category", "${it.id} ${it.name} active=${it.active} visible=${it.visible}")
+        }
+        categories.value = sortCategories(
+            remoteCategories.filter { category ->
+                category.id != null
+            }
+        )
+    }
+
+    private suspend fun authHeader(): String {
+        val user = firebaseAuth.currentUser
+            ?: throw IllegalStateException(context.getString(R.string.error_user_not_signed_in))
+        val token = user.getIdToken(false).awaitResult().token
+            ?: throw IllegalStateException(context.getString(R.string.error_firebase_token_missing))
+        return "Bearer $token"
+    }
+
+    private suspend fun authHeaderOrNull(): String? {
+        val user = firebaseAuth.currentUser ?: return null
+        val token = user.getIdToken(false).awaitResult().token ?: return null
+        return "Bearer $token"
+    }
+
+    private fun sortCategories(categories: List<CategoryDto>): List<CategoryDto> {
+        return categories.sortedBy { it.id ?: Int.MAX_VALUE }
+    }
+
+    private fun ensureSuccessful(code: Int, isSuccessful: Boolean, message: String) {
+        if (!isSuccessful) {
+            throw IOException(message)
         }
     }
+}
 
-    // Получаем категорию по ID с проверкой на системность
-    suspend fun getById(id: Int): CategoryEntity? = dao.getById(id)
-
-    /*
-    // Проверяем, является ли категория системной
-    suspend fun isSystemCategory(categoryId: Int): Boolean {
-        return dao.getById(categoryId)?.isSystem ?: false
-    }
-     */
-
-    // Остальные методы остаются без изменений
-    fun observeAll(): Flow<List<CategoryEntity>> {
-        return dao.observeAll().map { sortCategories(it) }
-    }
-
-    // Обновим метод getAll для правильной сортировки
-    suspend fun getAll(): List<CategoryEntity> = sortCategories(dao.getAll())
-
-    private fun sortCategories(categories: List<CategoryEntity>): List<CategoryEntity> {
-        val userCategories = categories.filter { !it.isSystem }.sortedByDescending { it.sortOrder }
-        val systemCategories = categories.filter { it.isSystem }.sortedBy { it.sortOrder }
-        return userCategories + systemCategories
-    }
-
-    private fun getDefaultColor(index: Int): String {
-        val colors = listOf("#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9")
-        return colors[index % colors.size]
-    }
-
-    /*
-    suspend fun setCategoryVisibility(categoryId: Int, isVisible: Boolean): Result<Unit> {
-        return try {
-            dao.setVisibility(categoryId, isVisible)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+private suspend fun <T> Task<T>.awaitResult(): T = suspendCancellableCoroutine { continuation ->
+    addOnCompleteListener { task ->
+        val exception = task.exception
+        when {
+            task.isSuccessful -> continuation.resume(task.result)
+            exception != null -> continuation.resumeWithException(exception)
+            else -> continuation.resumeWithException(IllegalStateException("Firebase task failed"))
         }
     }
-     */
-
-    // Убедимся, что observeVisibleCategories() возвращает только видимые
-    fun observeVisibleCategories(): Flow<List<CategoryEntity>> {
-        return dao.observeVisibleCategories().map { sortCategories(it) }
-    }
-
-    //suspend fun getVisibleCategories(): List<CategoryEntity> = dao.getVisibleCategories()
-
-    suspend fun getVisibleCategoriesCreatedBefore(fromTime: Long) = dao.getVisibleCategoriesCreatedBefore(fromTime)
-
-    // Обновим системные категории - по умолчанию все видимые
-    //suspend fun getAllIds() = dao.getAllIds()
-
 }
