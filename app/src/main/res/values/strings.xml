@@ -72,11 +72,25 @@
     <string name="registration_error_all_required">All fields are required</string>
     <string name="registration_error_password_mismatch">Passwords don\'t match</string>
     <string name="registration_info_card">By registering, you will be able to synchronize your data across multiple devices.</string>
+    <string name="registration_google_button">Sign up with Google</string>
+    <string name="registration_google_error">Google sign-in failed. Please try again.</string>
 
     <!-- Success Messages -->
     <string name="category_added_success">Category added successfully</string>
     <string name="category_updated_success">Category updated successfully</string>
     <string name="category_deleted_success">Category deleted successfully</string>
+
+    <!-- Error Messages -->
+    <string name="error_user_not_signed_in">User is not signed in</string>
+    <string name="error_firebase_token_missing">Firebase ID token is missing</string>
+    <string name="error_categories_load_failed">Failed to load categories</string>
+    <string name="error_category_not_found">Category not found</string>
+    <string name="error_category_create_failed">Failed to create category</string>
+    <string name="error_category_create_failed_http">Failed to create category: HTTP %1$d</string>
+    <string name="error_category_update_failed_http">Failed to update category: HTTP %1$d</string>
+    <string name="error_category_delete_failed_http">Failed to delete category: HTTP %1$d</string>
+    <string name="error_progress_load_failed_http">Failed to load progress: HTTP %1$d</string>
+    <string name="error_progress_save_failed_http">Failed to save progress: HTTP %1$d</string>
 
     <!-- Learn screen -->
     <string name="start_sc_title">Welcome to Life in Points!</string>
@@ -113,5 +127,49 @@
     <string name="theme_preview_light_stone_title">Light Stone</string>
     <string name="theme_preview_light_stone_subtitle">Always use light stone theme</string>
 
+    <!-- Daily Checkup Card Titles -->
+    <string name="card_title_productivity_points">Productivity Points</string>
+    <string name="card_title_goals">Goals</string>
+
+    <!-- Completed Targets Dialog -->
+    <string name="completed_targets_title">Completed Goals</string>
+    <string name="no_completed_targets">No completed goals</string>
+    <string name="close_button">Close</string>
+
+    <!-- Level Up Dialog -->
+    <string name="level_up_title">🎉 Congratulations!</string>
+    <string name="level_up_reached">You reached level %1$d!</string>
+    <string name="level_up_skill_points">You received 5 skill points.</string>
+    <string name="level_up_unspent_points">Total unspent points: %1$d</string>
+    <string name="later_button">Later</string>
+    <string name="distribute_button">Distribute</string>
+
+    <!-- Week Bar -->
+    <string name="prev_week_description">Previous week</string>
+    <string name="next_week_description">Next week</string>
+
+    <!-- Target List Card -->
+    <string name="add_target_button">+ Add goal</string>
+    <string name="view_completed">Completed</string>
+    <string name="view_completed_with_count">Completed (%1$d)</string>
+
+    <!-- Add / Edit Target -->
+    <string name="add_target_title">New Goal</string>
+    <string name="edit_target_title">Goal Settings</string>
+    <string name="target_name_label">Name</string>
+    <string name="target_days_label">Number of days</string>
+    <string name="target_days_input_label">Enter number of days</string>
+    <string name="target_deadline_label">Deadline (optional)</string>
+    <string name="delete_target_button">Delete goal</string>
+    <string name="add_button">Add</string>
+    <string name="ok_button">OK</string>
+    <string name="completed_days_count">Completed days: %1$d</string>
+
+    <!-- AI Mode Screen -->
+    <string name="ai_mode_screen_title">AI Mode</string>
+    <string name="ai_mode_input_placeholder">Enter text…</string>
+    <string name="ai_mode_send_button">Send</string>
+    <string name="ai_mode_back_content_description">Back</string>
+    <string name="ai_mode_mic_content_description">Record voice</string>
 
 </resources>

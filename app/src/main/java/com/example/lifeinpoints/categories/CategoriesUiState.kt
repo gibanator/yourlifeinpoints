@@ -4,7 +4,8 @@ package com.example.lifeinpoints.categories
 data class CategoriesUiState(
     val categories: List<CategoryUiItem> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val switchingCategoryIds: Set<Int> = emptySet()
 )
 
 data class CategoryUiItem(

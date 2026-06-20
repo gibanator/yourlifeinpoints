@@ -83,4 +83,23 @@ class RegisterViewModel @Inject constructor(
             }
         }
     }
+
+    fun loginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                repository.loginWithGoogle(idToken)
+                _uiState.update { it.copy(isLoading = false) }
+                _events.emit(RegisterEvent.Success)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = e.message ?: "Google sign-in failed")
+                }
+            }
+        }
+    }
+
+    fun onGoogleSignInError(message: String) {
+        _uiState.update { it.copy(errorMessage = message) }
+    }
 }

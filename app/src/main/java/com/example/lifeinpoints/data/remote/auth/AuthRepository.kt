@@ -5,13 +5,14 @@ import com.example.lifeinpoints.data.remote.api.AuthApi
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
-import java.io.IOException
-import javax.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.io.IOException
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -50,15 +51,43 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    suspend fun loginWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val user = firebaseAuth.signInWithCredential(credential).awaitResult().user
+            ?: throw IllegalStateException("Google authentication returned no user")
+
+        val email = user.email?.trim().orEmpty()
+        if (email.isBlank()) {
+            throw IllegalStateException("Google account did not provide an email address")
+        }
+
+        if (user.displayName.isNullOrBlank()) {
+            val username = email.substringBefore('@').trim()
+            if (username.isBlank()) {
+                throw IllegalStateException("Google account did not provide a username")
+            }
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setDisplayName(username)
+                .build()
+            user.updateProfile(profileUpdates).awaitResult()
+        }
+
+        syncMe()
+    }
+
     fun logout() {
         firebaseAuth.signOut()
     }
 
     suspend fun syncMe() {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("User is not signed in")
-        val token = user.getIdToken(false).awaitResult().token
+        val user = firebaseAuth.currentUser
+            ?: throw IllegalStateException("User is not signed in")
+
+        val token = user.getIdToken(true).awaitResult().token
             ?: throw IllegalStateException("Firebase ID token is missing")
+
         val response = authApi.syncMe("Bearer $token")
+
         if (!response.isSuccessful) {
             throw IOException("Failed to sync user: HTTP ${response.code()}")
         }

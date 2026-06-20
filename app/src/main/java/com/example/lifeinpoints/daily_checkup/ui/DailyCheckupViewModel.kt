@@ -10,6 +10,7 @@ import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.data.level.LevelRepository
+import com.example.lifeinpoints.data.target.TargetRepository
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +32,8 @@ class DailyCheckupViewModel @Inject constructor(
     private val dailyProgressRepo: DailyCategoryProgressRepository,
     private val dayCompletionRepo: DayCompletionRepository,
     private val commentTemplateRepo: CommentTemplateRepository,
-    private val levelRepository: LevelRepository, // Добавляем репозиторий уровней
+    private val levelRepository: LevelRepository,
+    private val targetRepository: TargetRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,9 +41,11 @@ class DailyCheckupViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
 
-    // Для отслеживания повышения уровня
     private val _levelUpEvent = MutableStateFlow<Int?>(null)
     val levelUpEvent = _levelUpEvent.asStateFlow()
+
+    private val _targetGoalReachedEvent = MutableStateFlow<List<TargetUi>>(emptyList())
+    val targetGoalReachedEvent = _targetGoalReachedEvent.asStateFlow()
 
     private var initJob: Job? = null
 
@@ -51,12 +55,11 @@ class DailyCheckupViewModel @Inject constructor(
 
         Log.d("VM", "init(), vmId=$id, dateArg=$dateStr, parsed=$today")
 
-        // Подписываемся на изменения видимых категорий
-        viewModelScope.launch {
-            categoryRepository.observeVisibleCategories().collect { _ ->
-                // Обновляем состояние, когда меняются видимые категории
-                initStateForDay(today)
-            }
+        _uiState.update {
+            it.copy(
+                selectedDate = today,
+                currentWeek = mapToUi(weekDatesOf(today), today)
+            )
         }
 
         viewModelScope.launch {
@@ -74,6 +77,35 @@ class DailyCheckupViewModel @Inject constructor(
                 _uiState.update { it.copy(templatesByCategory = map) }
             }
         }
+
+        viewModelScope.launch {
+            targetRepository.observeAll().collect { entities ->
+                val targets = entities
+                    .filter { !it.isCompleted }
+                    .map { e ->
+                        val deadline = e.deadlineMillis?.let { millis ->
+                            java.time.Instant.ofEpochMilli(millis)
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate()
+                        }
+                        TargetUi(id = e.id, name = e.name, nameKey = null, days = e.days, daysSelected = e.daysSelected, deadline = deadline)
+                    }
+                _uiState.update { it.copy(targets = targets) }
+            }
+        }
+
+        viewModelScope.launch {
+            targetRepository.observeCompleted().collect { entities ->
+                val completed = entities.map { e ->
+                    TargetUi(id = e.id, name = e.name, nameKey = null, days = e.days, daysSelected = e.daysSelected, deadline = null)
+                }
+                _uiState.update { it.copy(completedTargets = completed) }
+            }
+        }
+    }
+
+    fun refreshCurrentDay() {
+        loadDay(_uiState.value.selectedDate)
     }
 
     /**
@@ -106,7 +138,11 @@ class DailyCheckupViewModel @Inject constructor(
         val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
         val visibleCategories = categoryRepository
             .getVisibleCategoriesCreatedBefore(selectedDayMillis)
-            .map { CategoryUi(id = it.id, name = it.name, isSystem = it.isSystem, nameKey = it.nameKey) }
+            .mapNotNull { category ->
+                category.id?.let { id ->
+                    CategoryUi(id = id, name = category.name, isSystem = false, nameKey = null)
+                }
+            }
 
         val visibleIds = visibleCategories.map { category -> category.id }.toSet()
 
@@ -120,6 +156,8 @@ class DailyCheckupViewModel @Inject constructor(
                 cat.id to list
             }
 
+        val selectedTargetIds = targetRepository.getSelectedForDate(selected.toString())
+
         update { state ->
             state.copy(
                 selectedDate = selected,
@@ -128,11 +166,12 @@ class DailyCheckupViewModel @Inject constructor(
                     .filter { categoryId -> categoryId in visibleIds }
                     .toSet(),
                 allCategories = visibleCategories,
-                orderedCategories = visibleCategories, // Сохраняем упорядоченный список видимых категорий
+                orderedCategories = visibleCategories,
                 isDayEnded = isDayCompleted,
                 savedComments = savedComments,
                 commentDrafts = drafts,
-                templatesByCategory = templatesByCategory
+                templatesByCategory = templatesByCategory,
+                selectedTargets = selectedTargetIds
             )
         }
         savedStateHandle["selectedDay"] = selected.toString()
@@ -259,6 +298,13 @@ class DailyCheckupViewModel @Inject constructor(
 
             _uiState.update { it.copy(isDayEnded = true) }
             saveProgress()
+
+            val goalReached = targetRepository.getGoalReachedTargets()
+            if (goalReached.isNotEmpty()) {
+                _targetGoalReachedEvent.value = goalReached.map { e ->
+                    TargetUi(id = e.id, name = e.name, nameKey = null, days = e.days, daysSelected = e.daysSelected, deadline = null)
+                }
+            }
         }
     }
     private suspend fun calculateXpForCurrentState(): Int {
@@ -386,6 +432,44 @@ class DailyCheckupViewModel @Inject constructor(
     // Метод для сброса события повышения уровня (вызывается после показа диалога)
     fun levelUpEventConsumed() {
         _levelUpEvent.value = null
+    }
+
+    fun addTarget(name: String, days: Int, deadline: LocalDate?) {
+        viewModelScope.launch {
+            targetRepository.addTarget(name, days, deadline)
+        }
+    }
+
+    fun consumeNextTargetGoalEvent() {
+        _targetGoalReachedEvent.update { it.drop(1) }
+    }
+
+    fun completeTargetAndNext(id: Int) {
+        viewModelScope.launch { targetRepository.completeTarget(id) }
+        consumeNextTargetGoalEvent()
+    }
+
+    fun extendTargetAndNext(id: Int, additionalDays: Int) {
+        viewModelScope.launch { targetRepository.extendTarget(id, additionalDays) }
+        consumeNextTargetGoalEvent()
+    }
+
+    fun updateTarget(id: Int, name: String, days: Int, deadline: LocalDate?) {
+        viewModelScope.launch { targetRepository.updateTarget(id, name, days, deadline) }
+    }
+
+    fun deleteTarget(id: Int) {
+        viewModelScope.launch { targetRepository.deleteTarget(id) }
+    }
+
+    fun toggleTarget(targetId: Int) {
+        viewModelScope.launch {
+            val date = _uiState.value.selectedDate.toString()
+            val nowSelected = targetRepository.toggleSelection(targetId, date)
+            val newSet = _uiState.value.selectedTargets.toMutableSet()
+            if (nowSelected) newSet.add(targetId) else newSet.remove(targetId)
+            _uiState.update { it.copy(selectedTargets = newSet) }
+        }
     }
 
     fun showAiMode() {

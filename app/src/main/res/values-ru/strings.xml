@@ -72,11 +72,25 @@
     <string name="registration_error_all_required">Все поля обязательны</string>
     <string name="registration_error_password_mismatch">Пароли не совпадают</string>
     <string name="registration_info_card">Зарегистрировавшись, вы сможете синхронизировать свои данные между несколькими устройствами.</string>
+    <string name="registration_google_button">Зарегистрироваться через Google</string>
+    <string name="registration_google_error">Не удалось войти через Google. Попробуйте ещё раз.</string>
 
     <!-- Success Messages -->
     <string name="category_added_success">Категория создана успешно</string>
     <string name="category_updated_success">Категория обновлена успешно</string>
     <string name="category_deleted_success">Категория удалена успешно</string>
+
+    <!-- Error Messages -->
+    <string name="error_user_not_signed_in">Пользователь не вошёл в аккаунт</string>
+    <string name="error_firebase_token_missing">Отсутствует Firebase ID токен</string>
+    <string name="error_categories_load_failed">Не удалось загрузить категории</string>
+    <string name="error_category_not_found">Категория не найдена</string>
+    <string name="error_category_create_failed">Не удалось создать категорию</string>
+    <string name="error_category_create_failed_http">Не удалось создать категорию: HTTP %1$d</string>
+    <string name="error_category_update_failed_http">Не удалось обновить категорию: HTTP %1$d</string>
+    <string name="error_category_delete_failed_http">Не удалось удалить категорию: HTTP %1$d</string>
+    <string name="error_progress_load_failed_http">Не удалось загрузить прогресс: HTTP %1$d</string>
+    <string name="error_progress_save_failed_http">Не удалось сохранить прогресс: HTTP %1$d</string>
 
     <!-- Learn screen -->
     <string name="start_sc_title">Добро пожаловать в Life in Points!</string>
@@ -112,5 +126,50 @@
     <string name="theme_preview_dark_stone_subtitle">Всегда использовать тёмную тему</string>
     <string name="theme_preview_light_stone_title">Светлая каменная</string>
     <string name="theme_preview_light_stone_subtitle">Всегда использовать светлую тему</string>
+
+    <!-- Daily Checkup Card Titles -->
+    <string name="card_title_productivity_points">Баллы продуктивности</string>
+    <string name="card_title_goals">Цели</string>
+
+    <!-- Completed Targets Dialog -->
+    <string name="completed_targets_title">Завершённые цели</string>
+    <string name="no_completed_targets">Нет завершённых целей</string>
+    <string name="close_button">Закрыть</string>
+
+    <!-- Level Up Dialog -->
+    <string name="level_up_title">🎉 Поздравляем!</string>
+    <string name="level_up_reached">Вы достигли уровня %1$d!</string>
+    <string name="level_up_skill_points">Вы получили 5 очков навыков.</string>
+    <string name="level_up_unspent_points">Всего нераспределённых очков: %1$d</string>
+    <string name="later_button">Позже</string>
+    <string name="distribute_button">Распределить</string>
+
+    <!-- Week Bar -->
+    <string name="prev_week_description">Предыдущая неделя</string>
+    <string name="next_week_description">Следующая неделя</string>
+
+    <!-- Target List Card -->
+    <string name="add_target_button">+ Добавить цель</string>
+    <string name="view_completed">Завершённые</string>
+    <string name="view_completed_with_count">Завершённые (%1$d)</string>
+
+    <!-- Add / Edit Target -->
+    <string name="add_target_title">Новая цель</string>
+    <string name="edit_target_title">Настройка цели</string>
+    <string name="target_name_label">Название</string>
+    <string name="target_days_label">Количество дней</string>
+    <string name="target_days_input_label">Введите количество дней</string>
+    <string name="target_deadline_label">Дедлайн (необязательно)</string>
+    <string name="delete_target_button">Удалить цель</string>
+    <string name="add_button">Добавить</string>
+    <string name="ok_button">OK</string>
+    <string name="completed_days_count">Выполнено дней: %1$d</string>
+
+    <!-- AI Mode Screen -->
+    <string name="ai_mode_screen_title">AI режим</string>
+    <string name="ai_mode_input_placeholder">Введите текст…</string>
+    <string name="ai_mode_send_button">Отправить</string>
+    <string name="ai_mode_back_content_description">Назад</string>
+    <string name="ai_mode_mic_content_description">Записать голос</string>
 
 </resources>

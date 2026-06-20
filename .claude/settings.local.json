@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep -l \"fun AppTopAppBar\")",
+      "mcp__ide__getDiagnostics",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Koliasik\\\\YourLivePoints\\\\ProjectPoint\\\\app\\\\src\\\\main\\\\java\" -Recurse -Filter \"*.kt\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(grep -v \"^\\\\s*//\")",
+      "Bash(git -C /c/Users/Koliasik/YourLivePoints/ProjectPoint/.claude/worktrees/agent-a729b58691c55e2e0 show HEAD:app/src/main/java/com/example/lifeinpoints/daily_checkup/ui/AddTargetScreen.kt)",
+      "Bash(git -C /c/Users/Koliasik/YourLivePoints/ProjectPoint/.claude/worktrees/agent-a729b58691c55e2e0 status --short)",
+      "PowerShell(git *)",
+      "Bash(grep -v \"//\\\\|stringResource\\\\|Log\\\\.\\\\|\\\\.tag\\\\|format\\\\|pattern\\\\|toString\\\\|R\\\\.\\\\|\\\\.dp\\\\|\\\\.sp\\\\|\\\\.f\\\\b\")"
+    ]
+  }
+}

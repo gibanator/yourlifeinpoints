@@ -1,6 +1,8 @@
 package com.example.lifeinpoints.di
 
 import com.example.lifeinpoints.data.remote.api.AuthApi
+import com.example.lifeinpoints.data.remote.api.CategoryApi
+import com.example.lifeinpoints.data.remote.api.ProgressApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,5 +29,17 @@ object NetworkModule {
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryApi(retrofit: Retrofit): CategoryApi {
+        return retrofit.create(CategoryApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProgressApi(retrofit: Retrofit): ProgressApi {
+        return retrofit.create(ProgressApi::class.java)
     }
 }
