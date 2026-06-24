@@ -2,6 +2,12 @@ package com.example.lifeinpoints.daily_checkup.ui
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -59,6 +66,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -104,6 +112,10 @@ fun DailyCheckupScreen(
     var showAddTargetSheet by remember { mutableStateOf(false) }
     var editingTarget by remember { mutableStateOf<TargetUi?>(null) }
     var showCompletedTargets by remember { mutableStateOf(false) }
+
+    // Какая из двух карточек (Productivity Points / Goals) сейчас раскрыта.
+    // Всегда раскрыта ровно одна, вторая свёрнута до заголовка.
+    var expandedCard by remember { mutableStateOf(MainCard.Categories) }
 
     // Состояние для скролла всего экрана
     val scrollState = rememberScrollState()
@@ -182,6 +194,8 @@ fun DailyCheckupScreen(
                             selectedCategories = uiState.selectedCategories,
                             isDayEnded = uiState.isDayEnded,
                             isMultiplierMode = uiState.isMultiplierMode,
+                            expanded = expandedCard == MainCard.Categories,
+                            onHeaderClick = { expandedCard = MainCard.Categories },
                             onCategoryClick = { id -> vm.toggleCategory(id) },
                             onToggleMultiplierMode = { vm.toggleMultiplierMode() },
                             onAddComment = onNavigateToComments,
@@ -192,6 +206,8 @@ fun DailyCheckupScreen(
                             selectedTargets = uiState.selectedTargets,
                             isDayEnded = uiState.isDayEnded,
                             completedCount = uiState.completedTargets.size,
+                            expanded = expandedCard == MainCard.Goals,
+                            onHeaderClick = { expandedCard = MainCard.Goals },
                             onTargetClick = { id -> vm.toggleTarget(id) },
                             onTargetSettingsClick = { target -> editingTarget = target },
                             onAddTarget = { showAddTargetSheet = true },
@@ -512,6 +528,8 @@ fun CategoryListCard(
     selectedCategories: Set<Int>,
     isDayEnded: Boolean,
     isMultiplierMode: Boolean,
+    expanded: Boolean,
+    onHeaderClick: () -> Unit,
     onCategoryClick: (Int) -> Unit,
     onToggleMultiplierMode: () -> Unit,
     onAddComment: () -> Unit,
@@ -525,37 +543,47 @@ fun CategoryListCard(
         shape = MaterialTheme.shapes.small
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
-            Text(
-                text = stringResource(R.string.card_title_productivity_points),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+            CollapsibleCardHeader(
+                title = stringResource(R.string.card_title_productivity_points),
+                expanded = expanded,
+                onClick = onHeaderClick
             )
-            // Список категорий - теперь без внутреннего скролла
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
-                categories.forEach { category ->
-                    val isSelected = category.id in selectedCategories
-                    CategoryRow(
-                        category = categoryDisplayName(category.name, category.nameKey, category.isSystem),
-                        isSelected = isSelected,
-                        isDayEnded = isDayEnded,
-                        onCategoryClick = { onCategoryClick(category.id) }
+                Column(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Список категорий - теперь без внутреннего скролла
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        categories.forEach { category ->
+                            val isSelected = category.id in selectedCategories
+                            CategoryRow(
+                                category = categoryDisplayName(category.name, category.nameKey, category.isSystem),
+                                isSelected = isSelected,
+                                isDayEnded = isDayEnded,
+                                onCategoryClick = { onCategoryClick(category.id) }
+                            )
+                        }
+                    }
+
+                    // Ряд с двумя кнопками
+                    ActionButtonsRow(
+                        selectedCount = selectedCategories.size,
+                        totalCount = if (isMultiplierMode) categories.size * 31 else categories.size,
+                        onToggleMultiplierMode = onToggleMultiplierMode,
+                        onAddComment = onAddComment,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-
-            // Ряд с двумя кнопками
-            ActionButtonsRow(
-                selectedCount = selectedCategories.size,
-                totalCount = if (isMultiplierMode) categories.size * 31 else categories.size,
-                onToggleMultiplierMode = onToggleMultiplierMode,
-                onAddComment = onAddComment,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }
@@ -566,6 +594,8 @@ fun TargetListCard(
     selectedTargets: Set<Int>,
     isDayEnded: Boolean,
     completedCount: Int,
+    expanded: Boolean,
+    onHeaderClick: () -> Unit,
     onTargetClick: (Int) -> Unit,
     onTargetSettingsClick: (TargetUi) -> Unit,
     onAddTarget: () -> Unit,
@@ -580,46 +610,97 @@ fun TargetListCard(
             shape = MaterialTheme.shapes.small
         ){
             Column(
-                modifier = Modifier.padding(gap),
-                verticalArrangement = Arrangement.spacedBy(gap)
+                modifier = Modifier.padding(gap)
             ) {
-                Text(
-                    text = stringResource(R.string.card_title_goals),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                CollapsibleCardHeader(
+                    title = stringResource(R.string.card_title_goals),
+                    expanded = expanded,
+                    onClick = onHeaderClick
                 )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(gap)
+                AnimatedVisibility(
+                    visible = expanded,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
                 ) {
-                    targets.forEach { target ->
-                        TargetRow(
-                            target = target,
-                            isSelected = target.id in selectedTargets,
-                            isDayEnded = isDayEnded,
-                            onTargetClick = { onTargetClick(target.id) },
-                            onSettingsClick = { onTargetSettingsClick(target) }
-                        )
+                    Column(
+                        modifier = Modifier.padding(top = gap),
+                        verticalArrangement = Arrangement.spacedBy(gap)
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(gap)
+                        ) {
+                            targets.forEach { target ->
+                                TargetRow(
+                                    target = target,
+                                    isSelected = target.id in selectedTargets,
+                                    isDayEnded = isDayEnded,
+                                    onTargetClick = { onTargetClick(target.id) },
+                                    onSettingsClick = { onTargetSettingsClick(target) }
+                                )
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(gap)
+                        ) {
+                            TargetActionCard(
+                                text = stringResource(R.string.add_target_button),
+                                onClick = onAddTarget,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TargetActionCard(
+                                text = if (completedCount > 0) stringResource(R.string.view_completed_with_count, completedCount) else stringResource(R.string.view_completed),
+                                onClick = onViewCompleted,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(gap)
-                ) {
-                    TargetActionCard(
-                        text = stringResource(R.string.add_target_button),
-                        onClick = onAddTarget,
-                        modifier = Modifier.weight(1f)
-                    )
-                    TargetActionCard(
-                        text = if (completedCount > 0) stringResource(R.string.view_completed_with_count, completedCount) else stringResource(R.string.view_completed),
-                        onClick = onViewCompleted,
-                        modifier = Modifier.weight(1f)
-                    )
                 }
             }
         }
     }
 }
+
+/**
+ * Заголовок сворачиваемой карточки на главном экране.
+ * В свёрнутом виде остаётся только этот ряд (заголовок + стрелка),
+ * поэтому высота карточки = заголовок + одинаковый отступ сверху и снизу.
+ * Стрелка плавно поворачивается при разворачивании.
+ */
+@Composable
+private fun CollapsibleCardHeader(
+    title: String,
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val arrowRotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "cardHeaderArrow"
+    )
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = Icons.Filled.KeyboardArrowDown,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.rotate(arrowRotation)
+        )
+    }
+}
+
+/** Две сворачиваемые карточки главного экрана; раскрыта всегда ровно одна. */
+private enum class MainCard { Categories, Goals }
 
 @Composable
 fun TargetActionCard(
