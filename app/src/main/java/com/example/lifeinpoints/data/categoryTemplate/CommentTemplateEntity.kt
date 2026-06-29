@@ -12,20 +12,22 @@ import com.example.lifeinpoints.data.category.CategoryEntity
     foreignKeys = [
         ForeignKey(
             entity = CategoryEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["categoryId"],
+            parentColumns = ["localId"],
+            childColumns = ["categoryLocalId"],
             onDelete = CASCADE
         )
     ],
     indices = [
-        Index("categoryId"),
-        Index(value = ["categoryId", "position"], unique = true)
+        Index("categoryLocalId"),
+        Index(value = ["categoryLocalId", "position"], unique = true)
     ]
 )
 data class CommentTemplateEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val categoryId: Long,
-    val position: Int, // 0..4
+
+    val categoryLocalId: Int,
+
+    val position: Int,
     val text: String
 )

@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,7 +22,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,12 +41,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.AppTopAppBar
 import com.example.lifeinpoints.core.ui.AutoSizeText
 import com.example.lifeinpoints.core.ui.theme.ThemeType
-import androidx.compose.ui.unit.sp
+import com.example.lifeinpoints.data.outbox.SyncStatus
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +65,7 @@ fun SettingsScreen(
 ) {
     val currentTheme by vm.currentTheme.collectAsState()
     val gameModeEnabled by vm.gameModeEnabled.collectAsState()
+    val syncStatus by vm.syncStatus.collectAsState()
 
     Scaffold(
         topBar = {
@@ -146,6 +149,10 @@ fun SettingsScreen(
                 text = stringResource(R.string.auth_section_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
+            )
+
+            SyncStatusCard(
+                status = syncStatus,
             )
 
             AuthCard(
@@ -528,6 +535,56 @@ fun LanguageSettingsCard() {
                 Text(
                     text = stringResource(R.string.settings_language_subtitle_system),
                     style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SyncStatusCard(
+    status: SyncStatus,
+    modifier: Modifier = Modifier
+) {
+    val subtitle = when (status) {
+        SyncStatus.Synced -> "Your progress is safe"
+        SyncStatus.NotLoggedIn -> "Log in to sync"
+        is SyncStatus.Pending -> "${status.count} waiting"
+        is SyncStatus.Error -> "Sync unavailable"
+    }
+
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 10.dp,
+                vertical = 6.dp
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "☁",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            Column {
+                Text(
+                    text = "Cloud Sync",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

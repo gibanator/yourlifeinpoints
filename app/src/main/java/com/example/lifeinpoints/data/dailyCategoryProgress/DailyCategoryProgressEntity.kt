@@ -8,23 +8,23 @@ import com.example.lifeinpoints.data.category.CategoryEntity
 
 @Entity(
     tableName = "daily_category_progress",
-    primaryKeys = ["date", "categoryId"],
+    primaryKeys = ["date", "categoryLocalId"],
     foreignKeys = [
         ForeignKey(
             entity = CategoryEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["categoryId"],
+            parentColumns = ["localId"],
+            childColumns = ["categoryLocalId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
-        Index(value = ["categoryId"])
+        Index(value = ["categoryLocalId"])
     ]
 )
 data class DailyCategoryProgressEntity(
-    val categoryId: Int,
+    val categoryLocalId: Int,
 
-    val date: String, // формат "YYYY-MM-DD"
+    val date: String,
 
     val value: Boolean,
 

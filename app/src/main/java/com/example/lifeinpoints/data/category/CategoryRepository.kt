@@ -48,7 +48,7 @@ class CategoryRepository @Inject constructor(
 
             categories.value = sortCategories(
                 categories.value + CategoryDto(
-                    id = createdId,
+                    id = createdId.toInt(),
                     name = trimmedName,
                     active = true,
                     visible = true
@@ -67,7 +67,7 @@ class CategoryRepository @Inject constructor(
             val trimmedName = name.trim()
             val response = categoryApi.updateCategory(
                 authorization = authHeader(),
-                id = categoryId,
+                id = categoryId.toLong(),
                 request = CategoryUpdateRequest(
                     name = trimmedName,
                     active = active,
@@ -94,7 +94,7 @@ class CategoryRepository @Inject constructor(
         return runCatching {
             val response = categoryApi.deleteCategory(
                 authorization = authHeader(),
-                id = categoryId
+                id = categoryId.toLong()
             )
             Log.d("CategoryDebug", "delete id = $categoryId")
 

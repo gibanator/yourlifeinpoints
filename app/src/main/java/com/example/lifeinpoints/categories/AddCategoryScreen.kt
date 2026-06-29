@@ -58,21 +58,25 @@ fun AddCategoryScreen(
                         onClick = {
                             if (categoryName.isNotBlank()) {
                                 coroutineScope.launch {
-                                    val createdAtForVisibility = when (startMode) {
-                                        CategoryStartMode.TODAY -> LocalDate.now().toEpochMilliAtStartOfDay()
-                                        CategoryStartMode.PICK_DATE -> pickedDate.toEpochMilliAtStartOfDay()
-                                        CategoryStartMode.FROM_START -> 0L
-                                    }
-
-
-                                    val result = viewModel.addCategory(
-                                        categoryName.trim(),
-                                        createdAt = createdAtForVisibility
-                                    )
-
-                                    if (result.isSuccess) {
+                                    isLoading = true
+                                    errorMessage = null
+                                    try {
+                                        val createdAtForVisibility = when (startMode) {
+                                            CategoryStartMode.TODAY -> LocalDate.now().toEpochMilliAtStartOfDay()
+                                            CategoryStartMode.PICK_DATE -> pickedDate.toEpochMilliAtStartOfDay()
+                                            CategoryStartMode.FROM_START -> 0L
+                                        }
+                                        viewModel.addCategory(
+                                            categoryName.trim(),
+                                            createdAt = createdAtForVisibility
+                                        )
                                         onCategoryAdded()
+                                    } catch (e: Exception) {
+                                        errorMessage = e.message
+                                    } finally {
+                                        isLoading = false
                                     }
+
                                 }
                             }
                         },

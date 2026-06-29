@@ -24,7 +24,7 @@ class CommentTemplatesViewModel @Inject constructor(
     val isSystem: StateFlow<Boolean> = _isSystem.asStateFlow()
 
     fun observeTemplates(categoryId: Int): Flow<List<CommentTemplateEntity>> {
-        return templatesRepository.observeByCategory(categoryId.toLong())
+        return templatesRepository.observeByCategory(categoryId)
     }
 
     fun loadCategoryName(categoryId: Int) {
@@ -41,7 +41,7 @@ class CommentTemplatesViewModel @Inject constructor(
         require(position in 0..4)
         viewModelScope.launch {
             templatesRepository.upsertTemplate(
-                categoryId = categoryId.toLong(),
+                categoryId = categoryId,
                 position = position,
                 text = text
             )
@@ -51,7 +51,7 @@ class CommentTemplatesViewModel @Inject constructor(
     fun clearSlot(categoryId: Int, position: Int) {
         require(position in 0..4)
         viewModelScope.launch {
-            templatesRepository.clearSlot(categoryId.toLong(), position)
+            templatesRepository.clearSlot(categoryId, position)
         }
     }
 }

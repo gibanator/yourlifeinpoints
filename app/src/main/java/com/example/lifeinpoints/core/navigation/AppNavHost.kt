@@ -1,7 +1,6 @@
 package com.example.lifeinpoints.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -58,9 +57,6 @@ fun AppNavHost(
             )
         ) { backStackEntry ->
             val vm: DailyCheckupViewModel = hiltViewModel(backStackEntry)
-            LaunchedEffect(backStackEntry) {
-                vm.refreshCurrentDay()
-            }
             DailyCheckupNavHost(dailyVm = vm)
         }
 

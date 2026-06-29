@@ -29,13 +29,13 @@ interface CategoryApi {
     @DELETE("/api/v1/category/{id}")
     suspend fun deleteCategory(
         @Header("Authorization") authorization: String,
-        @Path("id") id: Int
+        @Path("id") id: Long
     ): Response<Unit>
 
     @PATCH("/api/v1/category/{id}")
     suspend fun updateCategory(
         @Header("Authorization") authorization: String,
-        @Path("id") id: Int,
+        @Path("id") id: Long,
         @Body request: CategoryUpdateRequest
     ): Response<Unit>
 

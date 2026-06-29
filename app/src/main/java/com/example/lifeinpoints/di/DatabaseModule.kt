@@ -4,7 +4,7 @@ package com.example.lifeinpoints.di
 import android.content.Context
 import androidx.room.Room
 import com.example.lifeinpoints.data.category.CategoryDao
-import com.example.lifeinpoints.data.category.CategoryDatabase
+import com.example.lifeinpoints.data.AppDatabase
 import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateDao
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressDao
 import com.example.lifeinpoints.data.daycompletion.DayCompletionDao
@@ -24,33 +24,36 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): CategoryDatabase =
-        Room.databaseBuilder(context, CategoryDatabase::class.java, "category_db")
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "category_db")
             .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides
-    fun provideCategoryDao(db: CategoryDatabase): CategoryDao = db.categoryDao()
+    fun provideCategoryDao(db: AppDatabase): CategoryDao = db.categoryDao()
 
     @Provides
-    fun provideDailyProgressDao(db: CategoryDatabase): DailyCategoryProgressDao = db.dailyProgressDao()
+    fun provideDailyProgressDao(db: AppDatabase): DailyCategoryProgressDao = db.dailyProgressDao()
 
     @Provides
-    fun provideDayCompletionDao(db: CategoryDatabase): DayCompletionDao = db.dayCompletionDao()
+    fun provideDayCompletionDao(db: AppDatabase): DayCompletionDao = db.dayCompletionDao()
 
     @Provides
-    fun provideCommentTemplateDao(db: CategoryDatabase): CommentTemplateDao = db.commentTemplateDao()
+    fun provideCommentTemplateDao(db: AppDatabase): CommentTemplateDao = db.commentTemplateDao()
 
     // Добавляем новые DAO для системы уровней
     @Provides
-    fun provideLevelProgressDao(db: CategoryDatabase): LevelProgressDao = db.levelProgressDao()
+    fun provideLevelProgressDao(db: AppDatabase): LevelProgressDao = db.levelProgressDao()
 
     @Provides
-    fun provideSkillPointsDao(db: CategoryDatabase): SkillPointsDao = db.skillPointsDao()
+    fun provideSkillPointsDao(db: AppDatabase): SkillPointsDao = db.skillPointsDao()
 
     @Provides
-    fun provideTargetDao(db: CategoryDatabase): TargetDao = db.targetDao()
+    fun provideTargetDao(db: AppDatabase): TargetDao = db.targetDao()
 
     @Provides
-    fun provideTargetSelectionDao(db: CategoryDatabase): TargetSelectionDao = db.targetSelectionDao()
+    fun provideTargetSelectionDao(db: AppDatabase): TargetSelectionDao = db.targetSelectionDao()
+
+    @Provides
+    fun provideOutboxDao(db: AppDatabase) = db.outboxDao()
 }

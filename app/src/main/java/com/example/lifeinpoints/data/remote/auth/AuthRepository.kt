@@ -2,6 +2,7 @@ package com.example.lifeinpoints.data.remote.auth
 
 import android.util.Log
 import com.example.lifeinpoints.data.remote.api.AuthApi
+import com.example.lifeinpoints.data.sync.OutboxSyncer
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -18,7 +19,9 @@ import kotlin.coroutines.resumeWithException
 
 class AuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val authApi: AuthApi
+    private val authApi: AuthApi,
+    private val syncer: OutboxSyncer,
+    private val tokenProvider: AuthTokenProvider
 ) {
     val currentUser: Flow<FirebaseUser?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
@@ -36,14 +39,14 @@ class AuthRepository @Inject constructor(
             .build()
         result.user?.updateProfile(profileUpdates)?.awaitResult()
         syncMe()
+        syncer.syncOnce()
     }
 
     suspend fun login(email: String, password: String) {
         firebaseAuth.signInWithEmailAndPassword(email, password).awaitResult()
         try {
-
             syncMe()
-
+            syncer.syncOnce()
         } catch (e: Exception) {
 
             Log.e("AuthRepository", "Failed to sync user", e)
@@ -73,6 +76,7 @@ class AuthRepository @Inject constructor(
         }
 
         syncMe()
+        syncer.syncOnce()
     }
 
     fun logout() {
@@ -80,13 +84,9 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun syncMe() {
-        val user = firebaseAuth.currentUser
-            ?: throw IllegalStateException("User is not signed in")
+        val token = tokenProvider.getAuthorizationHeader()
 
-        val token = user.getIdToken(true).awaitResult().token
-            ?: throw IllegalStateException("Firebase ID token is missing")
-
-        val response = authApi.syncMe("Bearer $token")
+        val response = authApi.syncMe(token)
 
         if (!response.isSuccessful) {
             throw IOException("Failed to sync user: HTTP ${response.code()}")
@@ -94,7 +94,7 @@ class AuthRepository @Inject constructor(
     }
 }
 
-private suspend fun <T> Task<T>.awaitResult(): T = suspendCancellableCoroutine { continuation ->
+suspend fun <T> Task<T>.awaitResult(): T = suspendCancellableCoroutine { continuation ->
     addOnCompleteListener { task ->
         val exception = task.exception
         when {

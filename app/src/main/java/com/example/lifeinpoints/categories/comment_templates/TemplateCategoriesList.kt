@@ -49,10 +49,6 @@ fun CommentTemplatesCategoriesScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        vm.loadCategories()
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
