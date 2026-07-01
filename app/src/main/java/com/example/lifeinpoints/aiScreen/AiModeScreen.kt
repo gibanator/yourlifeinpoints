@@ -18,13 +18,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +46,10 @@ import com.example.lifeinpoints.R
 @Composable
 fun AiModeScreen(
     vm: AiModeViewModel = hiltViewModel(),
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onSubmit: (String) -> Unit = {},
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -94,6 +100,14 @@ fun AiModeScreen(
                 placeholder = { Text(stringResource(R.string.ai_mode_input_placeholder)) },
                 maxLines = Int.MAX_VALUE,
             )
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(gapSmall))
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
             Spacer(modifier = Modifier.height(gapMedium))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -101,15 +115,24 @@ fun AiModeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { /* TODO: отправить запрос в нейросеть */ },
+                    onClick = { onSubmit(uiState.inputText) },
+                    enabled = uiState.inputText.isNotBlank() && !isLoading,
                     modifier = Modifier.weight(2f)
                 ) {
-                    Icon(Icons.Filled.Send, contentDescription = null)
-                    Spacer(modifier = Modifier.width(iconTextGap))
-                    Text(stringResource(R.string.ai_mode_send_button))
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(Icons.Filled.Send, contentDescription = null)
+                        Spacer(modifier = Modifier.width(iconTextGap))
+                        Text(stringResource(R.string.ai_mode_send_button))
+                    }
                 }
                 FilledIconButton(
                     onClick = { /* TODO: запись голоса */ },
+                    enabled = !isLoading,
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
