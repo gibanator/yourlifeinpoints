@@ -56,4 +56,3 @@ data class DailyCheckupUiState (
 
     val isVoiceRecognitionVisible: Boolean = false
 )
-

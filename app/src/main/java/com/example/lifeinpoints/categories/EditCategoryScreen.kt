@@ -107,10 +107,16 @@ fun EditCategoryScreen(
                             onClick = {
                                 if (categoryName.isNotBlank()) {
                                     coroutineScope.launch {
-                                        val result = viewModel.updateCategory(categoryId, categoryName.trim())
+                                        isLoading = true
+                                        errorMessage = null
 
-                                        if (result.isSuccess) {
+                                        try {
+                                            viewModel.updateCategory(categoryId, categoryName.trim())
                                             onCategoryUpdated()
+                                        } catch (e: Exception) {
+                                            errorMessage = e.message
+                                        } finally {
+                                            isLoading = false
                                         }
                                     }
                                 }
@@ -204,11 +210,16 @@ fun EditCategoryScreen(
                             onClick = {
                                 showDeleteDialog = false
                                 coroutineScope.launch {
-                                    val result = viewModel.deleteCategory(categoryId)
-                                    if (result.isSuccess) {
+                                    isLoading = true
+                                    errorMessage = null
+
+                                    try {
+                                        viewModel.deleteCategory(categoryId)
                                         onCategoryDeleted()
-                                    } else {
-                                        errorMessage = result.exceptionOrNull()?.message
+                                    } catch (e: Exception) {
+                                        errorMessage = e.message
+                                    } finally {
+                                        isLoading = false
                                     }
                                 }
                             },

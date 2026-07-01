@@ -1,18 +1,17 @@
 package com.example.lifeinpoints.data.category
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import androidx.room.Query
 
 @Dao
 interface CategoryDao {
-    // Существующие методы остаются без изменений
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(category: CategoryEntity)
+    suspend fun insert(category: CategoryEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(categories: List<CategoryEntity>)
@@ -20,56 +19,100 @@ interface CategoryDao {
     @Update
     suspend fun update(category: CategoryEntity)
 
-    @Delete
-    suspend fun delete(category: CategoryEntity)
+    @Query("SELECT * FROM categories WHERE localId = :localId")
+    suspend fun getByLocalId(localId: Int): CategoryEntity?
 
-    @Query("SELECT * FROM categories ORDER BY isSystem ASC, sortOrder DESC")
+    @Query("SELECT * FROM categories WHERE localId IN (:localIds)")
+    suspend fun getByLocalIds(localIds: List<Int>): List<CategoryEntity>
+
+    @Query("""
+        SELECT * FROM categories 
+        WHERE isDeleted = 0 
+        ORDER BY isSystem ASC, sortOrder DESC
+    """)
     fun observeAll(): Flow<List<CategoryEntity>>
 
-    @Query("SELECT * FROM categories WHERE id = :id")
-    suspend fun getById(id: Int): CategoryEntity?
-
-    @Query("SELECT * FROM categories ORDER BY isSystem ASC, sortOrder DESC")
-    suspend fun getAll(): List<CategoryEntity>
-
-    @Query("SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(:categoryName)")
-    suspend fun countByName(categoryName: String): Int
-
-    @Query("DELETE FROM categories WHERE isSystem = 0") // Удаляем только пользовательские
-    suspend fun clearUserCategories()
-
-    @Query("UPDATE categories SET isVisible = :isVisible WHERE id = :categoryId")
-    suspend fun setVisibility(categoryId: Int, isVisible: Boolean)
-
-    @Query("SELECT * FROM categories WHERE isVisible = 1 ORDER BY isSystem ASC, sortOrder DESC")
+    @Query("""
+        SELECT * FROM categories 
+        WHERE isVisible = 1 AND isDeleted = 0 
+        ORDER BY isSystem ASC, sortOrder DESC
+    """)
     fun observeVisibleCategories(): Flow<List<CategoryEntity>>
 
-    @Query("SELECT * FROM categories WHERE isVisible = 1 ORDER BY isSystem ASC, sortOrder DESC")
-    suspend fun getVisibleCategories(): List<CategoryEntity>
+    @Query("""
+    SELECT *
+    FROM categories
+    WHERE isVisible = 1
+      AND isDeleted = 0
+      AND createdAt <= :fromTime
+    ORDER BY isSystem ASC, sortOrder DESC
+    """)
+    fun observeVisibleCategoriesCreatedBefore(
+        fromTime: Long
+    ): Flow<List<CategoryEntity>>
 
-    @Query("SELECT * FROM categories WHERE isVisible = 1 AND createdAt <= :fromTime ORDER BY isSystem ASC, sortOrder DESC")
-    suspend fun getVisibleCategoriesCreatedBefore(fromTime: Long): List<CategoryEntity>
+    @Query("""
+        UPDATE categories 
+        SET name = :name, updatedAt = :updatedAt 
+        WHERE localId = :localId
+    """)
+    suspend fun updateName(
+        localId: Int,
+        name: String,
+        updatedAt: Long = System.currentTimeMillis()
+    )
 
-//    @Query("SELECT * FROM categories")
-//    suspend fun getAll(): List<CategoryEntity>
 
-    @Query("SELECT id FROM categories WHERE name IN (:categoryNames)")
-    suspend fun getIdsByName(categoryNames: List<String>): List<Int>
 
-    @Query("SELECT id FROM categories")
-    suspend fun getAllIds(): List<Int>
-//    @Query("SELECT * FROM categories WHERE userId = :userId")
-//    fun observeByUserId(userId: Int): Flow<List<CategoryEntity>>
-//
-//    @Query("SELECT * FROM categories WHERE userId = :userId")
-//    suspend fun getByUserId(userId: Int): List<CategoryEntity>
-//
-//    @Query("DELETE FROM categories WHERE userId = :userId")
-//    suspend fun deleteByUserId(userId: Int)
-//
-//    @Query("SELECT COUNT(*) FROM categories WHERE userId = :userId AND LOWER(name) = LOWER(:categoryName)")
-//    suspend fun countByUserIdAndName(userId: Int, categoryName: String): Int
-//
-//    @Query("SELECT * FROM categories WHERE userId = :userId ORDER BY sortOrder ASC, name ASC")
-//    fun observeByUserIdSorted(userId: Int): Flow<List<CategoryEntity>>
+    @Query("""
+    UPDATE categories
+    SET isVisible = :isVisible,
+        updatedAt = :updatedAt
+    WHERE localId = :localId
+    """)
+    suspend fun setVisibility(
+        localId: Int,
+        isVisible: Boolean,
+        updatedAt: Long
+    )
+
+    @Query("""
+        UPDATE categories 
+        SET isDeleted = 1, isActive = 0, updatedAt = :updatedAt 
+        WHERE localId = :localId
+    """)
+    suspend fun markDeleted(
+        localId: Int,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+
+    @Query("""
+        UPDATE categories 
+        SET serverId = :serverId, updatedAt = :updatedAt 
+        WHERE localId = :localId
+    """)
+    suspend fun setServerId(
+        localId: Int,
+        serverId: Long,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+
+    @Query("""
+    UPDATE categories
+    SET name = :name,
+        isActive = :active,
+        isVisible = :visible,
+        updatedAt = :updatedAt
+    WHERE localId = :localId
+    """)
+    suspend fun updateCategoryFields(
+        localId: Int,
+        name: String,
+        active: Boolean,
+        visible: Boolean,
+        updatedAt: Long
+    )
+
+    @Query("DELETE FROM categories WHERE localId = :localId")
+    suspend fun deleteLocal(localId: Int)
 }

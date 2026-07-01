@@ -10,14 +10,14 @@ class CommentTemplateRepository @Inject constructor(
 ) {
 
     fun observeAll(): Flow<List<CommentTemplateEntity>> = dao.observeAll()
-    fun observeByCategory(categoryId: Long): Flow<List<CommentTemplateEntity>> =
+    fun observeByCategory(categoryId: Int): Flow<List<CommentTemplateEntity>> =
         dao.observeByCategory(categoryId)
 
-    suspend fun getByCategory(categoryId: Long): List<CommentTemplateEntity> =
+    suspend fun getByCategory(categoryId: Int): List<CommentTemplateEntity> =
         dao.getByCategory(categoryId)
 
     suspend fun upsertTemplate(
-        categoryId: Long,
+        categoryId: Int,
         position: Int,
         text: String
     ) {
@@ -29,7 +29,7 @@ class CommentTemplateRepository @Inject constructor(
         } else {
             dao.upsert(
                 CommentTemplateEntity(
-                    categoryId = categoryId,
+                    categoryLocalId = categoryId,
                     position = position,
                     text = trimmed
                 )
@@ -37,7 +37,7 @@ class CommentTemplateRepository @Inject constructor(
         }
     }
 
-    suspend fun clearSlot(categoryId: Long, position: Int) {
+    suspend fun clearSlot(categoryId: Int, position: Int) {
         require(position in 0..4) { "Template position must be 0..4" }
         dao.clearSlot(categoryId, position)
     }

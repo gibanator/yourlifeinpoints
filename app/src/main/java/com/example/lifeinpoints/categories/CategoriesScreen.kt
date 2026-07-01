@@ -35,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,9 +66,6 @@ fun CategoriesScreen(
     var categoryToDelete by remember { mutableStateOf<CategoryUiItem?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        vm.loadCategories()
-    }
 
     Scaffold(
         topBar = {
@@ -155,14 +151,12 @@ fun CategoriesScreen(
                     category = category,
                     onConfirm = {
                         coroutineScope.launch {
-                            val result = vm.deleteCategory(category.id)
-                            if (result.isSuccess) {
-                                // Категория удалена, StateFlow автоматически обновит UI
+                            try {
+                                vm.deleteCategory(category.id)
                                 categoryToDelete = null
-                            } else {
-                                // Можно показать ошибку
-                                println("Failed to delete category: ${result.exceptionOrNull()?.message}")
+                            } catch (e: Exception) {
                                 categoryToDelete = null
+                                // snackbar fail
                             }
                         }
                     },

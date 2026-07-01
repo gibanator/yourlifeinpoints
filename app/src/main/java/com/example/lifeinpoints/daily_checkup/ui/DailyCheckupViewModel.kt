@@ -5,11 +5,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lifeinpoints.data.category.CategoryRepository
+import com.example.lifeinpoints.data.category.CategoryRepositoryNew
 import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
-import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
+import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressEntity
+import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepositoryNew
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.data.level.LevelRepository
+import com.example.lifeinpoints.data.target.TargetEntity
 import com.example.lifeinpoints.data.target.TargetRepository
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
@@ -17,10 +19,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
@@ -28,15 +33,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DailyCheckupViewModel @Inject constructor(
-    private val categoryRepository: CategoryRepository,
-    private val dailyProgressRepo: DailyCategoryProgressRepository,
+    private val categoryRepository: CategoryRepositoryNew,
+    private val dailyProgressRepo: DailyCategoryProgressRepositoryNew,
     private val dayCompletionRepo: DayCompletionRepository,
     private val commentTemplateRepo: CommentTemplateRepository,
     private val levelRepository: LevelRepository,
     private val targetRepository: TargetRepository,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
+    private var dayJob: Job? = null
     private val id = hashCode()
     private val _uiState = MutableStateFlow(DailyCheckupUiState(selectedDate = LocalDate.now()))
     val uiState = _uiState.asStateFlow()
@@ -47,7 +52,6 @@ class DailyCheckupViewModel @Inject constructor(
     private val _targetGoalReachedEvent = MutableStateFlow<List<TargetUi>>(emptyList())
     val targetGoalReachedEvent = _targetGoalReachedEvent.asStateFlow()
 
-    private var initJob: Job? = null
 
     init {
         val dateStr = savedStateHandle.get<String>("date")
@@ -61,132 +65,108 @@ class DailyCheckupViewModel @Inject constructor(
                 currentWeek = mapToUi(weekDatesOf(today), today)
             )
         }
+        observeDay(today)
+        observeCommentTemplates()
+        observeTargets()
+    }
 
-        viewModelScope.launch {
-            commentTemplateRepo.observeAll().collect { allTemplates ->
-                val visibleIds = _uiState.value.orderedCategories.map { it.id }.toSet()
+    private fun observeDay(selected: LocalDate) {
+        dayJob?.cancel()
 
-                val map: Map<Int, List<String>> =
-                    allTemplates
-                        .filter { it.categoryId.toInt() in visibleIds }
-                        .groupBy { it.categoryId.toInt() }
-                        .mapValues { (_, list) ->
-                            list.sortedBy { it.position }.map { it.text }
-                        }
+        dayJob = viewModelScope.launch {
+            val date = selected.toString()
+            val week = weekDatesOf(selected)
+            val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
 
-                _uiState.update { it.copy(templatesByCategory = map) }
+            combine(
+                dailyProgressRepo.observeDay(date),
+                categoryRepository.observeVisibleCategoriesCreatedBefore(selectedDayMillis),
+                dayCompletionRepo.observeDayCompletion(date)
+            ) { rows, categories, isDayEnded ->
+                Triple(rows, categories, isDayEnded)
+            }.collect { (rows, categories, isDayEnded) ->
+
+                val visibleCategories = categories.map { category ->
+                    CategoryUi(
+                        id = category.localId,
+                        name = category.name,
+                        isSystem = category.isSystem,
+                        nameKey = null
+                    )
+                }
+
+                val visibleIds = visibleCategories.map { it.id }.toSet()
+
+                val completedCategories = rows
+                    .filter { it.value }
+                    .map { it.categoryLocalId }
+                    .filter { it in visibleIds }
+                    .toSet()
+
+                val savedComments = rows.associate { it.categoryLocalId to it.comment }
+
+                val drafts = savedComments.mapValues { (_, comment) ->
+                    comment.orEmpty()
+                }
+
+                _uiState.update { state ->
+                    state.copy(
+                        selectedDate = selected,
+                        currentWeek = mapToUi(week, selected),
+                        selectedCategories = completedCategories,
+                        allCategories = visibleCategories,
+                        orderedCategories = visibleCategories,
+                        savedComments = savedComments,
+                        commentDrafts = drafts,
+                        isDayEnded = isDayEnded
+                    )
+                }
             }
         }
+    }
 
+    private fun observeCommentTemplates() {
+        viewModelScope.launch {
+            commentTemplateRepo.observeAll().collect { allTemplates ->
+                val visibleIds = _uiState.value.orderedCategories
+                    .map { it.id }
+                    .toSet()
+
+                val templatesByCategory = allTemplates
+                    .filter { it.categoryLocalId in visibleIds }
+                    .groupBy { it.categoryLocalId }
+                    .mapValues { (_, list) ->
+                        list.sortedBy { it.position }.map { it.text }
+                    }
+
+                _uiState.update {
+                    it.copy(templatesByCategory = templatesByCategory)
+                }
+            }
+        }
+    }
+
+    private fun observeTargets() {
         viewModelScope.launch {
             targetRepository.observeAll().collect { entities ->
                 val targets = entities
                     .filter { !it.isCompleted }
-                    .map { e ->
-                        val deadline = e.deadlineMillis?.let { millis ->
-                            java.time.Instant.ofEpochMilli(millis)
-                                .atZone(java.time.ZoneId.systemDefault())
-                                .toLocalDate()
-                        }
-                        TargetUi(id = e.id, name = e.name, nameKey = null, days = e.days, daysSelected = e.daysSelected, deadline = deadline)
-                    }
-                _uiState.update { it.copy(targets = targets) }
+                    .map { it.toTargetUi() }
+
+                _uiState.update {
+                    it.copy(targets = targets)
+                }
             }
         }
 
         viewModelScope.launch {
             targetRepository.observeCompleted().collect { entities ->
-                val completed = entities.map { e ->
-                    TargetUi(id = e.id, name = e.name, nameKey = null, days = e.days, daysSelected = e.daysSelected, deadline = null)
-                }
-                _uiState.update { it.copy(completedTargets = completed) }
-            }
-        }
-    }
+                val completedTargets = entities.map { it.toTargetUi() }
 
-    fun refreshCurrentDay() {
-        loadDay(_uiState.value.selectedDate)
-    }
-
-    /**
-     * Function for initializing the state for a date. Gets the data for day from the database and
-     * applies it to UiState.
-     *
-     * @param selected Date to initialize
-     */
-    private suspend fun initStateForDay(selected: LocalDate) {
-        Log.d("VM", "initStateForDay() CALLED, vmId=$id, day=$selected")
-        val week = weekDatesOf(selected)
-
-        val rows = dailyProgressRepo.getByDate(selected.toString())
-        val completedCategories: Set<Int> =
-            rows
-                .filter { it.value }
-                .map { it.categoryId }
-                .toSet()
-
-        val savedComments: Map<Int, String?> =
-            rows.associate { it.categoryId to it.comment }
-
-        val drafts: Map<Int, String> =
-            savedComments.mapValues { (_, c) -> c.orEmpty() }
-
-        // Получаем состояние завершенности дня из базы
-        val isDayCompleted = dayCompletionRepo.getDayCompletion(selected.toString())
-
-        // которые созданы не позже этой даты
-        val selectedDayMillis = selected.toEpochMilliAtEndOfDay()
-        val visibleCategories = categoryRepository
-            .getVisibleCategoriesCreatedBefore(selectedDayMillis)
-            .mapNotNull { category ->
-                category.id?.let { id ->
-                    CategoryUi(id = id, name = category.name, isSystem = false, nameKey = null)
+                _uiState.update {
+                    it.copy(completedTargets = completedTargets)
                 }
             }
-
-        val visibleIds = visibleCategories.map { category -> category.id }.toSet()
-
-
-        val templatesByCategory: Map<Int, List<String>> =
-            visibleCategories.associate { cat ->
-                val list = commentTemplateRepo
-                    .getByCategory(cat.id.toLong())
-                    .sortedBy { it.position }
-                    .map { it.text }
-                cat.id to list
-            }
-
-        val selectedTargetIds = targetRepository.getSelectedForDate(selected.toString())
-
-        update { state ->
-            state.copy(
-                selectedDate = selected,
-                currentWeek = mapToUi(week, selected),
-                selectedCategories = completedCategories
-                    .filter { categoryId -> categoryId in visibleIds }
-                    .toSet(),
-                allCategories = visibleCategories,
-                orderedCategories = visibleCategories,
-                isDayEnded = isDayCompleted,
-                savedComments = savedComments,
-                commentDrafts = drafts,
-                templatesByCategory = templatesByCategory,
-                selectedTargets = selectedTargetIds
-            )
-        }
-        savedStateHandle["selectedDay"] = selected.toString()
-    }
-
-    /**
-     * Race condition safe function to load a day
-     *
-     * @param date Date
-     */
-    private fun loadDay(date: LocalDate) {
-        initJob?.cancel()
-        initJob = viewModelScope.launch {
-            initStateForDay(date)
-            savedStateHandle["selectedDay"] = date.toString()
         }
     }
 
@@ -219,9 +199,7 @@ class DailyCheckupViewModel @Inject constructor(
             )
         }
 
-        viewModelScope.launch {
-            initStateForDay(newSelected)
-        }
+        observeDay(newSelected)
     }
 
     fun toNextWeek() {
@@ -236,49 +214,44 @@ class DailyCheckupViewModel @Inject constructor(
                 currentWeek = mapToUi(weekDatesOf(newSelected), newSelected)
             )
         }
-        viewModelScope.launch {
-            initStateForDay(newSelected)
-        }
+
+        observeDay(newSelected)
     }
 
     /**
      * Function to toggle category state
      *
-     * @param index Index of the category
+     * @param categoryId id of the category
      */
-    fun toggleCategory(index: Int) {
+    fun toggleCategory(categoryId: Int) {
         val newSelection = _uiState.value.selectedCategories.toMutableSet()
-        if (newSelection.contains(index)) {
-            newSelection.remove(index)
+
+        if (categoryId in newSelection) {
+            newSelection.remove(categoryId)
         } else {
-            newSelection.add(index)
+            newSelection.add(categoryId)
         }
-        Log.d("Categories", "${newSelection.sorted()}")
+
         _uiState.update {
-            it.copy(
-                selectedCategories = newSelection
-            )
+            it.copy(selectedCategories = newSelection)
         }
+
+        saveProgress()
     }
 
     fun toggleDayEnded() {
         viewModelScope.launch {
             val date = _uiState.value.selectedDate.toString()
+            val before = dayCompletionRepo.getCompletedEntity(date)
 
-            // ensure row exists (so we can update it)
-            dayCompletionRepo.ensureRow(date)
-
-            val before = dayCompletionRepo.getEntityOrDefault(date)
-            val nowCompleted = !before.isCompleted
-
-            if (!nowCompleted) {
-                //  un-end day: subtract what this day previously contributed
+            if (before != null) {
                 val oldXp = before.xpEarned
+
                 if (oldXp != 0) {
-                    levelRepository.addXp(-oldXp) // must support negative delta safely
+                    levelRepository.addXp(-oldXp)
                 }
 
-                dayCompletionRepo.setState(date, isCompleted = false, xpEarned = 0)
+                dayCompletionRepo.unmarkCompleted(date)
                 levelRepository.updateConsecutiveDays(date, false)
 
                 _uiState.update { it.copy(isDayEnded = false) }
@@ -286,14 +259,17 @@ class DailyCheckupViewModel @Inject constructor(
                 return@launch
             }
 
-            // ✅ end day: compute new XP and apply delta vs old stored XP
             val newXp = calculateXpForCurrentState()
-            val delta = newXp - before.xpEarned
-            if (delta != 0) {
-                levelRepository.addXp(delta)
+
+            if (newXp != 0) {
+                levelRepository.addXp(newXp)
             }
 
-            dayCompletionRepo.setState(date, isCompleted = true, xpEarned = newXp)
+            dayCompletionRepo.markCompleted(
+                date = date,
+                xpEarned = newXp
+            )
+
             levelRepository.updateConsecutiveDays(date, true)
 
             _uiState.update { it.copy(isDayEnded = true) }
@@ -302,11 +278,43 @@ class DailyCheckupViewModel @Inject constructor(
             val goalReached = targetRepository.getGoalReachedTargets()
             if (goalReached.isNotEmpty()) {
                 _targetGoalReachedEvent.value = goalReached.map { e ->
-                    TargetUi(id = e.id, name = e.name, nameKey = null, days = e.days, daysSelected = e.daysSelected, deadline = null)
+                    TargetUi(
+                        id = e.id,
+                        name = e.name,
+                        nameKey = null,
+                        days = e.days,
+                        daysSelected = e.daysSelected,
+                        deadline = null
+                    )
                 }
             }
         }
     }
+
+    private fun saveProgress() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val date = state.selectedDate.toString()
+
+            val rows = state.allCategories.map { category ->
+                DailyCategoryProgressEntity(
+                    date = date,
+                    categoryLocalId = category.id,
+                    value = category.id in state.selectedCategories,
+                    comment = state.commentDrafts[category.id]
+                        ?.trim()
+                        ?.take(100)
+                        ?.ifBlank { null }
+                )
+            }
+
+            dailyProgressRepo.saveDay(
+                date = date,
+                rows = rows
+            )
+        }
+    }
+
     private suspend fun calculateXpForCurrentState(): Int {
         val state = _uiState.value
         val selectedCount = state.selectedCategories.size
@@ -323,31 +331,15 @@ class DailyCheckupViewModel @Inject constructor(
     }
 
     fun onCommentChanged(categoryId: Int, newText: String) {
-        _uiState.update { s ->
-            s.copy(
-                commentDrafts = s.commentDrafts + (categoryId to newText.take(100))
+        _uiState.update { state ->
+            state.copy(
+                commentDrafts = state.commentDrafts + (categoryId to newText.take(100))
             )
         }
     }
 
     fun commitCommentsAndLeave(onBack: () -> Unit) {
-        val s = _uiState.value
-        val date = s.selectedDate.toString()
-
-        viewModelScope.launch {
-            s.commentDrafts.forEach { (categoryId, raw) ->
-                val newClean = raw.trim().take(100)
-                val oldClean = s.savedComments[categoryId]?.trim().orEmpty()
-
-                when {
-                    newClean == oldClean -> Unit
-                    newClean.isNotEmpty() -> dailyProgressRepo.updateComment(categoryId, date, newClean)
-                    oldClean.isNotEmpty() -> dailyProgressRepo.updateComment(categoryId, date, null) // delete
-                    else -> Unit
-                }
-            }
-        }
-
+        saveProgress()
         onBack()
     }
 
@@ -359,13 +351,12 @@ class DailyCheckupViewModel @Inject constructor(
             it.copy(isMultiplierMode = !it.isMultiplierMode)
         }
     }
+
     /**
      * A function for UI
      */
     fun onDaySelected(day: LocalDate) {
-        viewModelScope.launch {
-            initStateForDay(day)
-        }
+        observeDay(day)
     }
 
 
@@ -379,7 +370,7 @@ class DailyCheckupViewModel @Inject constructor(
             )
         }
 
-        loadDay(newSelected)
+        observeDay(newSelected)
     }
 
     fun prevDay() {
@@ -392,7 +383,7 @@ class DailyCheckupViewModel @Inject constructor(
             )
         }
 
-        loadDay(newSelected)
+        observeDay(newSelected)
     }
 
     fun goToToday() {
@@ -405,28 +396,7 @@ class DailyCheckupViewModel @Inject constructor(
             )
         }
 
-        viewModelScope.launch {
-            initStateForDay(today)
-            savedStateHandle["selectedDay"] = today.toString()
-        }
-    }
-
-    private inline fun update(x: (DailyCheckupUiState) -> DailyCheckupUiState) {
-        _uiState.update(x)
-    }
-
-    fun saveProgress() {
-        viewModelScope.launch {
-            val completed = _uiState.value.selectedCategories.toList()
-            val incompleted = _uiState.value.allCategories.map {it.id} - completed
-            Log.d("Progress", "completed=${completed.sorted()} incompleted=${incompleted.sorted()}")
-
-            dailyProgressRepo.rewriteDayByCategoryIds(
-                date = _uiState.value.selectedDate.toString(),
-                completedIds = completed,
-                incompletedIds = incompleted
-            )
-        }
+        observeDay(today)
     }
 
     // Метод для сброса события повышения уровня (вызывается после показа диалога)
@@ -487,4 +457,19 @@ class DailyCheckupViewModel @Inject constructor(
     fun hideVoiceRecognition() {
         _uiState.update { it.copy(isVoiceRecognitionVisible = false) }
     }
+}
+
+private fun TargetEntity.toTargetUi(): TargetUi {
+    return TargetUi(
+        id = id,
+        name = name,
+        nameKey = null,
+        days = days,
+        daysSelected = daysSelected,
+        deadline = deadlineMillis?.let { millis ->
+            Instant.ofEpochMilli(millis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+        }
+    )
 }

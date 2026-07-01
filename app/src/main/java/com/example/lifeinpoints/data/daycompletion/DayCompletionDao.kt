@@ -5,31 +5,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DayCompletionDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertIfAbsent(dayCompletion: DayCompletionEntity): Long
-
-    @Query("""
-    UPDATE day_completion
-    SET isCompleted = :isCompleted,
-        completedAt = :completedAt,
-        xpEarned = :xpEarned
-    WHERE date = :date
-""")
-    suspend fun setState(
-        date: String,
-        isCompleted: Boolean,
-        completedAt: Long,
-        xpEarned: Int
-    ): Int
-
-    @Update
-    suspend fun update(dayCompletion: DayCompletionEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(dayCompletion: DayCompletionEntity)
 
     @Query("SELECT * FROM day_completion WHERE date = :date")
     suspend fun getByDate(date: String): DayCompletionEntity?
@@ -37,18 +19,15 @@ interface DayCompletionDao {
     @Query("SELECT * FROM day_completion WHERE date = :date")
     fun observeByDate(date: String): Flow<DayCompletionEntity?>
 
-    @Query("SELECT * FROM day_completion WHERE date BETWEEN :startDate AND :endDate")
-    suspend fun getByDateRange(startDate: String, endDate: String): List<DayCompletionEntity>
+    @Query("SELECT EXISTS(SELECT 1 FROM day_completion WHERE date = :date)")
+    suspend fun exists(date: String): Boolean
 
-    // Изменяем этот метод, чтобы он возвращал все записи
+    @Query("DELETE FROM day_completion WHERE date = :date")
+    suspend fun deleteByDate(date: String)
+
     @Query("SELECT * FROM day_completion ORDER BY date DESC")
     fun observeAllCompletedDays(): Flow<List<DayCompletionEntity>>
 
     @Query("SELECT * FROM day_completion WHERE date BETWEEN :fromDate AND :toDate")
     fun observeRange(fromDate: String, toDate: String): Flow<List<DayCompletionEntity>>
-
-
-    @Query("DELETE FROM day_completion WHERE date = :date")
-    suspend fun deleteByDate(date: String)
-
 }

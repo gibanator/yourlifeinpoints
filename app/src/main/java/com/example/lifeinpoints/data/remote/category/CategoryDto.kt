@@ -18,7 +18,7 @@ data class CategoryCreateRequest(
 
 data class CategoryCreateResponse(
     @SerializedName(value = "id", alternate = ["categoryId", "category_id"])
-    val id: Int? = null
+    val id: Long? = null
 )
 
 data class CategoryUpdateRequest(

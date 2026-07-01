@@ -2,7 +2,13 @@
 package com.example.lifeinpoints.data.daycompletion
 
 //import android.util.Log
+import androidx.room.withTransaction
 import com.example.lifeinpoints.calendar.DayInMonth
+import com.example.lifeinpoints.data.AppDatabase
+import com.example.lifeinpoints.data.outbox.OutboxDao
+import com.example.lifeinpoints.data.outbox.OutboxOperationEntity
+import com.example.lifeinpoints.data.outbox.OutboxOperationType
+import com.example.lifeinpoints.data.sync.SyncScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
@@ -11,47 +17,50 @@ import javax.inject.Singleton
 
 @Singleton
 class DayCompletionRepository @Inject constructor(
-    private val dao: DayCompletionDao
+    private val database: AppDatabase,
+    private val dao: DayCompletionDao,
+    private val syncScheduler: SyncScheduler,
+    private val outboxDao: OutboxDao
 ) {
-
-    suspend fun ensureRow(date: String) {
-        dao.insertIfAbsent(DayCompletionEntity(date = date, isCompleted = false))
+    suspend fun getCompletedEntity(date: String): DayCompletionEntity? {
+        return dao.getByDate(date)
     }
 
-    suspend fun getEntityOrDefault(date: String): DayCompletionEntity =
-        dao.getByDate(date) ?: DayCompletionEntity(date = date, isCompleted = false)
+    suspend fun markCompleted(date: String, xpEarned: Int) {
+        database.withTransaction {
+            dao.insert(
+                DayCompletionEntity(
+                    date = date,
+                    xpEarned = xpEarned
+                )
+            )
 
-    suspend fun setState(date: String, isCompleted: Boolean, xpEarned: Int) {
-        dao.setState(
-            date = date,
-            isCompleted = isCompleted,
-            completedAt = System.currentTimeMillis(),
-            xpEarned = xpEarned
-        )
+            enqueueSaveDayCompletion(date)
+        }
+
+        syncScheduler.enqueueSync()
     }
 
-    suspend fun getDayCompletion(date: String): Boolean {
-        return dao.getByDate(date)?.isCompleted ?: false
+    suspend fun unmarkCompleted(date: String) {
+        database.withTransaction {
+            dao.deleteByDate(date)
+
+            enqueueSaveDayCompletion(date)
+        }
+
+        syncScheduler.enqueueSync()
     }
-/*
+
+    suspend fun isCompleted(date: String): Boolean {
+        return dao.exists(date)
+    }
+
     fun observeDayCompletion(date: String): Flow<Boolean> {
         return dao.observeByDate(date).map { entity ->
-            entity?.isCompleted ?: false
+            entity != null
         }
     }
 
-
-
-    suspend fun getCompletedDaysInRange(startDate: String, endDate: String): List<String> {
-        return dao.getByDateRange(startDate, endDate)
-            .filter { it.isCompleted }
-            .map { it.date }
-    }
-
- */
-
-
-    // Добавляем метод для подписки на все изменения
     fun observeAllChanges(): Flow<List<DayCompletionEntity>> {
         return dao.observeAllCompletedDays()
     }
@@ -62,23 +71,30 @@ class DayCompletionRepository @Inject constructor(
 
         return dao.observeRange(from, to).map { rows ->
             rows.associate { row ->
-                val date = LocalDate.parse(row.date)
-                val cat =
-                    if (row.isCompleted)
-                        DayInMonth.CompletionCategory.COMPLETED
-                    else
-                        DayInMonth.CompletionCategory.NONE
-                date to cat
+                LocalDate.parse(row.date) to DayInMonth.CompletionCategory.COMPLETED
             }
         }
     }
 
-    /*
+    private suspend fun enqueueSaveDayCompletion(date: String) {
+        val alreadyQueued =
+            outboxDao.countByTypeAndKey(
+                type = OutboxOperationType.SAVE_DAY_COMPLETION,
+                entityType = DAY_COMPLETION_ENTITY_TYPE,
+                syncKey = date
+            ) > 0
 
-    fun observeRange(
-        from: LocalDate,
-        to: LocalDate
-    ): Flow<Map<LocalDate, DayInMonth.CompletionCategory>> =
-        observeYear(from.year)
-    */
+        if (!alreadyQueued) {
+            outboxDao.insert(
+                OutboxOperationEntity(
+                    type = OutboxOperationType.SAVE_DAY_COMPLETION,
+                    entityType = DAY_COMPLETION_ENTITY_TYPE,
+                    syncKey = date
+                )
+            )
+        }
+    }
+    private companion object {
+        const val DAY_COMPLETION_ENTITY_TYPE = "DayCompletion"
+    }
 }

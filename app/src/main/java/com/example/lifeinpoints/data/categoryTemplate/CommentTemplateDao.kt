@@ -14,7 +14,7 @@ interface CommentTemplateDao {
 
     @Query("""
     SELECT * FROM comment_templates
-    ORDER BY categoryId ASC, position ASC
+    ORDER BY categoryLocalId ASC, position ASC
     """
     )
     fun observeAll(): Flow<List<CommentTemplateEntity>>
@@ -22,29 +22,29 @@ interface CommentTemplateDao {
     @Query(
         """
         SELECT * FROM comment_templates
-        WHERE categoryId = :categoryId
+        WHERE categoryLocalId = :categoryId
         ORDER BY position ASC
     """
     )
-    fun observeByCategory(categoryId: Long): Flow<List<CommentTemplateEntity>>
+    fun observeByCategory(categoryId: Int): Flow<List<CommentTemplateEntity>>
 
     @Query(
         """
         SELECT * FROM comment_templates
-        WHERE categoryId = :categoryId
+        WHERE categoryLocalId = :categoryId
         ORDER BY position ASC
     """
     )
-    suspend fun getByCategory(categoryId: Long): List<CommentTemplateEntity>
+    suspend fun getByCategory(categoryId: Int): List<CommentTemplateEntity>
 
     @Query(
         """
         SELECT * FROM comment_templates
-        WHERE categoryId = :categoryId AND position = :position
+        WHERE categoryLocalId = :categoryId AND position = :position
         LIMIT 1
     """
     )
-    suspend fun getSlot(categoryId: Long, position: Int): CommentTemplateEntity?
+    suspend fun getSlot(categoryId: Int, position: Int): CommentTemplateEntity?
 
     // --- Write ---
 
@@ -57,23 +57,23 @@ interface CommentTemplateDao {
     @Query(
         """
         DELETE FROM comment_templates
-        WHERE categoryId = :categoryId AND position = :position
+        WHERE categoryLocalId = :categoryId AND position = :position
     """
     )
-    suspend fun clearSlot(categoryId: Long, position: Int)
+    suspend fun clearSlot(categoryId: Int, position: Int)
 
     @Query(
         """
         DELETE FROM comment_templates
-        WHERE categoryId = :categoryId
+        WHERE categoryLocalId = :categoryId
     """
     )
-    suspend fun deleteByCategory(categoryId: Long)
+    suspend fun deleteByCategory(categoryId: Int)
 
     // --- Optional: for "reorder" support later ---
 
     @Transaction
-    suspend fun replaceAllForCategory(categoryId: Long, newTemplates: List<CommentTemplateEntity>) {
+    suspend fun replaceAllForCategory(categoryId: Int, newTemplates: List<CommentTemplateEntity>) {
         deleteByCategory(categoryId)
         upsertAll(newTemplates)
     }

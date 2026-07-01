@@ -318,11 +318,12 @@ class StatisticsViewModel @Inject constructor(
         for (day in 1..daysInMonth) {
             val date = month.atDay(day)
             val dateString = date.toString()
-            val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
+            val isDayCompleted =
+                dayCompletionRepo.getCompletedEntity(dateString) != null
 
             if (isDayCompleted) {
                 val dailyProgress = dailyProgressRepo.getByDate(dateString)
-                val progressMap = dailyProgress.associate { it.categoryId to it.value }
+                val progressMap = dailyProgress.associate { it.categoryLocalId to it.value }
                 val totalSelected = progressMap.values.count { it }
 
                 val categorySelections = categoryIds.associateWith { categoryId ->
@@ -363,11 +364,12 @@ class StatisticsViewModel @Inject constructor(
             val date = weekStart.plusDays(i.toLong())
             val dateString = date.toString()
             val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-            val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
+            val isDayCompleted =
+                dayCompletionRepo.getCompletedEntity(dateString) != null
 
             if (isDayCompleted) {
                 val dailyProgress = dailyProgressRepo.getByDate(dateString)
-                val progressMap = dailyProgress.associate { it.categoryId to it.value }
+                val progressMap = dailyProgress.associate { it.categoryLocalId to it.value }
                 val totalSelected = progressMap.values.count { it }
 
                 val categorySelections = categoryIds.associateWith { categoryId ->
@@ -421,11 +423,12 @@ class StatisticsViewModel @Inject constructor(
             for (day in 1..daysInMonth) {
                 val date = yearMonth.atDay(day)
                 val dateString = date.toString()
-                val isDayCompleted = dayCompletionRepo.getDayCompletion(dateString)
+                val isDayCompleted =
+                    dayCompletionRepo.getCompletedEntity(dateString) != null
 
                 if (isDayCompleted) {
                     val dailyProgress = dailyProgressRepo.getByDate(dateString)
-                    val progressMap = dailyProgress.associate { it.categoryId to it.value }
+                    val progressMap = dailyProgress.associate { it.categoryLocalId to it.value }
 
                     progressMap.forEach { (categoryId, isSelected) ->
                         if (isSelected && categoryId in categoryIds) {

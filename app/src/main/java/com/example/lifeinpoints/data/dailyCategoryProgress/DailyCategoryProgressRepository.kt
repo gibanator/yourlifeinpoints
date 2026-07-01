@@ -47,7 +47,7 @@ class DailyCategoryProgressRepository @Inject constructor(
         val items = parseProgressItems(response.body())
         return items.map { item ->
             DailyCategoryProgressEntity(
-                categoryId = item.categoryId,
+                categoryLocalId = item.categoryId,
                 date = date,
                 value = item.completed,
                 comment = item.comment
@@ -61,7 +61,7 @@ class DailyCategoryProgressRepository @Inject constructor(
         incompletedIds: List<Int>
     ) {
         val commentsByCategory = runCatching {
-            getByDate(date).associate { it.categoryId to it.comment }
+            getByDate(date).associate { it.categoryLocalId to it.comment }
         }.getOrDefault(emptyMap())
 
         val rows = buildList {
@@ -69,7 +69,7 @@ class DailyCategoryProgressRepository @Inject constructor(
                 add(
                     DailyCategoryProgressEntity(
                         date = date,
-                        categoryId = categoryId,
+                        categoryLocalId = categoryId,
                         value = true,
                         comment = commentsByCategory[categoryId]
                     )
@@ -79,7 +79,7 @@ class DailyCategoryProgressRepository @Inject constructor(
                 add(
                     DailyCategoryProgressEntity(
                         date = date,
-                        categoryId = categoryId,
+                        categoryLocalId = categoryId,
                         value = false,
                         comment = commentsByCategory[categoryId]
                     )
@@ -93,7 +93,7 @@ class DailyCategoryProgressRepository @Inject constructor(
     suspend fun updateComment(categoryId: Int, date: String, comment: String?) {
         val current = getByDate(date)
         val rows = current.map { row ->
-            if (row.categoryId == categoryId) {
+            if (row.categoryLocalId == categoryId) {
                 row.copy(comment = comment)
             } else {
                 row
@@ -109,7 +109,7 @@ class DailyCategoryProgressRepository @Inject constructor(
                 date = date,
                 items = rows.map { row ->
                     ProgressItemDto(
-                        categoryId = row.categoryId,
+                        categoryId = row.categoryLocalId,
                         completed = row.value,
                         comment = row.comment
                     )
@@ -125,9 +125,9 @@ class DailyCategoryProgressRepository @Inject constructor(
         rows: List<DailyCategoryProgressEntity>,
         progress: DailyCategoryProgressEntity
     ): List<DailyCategoryProgressEntity> {
-        val replaced = rows.any { it.categoryId == progress.categoryId }
+        val replaced = rows.any { it.categoryLocalId == progress.categoryLocalId }
         val updated = rows.map { row ->
-            if (row.categoryId == progress.categoryId) progress else row
+            if (row.categoryLocalId == progress.categoryLocalId) progress else row
         }
         return if (replaced) updated else updated + progress
     }
