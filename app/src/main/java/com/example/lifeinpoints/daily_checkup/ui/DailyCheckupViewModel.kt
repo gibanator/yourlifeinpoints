@@ -11,6 +11,10 @@ import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgress
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepositoryNew
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.data.level.LevelRepository
+import com.example.lifeinpoints.data.remote.ai.AiEvaluateRequest
+import com.example.lifeinpoints.data.remote.ai.AiNamedDto
+import com.example.lifeinpoints.data.remote.api.AiApi
+import com.example.lifeinpoints.data.remote.auth.AuthTokenProvider
 import com.example.lifeinpoints.data.target.TargetEntity
 import com.example.lifeinpoints.data.target.TargetRepository
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
@@ -39,6 +43,8 @@ class DailyCheckupViewModel @Inject constructor(
     private val commentTemplateRepo: CommentTemplateRepository,
     private val levelRepository: LevelRepository,
     private val targetRepository: TargetRepository,
+    private val aiApi: AiApi,
+    private val authTokenProvider: AuthTokenProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var dayJob: Job? = null
@@ -443,11 +449,84 @@ class DailyCheckupViewModel @Inject constructor(
     }
 
     fun showAiMode() {
-        _uiState.update { it.copy(isAiModeVisible = true) }
+        _uiState.update { it.copy(isAiModeVisible = true, aiError = null) }
     }
 
     fun hideAiMode() {
         _uiState.update { it.copy(isAiModeVisible = false) }
+    }
+
+    /**
+     * Отправляет текст дня в нейросеть (через бэкенд) и проставляет отметки 1/0
+     * по категориям и целям. XP здесь НЕ начисляется — он считается при «Завершить день».
+     *
+     * @param dayText текст пользователя из AI-режима
+     * @param provider выбранный провайдер (пока единственный доступный — GigaChat)
+     */
+    fun evaluateDayWithAi(dayText: String, provider: String = "gigachat") {
+        val text = dayText.trim()
+        if (text.isEmpty()) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAiLoading = true, aiError = null) }
+            try {
+                val state = _uiState.value
+                val date = state.selectedDate.toString()
+
+                val request = AiEvaluateRequest(
+                    provider = provider,
+                    date = date,
+                    dayText = text,
+                    categories = state.allCategories.map { AiNamedDto(it.id, it.name) },
+                    targets = state.targets.map { AiNamedDto(it.id, it.name) }
+                )
+
+                val auth = authTokenProvider.getAuthorizationHeader()
+                val response = aiApi.evaluateDay(auth, request)
+                val body = response.body()
+
+                if (!response.isSuccessful || body == null) {
+                    _uiState.update {
+                        it.copy(isAiLoading = false, aiError = "Ошибка ИИ (${response.code()})")
+                    }
+                    return@launch
+                }
+
+                // 1. Категории 1/0 (ИИ предзаполняет галочки)
+                val completedCatIds = body.categories
+                    .filter { it.completed }
+                    .map { it.categoryId }
+                    .toSet()
+
+                // 2. Комментарии от ИИ
+                val drafts = body.categories
+                    .filter { it.comment.isNotBlank() }
+                    .associate { it.categoryId to it.comment.take(100) }
+
+                _uiState.update {
+                    it.copy(
+                        selectedCategories = completedCatIds,
+                        commentDrafts = it.commentDrafts + drafts
+                    )
+                }
+
+                // 3. Цели: отмечаем выполненные, которые ещё не отмечены за этот день
+                val alreadySelected = targetRepository.getSelectedForDate(date)
+                body.targets
+                    .filter { it.completed && it.targetId !in alreadySelected }
+                    .forEach { toggleTarget(it.targetId) }
+
+                // 4. Сохранить отметки категорий
+                saveProgress()
+
+                _uiState.update { it.copy(isAiLoading = false) }
+                hideAiMode()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isAiLoading = false, aiError = e.message ?: "Сетевая ошибка")
+                }
+            }
+        }
     }
 
     fun showVoiceRecognition() {

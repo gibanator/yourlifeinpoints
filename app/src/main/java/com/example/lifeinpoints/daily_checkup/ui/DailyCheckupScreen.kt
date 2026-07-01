@@ -355,7 +355,12 @@ fun DailyCheckupScreen(
                 onDismissRequest = { vm.hideAiMode() },
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             ) {
-                AiModeScreen(onBack = { vm.hideAiMode() })
+                AiModeScreen(
+                    onBack = { vm.hideAiMode() },
+                    onSubmit = { vm.evaluateDayWithAi(it) },
+                    isLoading = uiState.isAiLoading,
+                    errorMessage = uiState.aiError
+                )
             }
         }
 
@@ -1039,6 +1044,7 @@ fun CategoryListItem(
         modifier = modifier.height(height),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = MaterialTheme.shapes.small
+        
     ) {
         Row(
             modifier = Modifier

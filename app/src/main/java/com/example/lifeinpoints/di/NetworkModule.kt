@@ -1,5 +1,6 @@
 package com.example.lifeinpoints.di
 
+import com.example.lifeinpoints.data.remote.api.AiApi
 import com.example.lifeinpoints.data.remote.api.AuthApi
 import com.example.lifeinpoints.data.remote.api.CategoryApi
 import com.example.lifeinpoints.data.remote.api.DayCompletionApi
@@ -48,5 +49,11 @@ object NetworkModule {
     @Singleton
     fun provideDayCompletionApi(retrofit: Retrofit): DayCompletionApi {
         return retrofit.create(DayCompletionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAiApi(retrofit: Retrofit): AiApi {
+        return retrofit.create(AiApi::class.java)
     }
 }

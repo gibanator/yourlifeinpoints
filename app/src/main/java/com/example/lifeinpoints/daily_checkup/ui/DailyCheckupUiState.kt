@@ -49,6 +49,8 @@ data class DailyCheckupUiState (
     val templatesByCategory: Map<Int, List<String>> = emptyMap(),
 
     val isAiModeVisible: Boolean = false,
+    val isAiLoading: Boolean = false,
+    val aiError: String? = null,
 
     val targets: List<TargetUi> = emptyList(),
     val selectedTargets: Set<Int> = emptySet(),
