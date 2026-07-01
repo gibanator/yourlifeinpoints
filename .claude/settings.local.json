@@ -9,7 +9,24 @@
       "Bash(git -C /c/Users/Koliasik/YourLivePoints/ProjectPoint/.claude/worktrees/agent-a729b58691c55e2e0 show HEAD:app/src/main/java/com/example/lifeinpoints/daily_checkup/ui/AddTargetScreen.kt)",
       "Bash(git -C /c/Users/Koliasik/YourLivePoints/ProjectPoint/.claude/worktrees/agent-a729b58691c55e2e0 status --short)",
       "PowerShell(git *)",
-      "Bash(grep -v \"//\\\\|stringResource\\\\|Log\\\\.\\\\|\\\\.tag\\\\|format\\\\|pattern\\\\|toString\\\\|R\\\\.\\\\|\\\\.dp\\\\|\\\\.sp\\\\|\\\\.f\\\\b\")"
+      "Bash(grep -v \"//\\\\|stringResource\\\\|Log\\\\.\\\\|\\\\.tag\\\\|format\\\\|pattern\\\\|toString\\\\|R\\\\.\\\\|\\\\.dp\\\\|\\\\.sp\\\\|\\\\.f\\\\b\")",
+      "Skill(claude-api)",
+      "Bash(find . -maxdepth 2 -type d -not -path '*/\\\\.*')",
+      "Bash(find \"Жизнь в обсидиане/разработка приложения/Разработка\" -maxdepth 2 -name \"*.md\" -newermt \"2026-06-21\")",
+      "Bash(ls -d Жизнь*)",
+      "Bash(find . -maxdepth 4 -name \"02 — Что нужно*\")",
+      "Bash(python -c \"import json; json.load\\(open\\('Блок-схема AI.canvas', encoding='utf-8'\\)\\); print\\('canvas JSON OK'\\)\")",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('Блок-схема AI.canvas','utf8'\\)\\); console.log\\('canvas JSON OK'\\)\")",
+      "Bash(find src/main/resources -type f)",
+      "Bash(cat src/main/resources/application.properties)",
+      "Bash(cat src/main/resources/application.yml)",
+      "Bash(cat src/main/resources/application.yaml)",
+      "PowerShell(.\\\\gradlew.bat :app:compileDebugKotlin -q 2>&1 | Select-Object -Last 40)",
+      "PowerShell($paths = @\\(\"$env:LOCALAPPDATA\\\\Programs\\\\Android Studio\\\\jbr\",\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\",\"$env:ProgramFiles\\\\Android\\\\Android Studio\\\\jbr\"\\); foreach\\($p in $paths\\){ if\\(Test-Path $p\\){ \"FOUND: $p\" } }; if\\(Test-Path Env:JAVA_HOME\\){ \"JAVA_HOME=$env:JAVA_HOME\" })",
+      "PowerShell($env:JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\"; .\\\\gradlew.bat :app:compileDebugKotlin -q 2>&1 | Select-Object -Last 40)",
+      "PowerShell($env:JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\"; .\\\\gradlew.bat :app:compileDebugKotlin 2>&1 | Select-Object -Last 25)",
+      "PowerShell($env:JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\"; .\\\\gradlew.bat :app:compileDebugKotlin 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:JAVA_HOME=\"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\"; .\\\\gradlew.bat :app:compileDebugKotlin 2>&1 | Select-Object -Last 12)"
     ]
   }
 }

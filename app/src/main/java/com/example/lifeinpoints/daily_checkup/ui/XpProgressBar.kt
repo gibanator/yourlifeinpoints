@@ -2,11 +2,13 @@ package com.example.lifeinpoints.daily_checkup.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -43,11 +45,11 @@ fun XpProgressBar(
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 10.dp)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // Верхняя строка: уровень и класс
+            // Одна строка: уровень + класс (+ бейдж очков) слева, процент справа
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -61,10 +63,9 @@ fun XpProgressBar(
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Иконка или бейдж класса
+                    // Класс игрока
                     if (levelState.playerClassKey != "Новичок") {
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = stringResource(R.string.level_class_bullet, className),
                             style = MaterialTheme.typography.bodyMedium,
@@ -72,77 +73,45 @@ fun XpProgressBar(
                             fontWeight = FontWeight.Medium
                         )
                     }
-                }
 
-                // Нераспределенные очки (если есть)
-                if (levelState.unspentSkillPoints > 0) {
-                    Badge(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
-                    ) {
-                        Text(
-                            text = pluralStringResource(
-                                id = R.plurals.unspent_points_badge,
-                                count = levelState.unspentSkillPoints,
-                                levelState.unspentSkillPoints
-                            ),
-                            style = MaterialTheme.typography.labelSmall
-                        )
+                    // Нераспределенные очки (если есть)
+                    if (levelState.unspentSkillPoints > 0) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Badge(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = Color.White
+                        ) {
+                            Text(
+                                text = pluralStringResource(
+                                    id = R.plurals.unspent_points_badge,
+                                    count = levelState.unspentSkillPoints,
+                                    levelState.unspentSkillPoints
+                                ),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
                     }
                 }
+
+                Text(
+                    text = stringResource(R.string.percent_label, percent),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
-            // Прогресс бар
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                // Текст прогресса
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(
-                            R.string.xp_progress_label,
-                            levelState.currentXp,
-                            levelState.xpToNextLevel
-                        ),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Text(
-                        text = stringResource(R.string.percent_label, percent),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                LinearProgressIndicator(
+            // Тонкий прогресс-бар
+            LinearProgressIndicator(
                 progress = { progress },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(CircleShape),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-                )
-            }
-
-            // Нижняя строка: дополнительная информация
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.total_xp_label, levelState.totalXp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                // Последовательные дни
-                if (levelState.consecutiveDays > 0) {
-                    Text(
-                        text = stringResource(R.string.consecutive_days_label, levelState.consecutiveDays),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+            )
         }
     }
 }
