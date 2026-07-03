@@ -171,5 +171,6 @@
     <string name="ai_mode_send_button">Отправить</string>
     <string name="ai_mode_back_content_description">Назад</string>
     <string name="ai_mode_mic_content_description">Записать голос</string>
+    <string name="ai_mode_model_picker_content_description">Выбрать модель</string>
 
 </resources>

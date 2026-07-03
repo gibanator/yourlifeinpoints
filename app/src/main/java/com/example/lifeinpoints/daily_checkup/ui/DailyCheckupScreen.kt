@@ -357,7 +357,7 @@ fun DailyCheckupScreen(
             ) {
                 AiModeScreen(
                     onBack = { vm.hideAiMode() },
-                    onSubmit = { vm.evaluateDayWithAi(it) },
+                    onSubmit = { text, provider -> vm.evaluateDayWithAi(text, provider) },
                     isLoading = uiState.isAiLoading,
                     errorMessage = uiState.aiError
                 )

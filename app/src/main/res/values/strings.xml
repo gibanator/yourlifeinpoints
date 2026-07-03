@@ -171,5 +171,6 @@
     <string name="ai_mode_send_button">Send</string>
     <string name="ai_mode_back_content_description">Back</string>
     <string name="ai_mode_mic_content_description">Record voice</string>
+    <string name="ai_mode_model_picker_content_description">Choose model</string>
 
 </resources>

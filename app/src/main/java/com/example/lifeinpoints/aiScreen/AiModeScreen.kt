@@ -2,6 +2,7 @@ package com.example.lifeinpoints.aiScreen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,17 +17,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +53,7 @@ import com.example.lifeinpoints.R
 fun AiModeScreen(
     vm: AiModeViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
-    onSubmit: (String) -> Unit = {},
+    onSubmit: (text: String, provider: String) -> Unit = { _, _ -> },
     isLoading: Boolean = false,
     errorMessage: String? = null
 ) {
@@ -88,6 +94,40 @@ fun AiModeScreen(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                // Выбор модели — маленькое всплывающее меню, как в чате Клода.
+                val currentLabel = uiState.availableProviders
+                    .firstOrNull { it.id == uiState.selectedProvider }
+                    ?.label
+                    ?: uiState.selectedProvider
+                Box {
+                    TextButton(
+                        onClick = { vm.onModelMenuVisibilityChanged(true) },
+                        enabled = !isLoading
+                    ) {
+                        Text(currentLabel)
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = stringResource(R.string.ai_mode_model_picker_content_description)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = uiState.isModelMenuVisible,
+                        onDismissRequest = { vm.onModelMenuVisibilityChanged(false) }
+                    ) {
+                        uiState.availableProviders.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option.label) },
+                                onClick = { vm.onProviderSelected(option.id) },
+                                trailingIcon = {
+                                    if (option.id == uiState.selectedProvider) {
+                                        Icon(Icons.Filled.Check, contentDescription = null)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(gapSmall))
             OutlinedTextField(
@@ -115,7 +155,7 @@ fun AiModeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { onSubmit(uiState.inputText) },
+                    onClick = { onSubmit(uiState.inputText, uiState.selectedProvider) },
                     enabled = uiState.inputText.isNotBlank() && !isLoading,
                     modifier = Modifier.weight(2f)
                 ) {
