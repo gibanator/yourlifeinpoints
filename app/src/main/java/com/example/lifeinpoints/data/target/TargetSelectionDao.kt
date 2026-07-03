@@ -11,6 +11,9 @@ interface TargetSelectionDao {
     @Query("SELECT targetId FROM target_selections WHERE date = :date")
     suspend fun getSelectedForDate(date: String): List<Int>
 
+    @Query("SELECT targetId FROM target_selections WHERE date = :date")
+    fun observeSelectedForDate(date: String): Flow<List<Int>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entity: TargetSelectionEntity): Long
 

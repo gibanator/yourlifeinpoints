@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,10 +49,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.lifeinpoints.R
+import java.time.LocalDate
 
 @Composable
 fun AiModeScreen(
     vm: AiModeViewModel = hiltViewModel(),
+    selectedDate: LocalDate = LocalDate.now(),
     onBack: () -> Unit = {},
     onSubmit: (text: String, provider: String) -> Unit = { _, _ -> },
     isLoading: Boolean = false,
@@ -60,6 +63,11 @@ fun AiModeScreen(
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     var isTextFieldFocused by remember { mutableStateOf(false) }
+
+    // При смене дня очищаем поле, чтобы каждый день экран открывался пустым.
+    LaunchedEffect(selectedDate) {
+        vm.onDayChanged(selectedDate.toString())
+    }
 
     BackHandler(enabled = isTextFieldFocused) {
         focusManager.clearFocus()

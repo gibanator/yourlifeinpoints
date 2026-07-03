@@ -35,8 +35,22 @@ class AiModeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AiModeUiState())
     val uiState: StateFlow<AiModeUiState> = _uiState.asStateFlow()
 
+    // Дата, для которой сейчас набирается текст. Нужна, чтобы чистить поле при смене дня.
+    private var currentDay: String? = null
+
     init {
         loadModels()
+    }
+
+    /**
+     * Сообщает VM активный день. Если день сменился — очищаем поле ввода,
+     * чтобы каждый день AI-экран открывался пустым (текст не переносится со вчера).
+     */
+    fun onDayChanged(day: String) {
+        if (currentDay != null && currentDay != day) {
+            _uiState.update { it.copy(inputText = "") }
+        }
+        currentDay = day
     }
 
     fun onInputChanged(text: String) {
