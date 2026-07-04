@@ -2,17 +2,18 @@ package com.example.lifeinpoints.categories.comment_templates
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lifeinpoints.data.category.CategoryRepository
+import com.example.lifeinpoints.data.category.CategoryRepositoryNew
 import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateEntity
 import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CommentTemplatesViewModel @Inject constructor(
-    private val categoriesRepository: CategoryRepository,            // or whatever you use
+    private val categoriesRepository: CategoryRepositoryNew,
     private val templatesRepository: CommentTemplateRepository      // wrapper over DAO
 ) : ViewModel() {
 
@@ -22,18 +23,23 @@ class CommentTemplatesViewModel @Inject constructor(
     val categoryName: StateFlow<String?> = _categoryName.asStateFlow()
     val categoryNameKey: StateFlow<String?> = _categoryNameKey.asStateFlow()
     val isSystem: StateFlow<Boolean> = _isSystem.asStateFlow()
+    private var categoryJob: Job? = null
 
     fun observeTemplates(categoryId: Int): Flow<List<CommentTemplateEntity>> {
         return templatesRepository.observeByCategory(categoryId)
     }
 
     fun loadCategoryName(categoryId: Int) {
-        viewModelScope.launch {
-            categoriesRepository.getById(categoryId)?.let { category ->
-                _categoryName.value = category.name
-                _categoryNameKey.value = null
-                _isSystem.value = false
-            }
+        categoryJob?.cancel()
+        categoryJob = viewModelScope.launch {
+            categoriesRepository.observeAll()
+                .map { categories -> categories.firstOrNull { it.localId == categoryId } }
+                .distinctUntilChanged()
+                .collect { category ->
+                    _categoryName.value = category?.name
+                    _categoryNameKey.value = null
+                    _isSystem.value = category?.isSystem ?: false
+                }
         }
     }
 

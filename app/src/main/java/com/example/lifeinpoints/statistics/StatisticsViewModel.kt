@@ -3,21 +3,23 @@ package com.example.lifeinpoints.statistics
 //import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lifeinpoints.data.category.CategoryRepository
-import com.example.lifeinpoints.data.remote.category.CategoryDto
-import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepository
+import com.example.lifeinpoints.data.category.CategoryEntity
+import com.example.lifeinpoints.data.category.CategoryRepositoryNew
+import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressEntity
+import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressRepositoryNew
 import com.example.lifeinpoints.data.daycompletion.DayCompletionRepository
 import com.example.lifeinpoints.statistics.ui.PieChart.PieChartItem
 import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesColorKey
 import com.example.lifeinpoints.statistics.ui.chart.TimeSeriesData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.YearMonth
@@ -31,14 +33,15 @@ import javax.inject.Inject
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     private val dayCompletionRepo: DayCompletionRepository,
-    private val dailyProgressRepo: DailyCategoryProgressRepository,
-    private val categoryRepository: CategoryRepository
+    private val dailyProgressRepo: DailyCategoryProgressRepositoryNew,
+    private val categoryRepository: CategoryRepositoryNew
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StatisticsUiState())
     val uiState: StateFlow<StatisticsUiState> = _uiState.asStateFlow()
 
     private val _forceRefresh = MutableStateFlow(0)
+    private var statisticsJob: Job? = null
 
     //private val dateFormatter = DateTimeFormatter.ofPattern("d")
     //private val weekDayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
@@ -46,18 +49,7 @@ class StatisticsViewModel @Inject constructor(
 
 
     init {
-        setupDayCompletionSubscription()
         loadStatistics()
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun setupDayCompletionSubscription() {
-        dayCompletionRepo.observeAllChanges()
-            .debounce(500)
-            .onEach {
-                loadStatistics()
-            }
-            .launchIn(viewModelScope)
     }
 
     // Метод для переключения выбора категории
@@ -137,7 +129,7 @@ class StatisticsViewModel @Inject constructor(
 
     private fun processDayData(
         rawData: List<DayStatistics>,
-        allCategories: List<CategoryDto>
+        allCategories: List<CategoryEntity>
     ): Processed<List<DayStatistics>> {
         val relevantIds = findRelevantCategories(rawData, allCategories)
         val categoriesToShow = filterCategories(allCategories, relevantIds)
@@ -147,7 +139,7 @@ class StatisticsViewModel @Inject constructor(
 
     private fun processYearData(
         rawData: List<MonthStatistics>,
-        allCategories: List<CategoryDto>
+        allCategories: List<CategoryEntity>
     ): Processed<List<MonthStatistics>> {
         val relevantIds = findRelevantCategoriesForYear(rawData, allCategories)
         val categoriesToShow = filterCategories(allCategories, relevantIds)
@@ -156,75 +148,94 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private fun reloadStatistics(
-        allCategories: List<CategoryDto>
+        allCategories: List<CategoryEntity>,
+        completedDates: Set<String>,
+        progressByDate: Map<String, List<DailyCategoryProgressEntity>>
     ) {
-        viewModelScope.launch {
-            try {
-                val currentState = _uiState.value
+        try {
+            val currentState = _uiState.value
+            val categoryIds = allCategories.map { it.localId }
 
-                when (currentState.viewType) {
-                    ViewType.MONTH -> {
-                        val rawData = loadMonthData(currentState.currentMonth, allCategories.mapNotNull { it.id })
-                        val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
-                        val summary = calculateMonthSummaryStats(filteredData, currentState.currentMonth)
-                        val timeSeriesData = prepareTimeSeriesDataForMonth(filteredData, initialSelectedIds)
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                monthData = filteredData,
-                                categories = categoriesToShow,
-                                monthSummary = summary,
-                                pieChartData = pieChartData,
-                                timeSeriesData = timeSeriesData,
-                                filteredTimeSeriesData = timeSeriesData,
-                                selectedCategoryIds = initialSelectedIds
-                            )
-                        }
-                    }
-                    ViewType.WEEK -> {
-                        val rawData = loadWeekData(currentState.currentWeekStart, allCategories.mapNotNull { it.id })
-                        val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
-                        val summary = calculateWeekSummaryStats(filteredData, currentState.currentWeekStart)
-                        val timeSeriesData = prepareTimeSeriesDataForWeek(filteredData, initialSelectedIds)
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                weekData = filteredData,
-                                categories = categoriesToShow,
-                                weekSummary = summary,
-                                pieChartData = pieChartData,
-                                timeSeriesData = timeSeriesData,
-                                filteredTimeSeriesData = timeSeriesData,
-                                selectedCategoryIds = initialSelectedIds
-                            )
-                        }
-                    }
-                    ViewType.YEAR -> {
-                        val rawData = loadYearData(currentState.currentYear, allCategories.mapNotNull { it.id })
-                        val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processYearData(rawData, allCategories)
-                        val summary = calculateYearSummaryStats(filteredData, currentState.currentYear)
-                        val timeSeriesData = prepareTimeSeriesDataForYear(filteredData, initialSelectedIds)
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                yearData = filteredData,
-                                categories = categoriesToShow,
-                                yearSummary = summary,
-                                pieChartData = pieChartData,
-                                timeSeriesData = timeSeriesData,
-                                filteredTimeSeriesData = timeSeriesData,
-                                selectedCategoryIds = initialSelectedIds
-                            )
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Failed to load statistics: ${e.message}"
+            when (currentState.viewType) {
+                ViewType.MONTH -> {
+                    val rawData = loadMonthData(
+                        month = currentState.currentMonth,
+                        categoryIds = categoryIds,
+                        completedDates = completedDates,
+                        progressByDate = progressByDate
                     )
+                    val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
+                    val summary = calculateMonthSummaryStats(filteredData, currentState.currentMonth)
+                    val timeSeriesData = prepareTimeSeriesDataForMonth(filteredData, initialSelectedIds)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = null,
+                            monthData = filteredData,
+                            categories = categoriesToShow,
+                            monthSummary = summary,
+                            pieChartData = pieChartData,
+                            timeSeriesData = timeSeriesData,
+                            filteredTimeSeriesData = timeSeriesData,
+                            selectedCategoryIds = initialSelectedIds
+                        )
+                    }
                 }
+                ViewType.WEEK -> {
+                    val rawData = loadWeekData(
+                        weekStart = currentState.currentWeekStart,
+                        categoryIds = categoryIds,
+                        completedDates = completedDates,
+                        progressByDate = progressByDate
+                    )
+                    val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processDayData(rawData, allCategories)
+                    val summary = calculateWeekSummaryStats(filteredData, currentState.currentWeekStart)
+                    val timeSeriesData = prepareTimeSeriesDataForWeek(filteredData, initialSelectedIds)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = null,
+                            weekData = filteredData,
+                            categories = categoriesToShow,
+                            weekSummary = summary,
+                            pieChartData = pieChartData,
+                            timeSeriesData = timeSeriesData,
+                            filteredTimeSeriesData = timeSeriesData,
+                            selectedCategoryIds = initialSelectedIds
+                        )
+                    }
+                }
+                ViewType.YEAR -> {
+                    val rawData = loadYearData(
+                        year = currentState.currentYear,
+                        categoryIds = categoryIds,
+                        completedDates = completedDates,
+                        progressByDate = progressByDate
+                    )
+                    val (filteredData, categoriesToShow, pieChartData, initialSelectedIds) = processYearData(rawData, allCategories)
+                    val summary = calculateYearSummaryStats(filteredData, currentState.currentYear)
+                    val timeSeriesData = prepareTimeSeriesDataForYear(filteredData, initialSelectedIds)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = null,
+                            yearData = filteredData,
+                            categories = categoriesToShow,
+                            yearSummary = summary,
+                            pieChartData = pieChartData,
+                            timeSeriesData = timeSeriesData,
+                            filteredTimeSeriesData = timeSeriesData,
+                            selectedCategoryIds = initialSelectedIds
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    error = "Failed to load statistics: ${e.message}"
+                )
             }
         }
     }
@@ -292,11 +303,24 @@ class StatisticsViewModel @Inject constructor(
 
     fun loadStatistics() {
         _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val allCategories = categoryRepository.getAll()
-                reloadStatistics(allCategories)
-            } catch (e: Exception) {
+        statisticsJob?.cancel()
+
+        val dates = datesForCurrentView(_uiState.value)
+        val dailyProgressFlow = observeProgressByDate(dates)
+
+        statisticsJob = combine(
+            categoryRepository.observeAll(),
+            dayCompletionRepo.observeAllChanges(),
+            dailyProgressFlow,
+            _forceRefresh
+        ) { allCategories, completedDays, progressByDate, _ ->
+            StatisticsInput(
+                allCategories = allCategories,
+                completedDates = completedDays.map { it.date }.toSet(),
+                progressByDate = progressByDate
+            )
+        }
+            .catch { e ->
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -304,13 +328,57 @@ class StatisticsViewModel @Inject constructor(
                     )
                 }
             }
+            .let { flow ->
+                viewModelScope.launch {
+                    flow.collect { input ->
+                        reloadStatistics(
+                            allCategories = input.allCategories,
+                            completedDates = input.completedDates,
+                            progressByDate = input.progressByDate
+                        )
+                    }
+                }
+            }
+    }
+
+    private data class StatisticsInput(
+        val allCategories: List<CategoryEntity>,
+        val completedDates: Set<String>,
+        val progressByDate: Map<String, List<DailyCategoryProgressEntity>>
+    )
+
+    private fun datesForCurrentView(state: StatisticsUiState): List<String> {
+        return when (state.viewType) {
+            ViewType.MONTH -> (1..state.currentMonth.lengthOfMonth())
+                .map { day -> state.currentMonth.atDay(day).toString() }
+            ViewType.WEEK -> (0..6)
+                .map { dayOffset -> state.currentWeekStart.plusDays(dayOffset.toLong()).toString() }
+            ViewType.YEAR -> (1..12).flatMap { monthNumber ->
+                val month = YearMonth.of(state.currentYear.value, monthNumber)
+                (1..month.lengthOfMonth()).map { day -> month.atDay(day).toString() }
+            }
         }
     }
 
-    // Остальные методы остаются без изменений
-    private suspend fun loadMonthData(
+    private fun observeProgressByDate(
+        dates: List<String>
+    ) = if (dates.isEmpty()) {
+        flowOf(emptyMap())
+    } else {
+        combine(
+            dates.map { date ->
+                dailyProgressRepo.observeDay(date).map { rows -> date to rows }
+            }
+        ) { dateRows ->
+            dateRows.toMap()
+        }
+    }
+
+    private fun loadMonthData(
         month: YearMonth,
-        categoryIds: List<Int>
+        categoryIds: List<Int>,
+        completedDates: Set<String>,
+        progressByDate: Map<String, List<DailyCategoryProgressEntity>>
     ): List<DayStatistics> {
         val daysInMonth = month.lengthOfMonth()
         val monthData = mutableListOf<DayStatistics>()
@@ -318,11 +386,10 @@ class StatisticsViewModel @Inject constructor(
         for (day in 1..daysInMonth) {
             val date = month.atDay(day)
             val dateString = date.toString()
-            val isDayCompleted =
-                dayCompletionRepo.getCompletedEntity(dateString) != null
+            val isDayCompleted = dateString in completedDates
 
             if (isDayCompleted) {
-                val dailyProgress = dailyProgressRepo.getByDate(dateString)
+                val dailyProgress = progressByDate[dateString].orEmpty()
                 val progressMap = dailyProgress.associate { it.categoryLocalId to it.value }
                 val totalSelected = progressMap.values.count { it }
 
@@ -354,9 +421,11 @@ class StatisticsViewModel @Inject constructor(
         return monthData
     }
 
-    private suspend fun loadWeekData(
+    private fun loadWeekData(
         weekStart: LocalDate,
-        categoryIds: List<Int>
+        categoryIds: List<Int>,
+        completedDates: Set<String>,
+        progressByDate: Map<String, List<DailyCategoryProgressEntity>>
     ): List<DayStatistics> {
         val weekData = mutableListOf<DayStatistics>()
 
@@ -364,11 +433,10 @@ class StatisticsViewModel @Inject constructor(
             val date = weekStart.plusDays(i.toLong())
             val dateString = date.toString()
             val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-            val isDayCompleted =
-                dayCompletionRepo.getCompletedEntity(dateString) != null
+            val isDayCompleted = dateString in completedDates
 
             if (isDayCompleted) {
-                val dailyProgress = dailyProgressRepo.getByDate(dateString)
+                val dailyProgress = progressByDate[dateString].orEmpty()
                 val progressMap = dailyProgress.associate { it.categoryLocalId to it.value }
                 val totalSelected = progressMap.values.count { it }
 
@@ -402,9 +470,11 @@ class StatisticsViewModel @Inject constructor(
         return weekData
     }
 
-    private suspend fun loadYearData(
+    private fun loadYearData(
         year: Year,
-        categoryIds: List<Int>
+        categoryIds: List<Int>,
+        completedDates: Set<String>,
+        progressByDate: Map<String, List<DailyCategoryProgressEntity>>
     ): List<MonthStatistics> {
         val yearData = mutableListOf<MonthStatistics>()
 
@@ -423,11 +493,10 @@ class StatisticsViewModel @Inject constructor(
             for (day in 1..daysInMonth) {
                 val date = yearMonth.atDay(day)
                 val dateString = date.toString()
-                val isDayCompleted =
-                    dayCompletionRepo.getCompletedEntity(dateString) != null
+                val isDayCompleted = dateString in completedDates
 
                 if (isDayCompleted) {
-                    val dailyProgress = dailyProgressRepo.getByDate(dateString)
+                    val dailyProgress = progressByDate[dateString].orEmpty()
                     val progressMap = dailyProgress.associate { it.categoryLocalId to it.value }
 
                     progressMap.forEach { (categoryId, isSelected) ->
@@ -454,13 +523,13 @@ class StatisticsViewModel @Inject constructor(
 
     private fun findRelevantCategories(
         data: List<DayStatistics>,
-        allCategories: List<CategoryDto>
+        allCategories: List<CategoryEntity>
     ): Set<Int> {
         val relevantCategoryIds = mutableSetOf<Int>()
 
         allCategories
-            .filter { it.visible }
-            .forEach { category -> category.id?.let { relevantCategoryIds.add(it) } }
+            .filter { it.isVisible }
+            .forEach { category -> relevantCategoryIds.add(category.localId) }
 
         data.forEach { dayData ->
             if (dayData.totalSelected > 0) {
@@ -477,13 +546,13 @@ class StatisticsViewModel @Inject constructor(
 
     private fun findRelevantCategoriesForYear(
         yearData: List<MonthStatistics>,
-        allCategories: List<CategoryDto>
+        allCategories: List<CategoryEntity>
     ): Set<Int> {
         val relevantCategoryIds = mutableSetOf<Int>()
 
         allCategories
-            .filter { it.visible }
-            .forEach { category -> category.id?.let { relevantCategoryIds.add(it) } }
+            .filter { it.isVisible }
+            .forEach { category -> relevantCategoryIds.add(category.localId) }
 
         yearData.forEach { monthData ->
             monthData.categorySums.forEach { (categoryId, sum) ->
@@ -497,17 +566,17 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private fun filterCategories(
-        allCategories: List<CategoryDto>,
+        allCategories: List<CategoryEntity>,
         relevantCategoryIds: Set<Int>
     ): List<CategoryStats> {
         return allCategories
-            .filter { category -> category.id in relevantCategoryIds }
+            .filter { category -> category.localId in relevantCategoryIds }
             .map { category -> CategoryStats(
-                id = category.id ?: 0,
+                id = category.localId,
                 name = category.name,
                 nameKey = null,
-                isVisible = category.visible,
-                isSystem = false
+                isVisible = category.isVisible,
+                isSystem = category.isSystem
             ) }
     }
 
