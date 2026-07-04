@@ -126,6 +126,10 @@
     <string name="theme_preview_dark_stone_subtitle">Always use dark stone theme</string>
     <string name="theme_preview_light_stone_title">Light Stone</string>
     <string name="theme_preview_light_stone_subtitle">Always use light stone theme</string>
+    <string name="theme_preview_hotline_title">Hotline Miami</string>
+    <string name="theme_preview_hotline_subtitle">Neon retro with glowing text</string>
+    <string name="theme_preview_hotline_light_title">Hotline Miami Light</string>
+    <string name="theme_preview_hotline_light_subtitle">Light neon retro</string>
 
     <!-- Daily Checkup Card Titles -->
     <string name="card_title_productivity_points">Productivity Points</string>

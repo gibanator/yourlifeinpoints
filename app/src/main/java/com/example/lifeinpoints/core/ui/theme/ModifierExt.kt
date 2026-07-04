@@ -13,9 +13,9 @@ fun Modifier.clipByTheme(
     stoneShape: Shape = RectangleShape,
     defaultShape: Shape
 ): Modifier {
-    val isStone = LocalThemeType.current.isStoneTheme
+    val isSharp = LocalThemeType.current.isSharpTheme
     return this.then(
-        if (isStone) Modifier.clip(stoneShape)
+        if (isSharp) Modifier.clip(stoneShape)
         else Modifier.clip(defaultShape)
     )
 }

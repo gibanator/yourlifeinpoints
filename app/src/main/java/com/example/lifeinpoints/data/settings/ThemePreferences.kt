@@ -31,6 +31,8 @@ object SettingsPrefs {
                 "DARK" -> ThemeType.DARK
                 "DARK_STONE" -> ThemeType.DARK_STONE
                 "LIGHT_STONE" -> ThemeType.LIGHT_STONE
+                "HOTLINE_MIAMI" -> ThemeType.HOTLINE_MIAMI
+                "HOTLINE_MIAMI_LIGHT" -> ThemeType.HOTLINE_MIAMI_LIGHT
                 "SYSTEM", null -> ThemeType.SYSTEM
                 else -> ThemeType.SYSTEM
             }

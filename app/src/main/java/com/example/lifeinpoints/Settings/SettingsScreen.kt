@@ -415,6 +415,20 @@ fun ThemeSelectionCard(
                 isSelected = currentTheme == ThemeType.DARK_STONE,
                 onClick = { onThemeSelected(ThemeType.DARK_STONE) }
             )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            ThemeOption(
+                title = stringResource(R.string.theme_hotline_title),
+                subtitle = stringResource(R.string.theme_hotline_subtitle),
+                isSelected = currentTheme == ThemeType.HOTLINE_MIAMI,
+                onClick = { onThemeSelected(ThemeType.HOTLINE_MIAMI) }
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            ThemeOption(
+                title = stringResource(R.string.theme_hotline_light_title),
+                subtitle = stringResource(R.string.theme_hotline_light_subtitle),
+                isSelected = currentTheme == ThemeType.HOTLINE_MIAMI_LIGHT,
+                onClick = { onThemeSelected(ThemeType.HOTLINE_MIAMI_LIGHT) }
+            )
         }
     }
 }

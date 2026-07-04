@@ -63,6 +63,23 @@ fun LifeInPointsTheme(
         return
     }
 
+    // 🌴 Hotline Miami (неон, свечение текста, аркадные формы). Тёмный и светлый варианты.
+    if (themeType.isHotlineTheme) {
+        val isLight = themeType.isLightHotline
+        CompositionLocalProvider(
+            LocalThemeType provides themeType,
+            LocalStatsPalette provides if (isLight) HotlineLightStatsPalette else HotlineStatsPalette
+        ) {
+            MaterialTheme(
+                colorScheme = if (isLight) hotlineMiamiLightColorScheme() else hotlineMiamiColorScheme(),
+                typography = if (isLight) HotlineLightTypography else HotlineTypography,
+                shapes = HotlineShapes,
+                content = content
+            )
+        }
+        return
+    }
+
     // Стандартные темы (SYSTEM/LIGHT/DARK) — без изменений
     val systemDarkTheme = isSystemInDarkTheme()
     val useDarkTheme = when (themeType) {
@@ -137,5 +154,52 @@ private val StoneStatsPalette = StatsPalette(
         Color(0xFFB2A68D), // Бежевый (песчаник)
         Color(0xFF8A7F6D), // Серо-бежевый (цемент)
         Color(0xFF5E4B3C)  // Тёмный шоколад (базальт)
+    )
+)
+
+private val HotlineStatsPalette = StatsPalette(
+    month = HotlineCyan,
+    week  = HotlinePink,
+    year  = HotlineYellow,
+    categories = listOf(
+        HotlinePink,            // неоновый маджента
+        HotlineCyan,            // неоновый циан
+        HotlineYellow,          // закатный жёлтый
+        HotlinePurple,          // неоновый фиолетовый
+        Color(0xFF00FF9F),      // неоновый зелёный
+        Color(0xFFFF6C11),      // неоновый оранжевый
+        Color(0xFF3BF0E4),      // бирюзовый
+        Color(0xFFFF3864),      // ярко-розовый
+        Color(0xFFB967FF),      // светло-фиолетовый
+        Color(0xFF01FFC3),      // мятный неон
+        Color(0xFFFFB800),      // янтарный
+        Color(0xFFF706CF),      // фуксия
+        Color(0xFF6EFF3E),      // лаймовый неон
+        Color(0xFF00B8FF),      // электрик-синий
+        Color(0xFFFF9472)       // коралловый
+    )
+)
+
+// Светлый неон — насыщенные, но более тёмные оттенки для контраста на светлом фоне
+private val HotlineLightStatsPalette = StatsPalette(
+    month = HotlineLightCyan,
+    week  = HotlineLightPink,
+    year  = HotlineLightOrange,
+    categories = listOf(
+        HotlineLightPink,       // маджента
+        HotlineLightCyan,       // тил
+        HotlineLightPurple,     // фиолетовый
+        HotlineLightOrange,     // оранжевый
+        Color(0xFF00A878),      // зелёный
+        Color(0xFFD8125B),      // малиновый
+        Color(0xFF2D7DD2),      // синий
+        Color(0xFFC71585),      // фиалково-розовый
+        Color(0xFFE8A200),      // янтарный
+        Color(0xFF5A2A9E),      // тёмно-фиолетовый
+        Color(0xFFEF5DA8),      // розовый
+        Color(0xFF009B77),      // изумрудный
+        Color(0xFFB5179E),      // фуксия
+        Color(0xFFFF6B35),      // коралловый
+        Color(0xFF3A86FF)       // яркий синий
     )
 )
