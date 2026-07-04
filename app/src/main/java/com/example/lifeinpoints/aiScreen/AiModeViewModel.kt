@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -28,7 +27,7 @@ data class AiModeUiState(
     // По умолчанию — GigaChat, чтобы UI всегда что-то показывал до ответа /models.
     val availableProviders: List<AiProviderOption> = listOf(AiProviderOption("gigachat", "GigaChat")),
     val selectedProvider: String = "gigachat",
-    val isModelMenuVisible: Boolean = false
+    val isModelMenuVisible: Boolean = false,
     val isTranscribing: Boolean = false,
     val transcriptionError: String? = null
 )
