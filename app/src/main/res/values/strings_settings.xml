@@ -17,6 +17,10 @@
     <string name="theme_dark_stone_subtitle">Dark stone with carved text</string>
     <string name="theme_light_stone_title">Light Stone</string>
     <string name="theme_light_stone_subtitle">Light stone with carved text</string>
+    <string name="theme_hotline_title">Hotline Miami</string>
+    <string name="theme_hotline_subtitle">Neon retro with glowing text</string>
+    <string name="theme_hotline_light_title">Hotline Miami Light</string>
+    <string name="theme_hotline_light_subtitle">Light neon retro</string>
 
     <!-- Content Settings Group -->
     <string name="categories_management_title">Categories</string>

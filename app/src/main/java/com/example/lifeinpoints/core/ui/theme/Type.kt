@@ -212,3 +212,155 @@ val StoneTypography = Typography(
         )
     )
 )
+
+// 🌴 Типографика Hotline Miami — жирные заголовки с неоновым свечением.
+// Билдер переиспользуется тёмным и светлым вариантами (меняются цвета и сила свечения).
+private fun neonGlow(color: Color, radius: Float, alpha: Float) = Shadow(
+    color = color.copy(alpha = alpha),
+    offset = Offset(0f, 0f),
+    blurRadius = radius
+)
+
+private fun hotlineTypography(
+    primaryGlow: Color,
+    secondaryGlow: Color,
+    glowAlpha: Float,
+    blurScale: Float
+): Typography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Black,
+        fontSize = 57.sp,
+        lineHeight = 64.sp,
+        letterSpacing = 1.sp,
+        shadow = neonGlow(primaryGlow, 24f * blurScale, glowAlpha)
+    ),
+    displayMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Black,
+        fontSize = 45.sp,
+        lineHeight = 52.sp,
+        letterSpacing = 1.sp,
+        shadow = neonGlow(primaryGlow, 20f * blurScale, glowAlpha)
+    ),
+    displaySmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Black,
+        fontSize = 36.sp,
+        lineHeight = 44.sp,
+        letterSpacing = 0.5.sp,
+        shadow = neonGlow(primaryGlow, 18f * blurScale, glowAlpha)
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Black,
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.5.sp,
+        shadow = neonGlow(primaryGlow, 16f * blurScale, glowAlpha)
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Black,
+        fontSize = 28.sp,
+        lineHeight = 36.sp,
+        letterSpacing = 0.5.sp,
+        shadow = neonGlow(secondaryGlow, 14f * blurScale, glowAlpha)
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
+        letterSpacing = 0.5.sp,
+        shadow = neonGlow(secondaryGlow, 12f * blurScale, glowAlpha)
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.5.sp,
+        shadow = neonGlow(primaryGlow, 10f * blurScale, glowAlpha)
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.4.sp,
+        shadow = neonGlow(primaryGlow, 8f * blurScale, glowAlpha)
+    ),
+    titleSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.3.sp,
+        shadow = neonGlow(secondaryGlow, 7f * blurScale, glowAlpha * 0.7f)
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp,
+        shadow = neonGlow(secondaryGlow, 6f * blurScale, glowAlpha * 0.55f)
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp,
+        shadow = neonGlow(secondaryGlow, 5f * blurScale, glowAlpha * 0.5f)
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.4.sp,
+        shadow = neonGlow(secondaryGlow, 4f * blurScale, glowAlpha * 0.45f)
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.8.sp,
+        shadow = neonGlow(primaryGlow, 8f * blurScale, glowAlpha * 0.7f)
+    ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.8.sp,
+        shadow = neonGlow(primaryGlow, 7f * blurScale, glowAlpha * 0.65f)
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.8.sp,
+        shadow = neonGlow(primaryGlow, 6f * blurScale, glowAlpha * 0.6f)
+    )
+)
+
+// Тёмный неон — насыщенное, яркое свечение
+val HotlineTypography = hotlineTypography(
+    primaryGlow = HotlinePink,
+    secondaryGlow = HotlineCyan,
+    glowAlpha = 0.95f,
+    blurScale = 1.25f
+)
+
+// Светлый неон — свечение мягче и темнее, чтобы текст оставался читаемым
+val HotlineLightTypography = hotlineTypography(
+    primaryGlow = HotlineLightPink,
+    secondaryGlow = HotlineLightPurple,
+    glowAlpha = 0.45f,
+    blurScale = 0.7f
+)

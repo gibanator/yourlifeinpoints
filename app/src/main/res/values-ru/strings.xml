@@ -126,6 +126,10 @@
     <string name="theme_preview_dark_stone_subtitle">Всегда использовать тёмную тему</string>
     <string name="theme_preview_light_stone_title">Светлая каменная</string>
     <string name="theme_preview_light_stone_subtitle">Всегда использовать светлую тему</string>
+    <string name="theme_preview_hotline_title">Hotline Miami</string>
+    <string name="theme_preview_hotline_subtitle">Неоновый ретро со светящимся текстом</string>
+    <string name="theme_preview_hotline_light_title">Hotline Miami (светлая)</string>
+    <string name="theme_preview_hotline_light_subtitle">Светлый неоновый ретро</string>
 
     <!-- Daily Checkup Card Titles -->
     <string name="card_title_productivity_points">Баллы продуктивности</string>
@@ -171,6 +175,7 @@
     <string name="ai_mode_send_button">Отправить</string>
     <string name="ai_mode_back_content_description">Назад</string>
     <string name="ai_mode_mic_content_description">Записать голос</string>
+    <string name="ai_mode_model_picker_content_description">Выбрать модель</string>
     <string name="ai_mode_stop_recording_content_description">Остановить запись</string>
     <string name="ai_mode_recording_status">Идет запись… Нажмите на кнопку еще раз, чтобы остановить.</string>
     <string name="ai_mode_transcribing_status">Расшифровка аудио…</string>

@@ -10,7 +10,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.lifeinpoints.core.ui.theme.LocalThemeType
-import com.example.lifeinpoints.core.ui.theme.isStoneTheme
+import com.example.lifeinpoints.core.ui.theme.isSharpTheme
 
 // com/example/lifeinpoints/core/ui/AppTopAppBar.kt
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,9 +22,9 @@ fun AppTopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors()
 ) {
-    val isStone = LocalThemeType.current.isStoneTheme
+    val isSharp = LocalThemeType.current.isSharpTheme
 
-    val finalColors = if (isStone) {
+    val finalColors = if (isSharp) {
         TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
             scrolledContainerColor = MaterialTheme.colorScheme.background,
