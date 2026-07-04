@@ -17,6 +17,10 @@
     <string name="theme_dark_stone_subtitle">Тёмный камень с резным текстом</string>
     <string name="theme_light_stone_title">Светлый камень</string>
     <string name="theme_light_stone_subtitle">Светлый камень с резным текстом</string>
+    <string name="theme_hotline_title">Hotline Miami</string>
+    <string name="theme_hotline_subtitle">Неоновый ретро со светящимся текстом</string>
+    <string name="theme_hotline_light_title">Hotline Miami (светлая)</string>
+    <string name="theme_hotline_light_subtitle">Светлый неоновый ретро</string>
 
     <!-- Content -->
     <string name="categories_management_title">Категории</string>

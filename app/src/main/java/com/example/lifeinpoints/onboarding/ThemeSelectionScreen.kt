@@ -85,6 +85,20 @@ fun ThemeSelectionScreen(
                     onClick = { selectedTheme = ThemeType.LIGHT_STONE }
                 )
 
+                ThemeOptionCard(
+                    title = stringResource(R.string.theme_preview_hotline_title),
+                    description = stringResource(R.string.theme_preview_hotline_subtitle),
+                    isSelected = selectedTheme == ThemeType.HOTLINE_MIAMI,
+                    onClick = { selectedTheme = ThemeType.HOTLINE_MIAMI }
+                )
+
+                ThemeOptionCard(
+                    title = stringResource(R.string.theme_preview_hotline_light_title),
+                    description = stringResource(R.string.theme_preview_hotline_light_subtitle),
+                    isSelected = selectedTheme == ThemeType.HOTLINE_MIAMI_LIGHT,
+                    onClick = { selectedTheme = ThemeType.HOTLINE_MIAMI_LIGHT }
+                )
+
                 Spacer(modifier = Modifier.weight(0.3f))
 
                 Button(

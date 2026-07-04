@@ -22,3 +22,12 @@ val StoneShapes = Shapes(
     large = RoundedCornerShape(0.dp),
     extraLarge = RoundedCornerShape(0.dp)
 )
+
+// Аркадно-острые формы для Hotline Miami (лёгкий 2dp «фаск»)
+val HotlineShapes = Shapes(
+    extraSmall = RoundedCornerShape(2.dp),
+    small = RoundedCornerShape(2.dp),
+    medium = RoundedCornerShape(2.dp),
+    large = RoundedCornerShape(2.dp),
+    extraLarge = RoundedCornerShape(2.dp)
+)

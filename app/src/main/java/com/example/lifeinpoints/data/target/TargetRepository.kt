@@ -17,6 +17,9 @@ class TargetRepository @Inject constructor(
     suspend fun getSelectedForDate(date: String): Set<Int> =
         selectionDao.getSelectedForDate(date).toSet()
 
+    fun observeSelectedForDate(date: String): Flow<List<Int>> =
+        selectionDao.observeSelectedForDate(date)
+
     suspend fun addTarget(name: String, days: Int, deadline: LocalDate?) {
         val deadlineMillis = deadline?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
         dao.insert(TargetEntity(name = name, days = days, deadlineMillis = deadlineMillis))

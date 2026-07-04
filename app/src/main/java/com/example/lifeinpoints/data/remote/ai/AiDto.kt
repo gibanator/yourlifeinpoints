@@ -31,3 +31,7 @@ data class AiEvaluateResponse(
     val categories: List<AiCategoryResult>,
     val targets: List<AiTargetResult>
 )
+
+data class TranscriptionResponse(
+    val text: String
+)

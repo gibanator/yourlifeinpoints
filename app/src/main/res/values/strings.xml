@@ -126,6 +126,10 @@
     <string name="theme_preview_dark_stone_subtitle">Always use dark stone theme</string>
     <string name="theme_preview_light_stone_title">Light Stone</string>
     <string name="theme_preview_light_stone_subtitle">Always use light stone theme</string>
+    <string name="theme_preview_hotline_title">Hotline Miami</string>
+    <string name="theme_preview_hotline_subtitle">Neon retro with glowing text</string>
+    <string name="theme_preview_hotline_light_title">Hotline Miami Light</string>
+    <string name="theme_preview_hotline_light_subtitle">Light neon retro</string>
 
     <!-- Daily Checkup Card Titles -->
     <string name="card_title_productivity_points">Productivity Points</string>
@@ -171,5 +175,15 @@
     <string name="ai_mode_send_button">Send</string>
     <string name="ai_mode_back_content_description">Back</string>
     <string name="ai_mode_mic_content_description">Record voice</string>
+    <string name="ai_mode_model_picker_content_description">Choose model</string>
+    <string name="ai_mode_stop_recording_content_description">Stop recording</string>
+    <string name="ai_mode_recording_status">Recording… Tap the button again to stop.</string>
+    <string name="ai_mode_transcribing_status">Transcribing audio…</string>
+    <string name="ai_mode_microphone_permission_denied">Microphone permission was denied.</string>
+    <string name="ai_mode_voice_sheet_title">Voice input</string>
+    <string name="ai_mode_voice_sheet_ready">Ready to record.</string>
+    <string name="ai_mode_start_recording_button">Start recording</string>
+    <string name="ai_mode_stop_recording_button">Stop and transcribe</string>
+    <string name="ai_mode_close_button">Close</string>
 
 </resources>

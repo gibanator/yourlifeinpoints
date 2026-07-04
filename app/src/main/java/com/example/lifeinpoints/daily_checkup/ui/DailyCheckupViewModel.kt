@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lifeinpoints.data.category.CategoryEntity
 import com.example.lifeinpoints.data.category.CategoryRepositoryNew
 import com.example.lifeinpoints.data.categoryTemplate.CommentTemplateRepository
 import com.example.lifeinpoints.data.dailyCategoryProgress.DailyCategoryProgressEntity
@@ -87,10 +88,11 @@ class DailyCheckupViewModel @Inject constructor(
             combine(
                 dailyProgressRepo.observeDay(date),
                 categoryRepository.observeVisibleCategoriesCreatedBefore(selectedDayMillis),
-                dayCompletionRepo.observeDayCompletion(date)
-            ) { rows, categories, isDayEnded ->
-                Triple(rows, categories, isDayEnded)
-            }.collect { (rows, categories, isDayEnded) ->
+                dayCompletionRepo.observeDayCompletion(date),
+                targetRepository.observeSelectedForDate(date)
+            ) { rows, categories, isDayEnded, selectedTargetIds ->
+                DayData(rows, categories, isDayEnded, selectedTargetIds.toSet())
+            }.collect { (rows, categories, isDayEnded, selectedTargetIds) ->
 
                 val visibleCategories = categories.map { category ->
                     CategoryUi(
@@ -124,7 +126,8 @@ class DailyCheckupViewModel @Inject constructor(
                         orderedCategories = visibleCategories,
                         savedComments = savedComments,
                         commentDrafts = drafts,
-                        isDayEnded = isDayEnded
+                        isDayEnded = isDayEnded,
+                        selectedTargets = selectedTargetIds
                     )
                 }
             }
@@ -537,6 +540,13 @@ class DailyCheckupViewModel @Inject constructor(
         _uiState.update { it.copy(isVoiceRecognitionVisible = false) }
     }
 }
+
+private data class DayData(
+    val rows: List<DailyCategoryProgressEntity>,
+    val categories: List<CategoryEntity>,
+    val isDayEnded: Boolean,
+    val selectedTargetIds: Set<Int>
+)
 
 private fun TargetEntity.toTargetUi(): TargetUi {
     return TargetUi(
