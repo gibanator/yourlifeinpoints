@@ -176,5 +176,14 @@
     <string name="ai_mode_back_content_description">Back</string>
     <string name="ai_mode_mic_content_description">Record voice</string>
     <string name="ai_mode_model_picker_content_description">Choose model</string>
+    <string name="ai_mode_stop_recording_content_description">Stop recording</string>
+    <string name="ai_mode_recording_status">Recording… Tap the button again to stop.</string>
+    <string name="ai_mode_transcribing_status">Transcribing audio…</string>
+    <string name="ai_mode_microphone_permission_denied">Microphone permission was denied.</string>
+    <string name="ai_mode_voice_sheet_title">Voice input</string>
+    <string name="ai_mode_voice_sheet_ready">Ready to record.</string>
+    <string name="ai_mode_start_recording_button">Start recording</string>
+    <string name="ai_mode_stop_recording_button">Stop and transcribe</string>
+    <string name="ai_mode_close_button">Close</string>
 
 </resources>
