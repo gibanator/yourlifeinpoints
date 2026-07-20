@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="streak_current">Série actuelle :</string>
+    <string name="streak_best">Meilleure série :</string>
+    <string name="days">jours</string>
+    <string name="successful_days">Jours réussis :</string>
+
+    <string name="month">Mois</string>
+    <string name="year">Année</string>
+    <string name="week">Semaine</string>
+</resources>

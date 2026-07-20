@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="statistics_page_title">Estadísticas</string>
+
+    <string name="day_col_name">Día</string>
+    <string name="total_col_name">Total</string>
+
+    <!-- Summary card -->
+    <plurals name="summary_categories_count">
+        <item quantity="one">%d categoría</item>
+        <item quantity="other">%d categorías</item>
+    </plurals>
+
+    <string name="month_summary_title">Resumen de %1$s</string>
+    <string name="year_summary_title">Resumen de %1$d</string>
+    <string name="summary_day_number">#%1$d</string>
+    <string name="week_summary_title">Resumen de la semana</string>
+
+    <string name="summary_days">Días</string>
+    <string name="summary_months">Meses</string>
+    <string name="summary_completed">completados</string>
+    <string name="summary_average">Media</string>
+    <string name="summary_perday">por día</string>
+    <string name="summary_permonth">por mes</string>
+    <string name="summary_bestday">Mejor día</string>
+    <string name="summary_bestmonth">Mejor mes</string>
+
+    <!-- Pie Chart -->
+    <string name="piechart_title_month">Categorías del mes</string>
+    <string name="piechart_title_year">Categorías del año</string>
+    <string name="piechart_title_week">Categorías de la semana</string>
+    <string name="piechart_nodata">No hay datos para mostrar</string>
+
+    <!-- Chart -->
+    <string name="chart_category_selection_annotation">Selecciona categorías para mostrar el gráfico</string>
+    <string name="chart_no_data_annotation">No hay datos para las categorías seleccionadas</string>
+    <string name="chart_selectall_button">Seleccionar todo</string>
+    <string name="chart_deselectall_button">Deseleccionar todo</string>
+    <string name="chart_selected_count">Seleccionadas: %1$d de %2$d</string>
+</resources>

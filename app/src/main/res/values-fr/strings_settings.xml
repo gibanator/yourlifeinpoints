@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Groups -->
+    <string name="settings_title">Paramètres</string>
+    <string name="theme_setting_title">Thème</string>
+    <string name="content_section_title">Contenu</string>
+    <string name="leveling_section_title">Progression</string>
+
+    <!-- Theming -->
+    <string name="theme_system_title">Par défaut du système</string>
+    <string name="theme_system_subtitle">Suivre le thème du système</string>
+    <string name="theme_light_title">Clair</string>
+    <string name="theme_light_subtitle">Toujours utiliser le thème clair</string>
+    <string name="theme_dark_title">Sombre</string>
+    <string name="theme_dark_subtitle">Toujours utiliser le thème sombre</string>
+    <string name="theme_dark_stone_title">Pierre sombre</string>
+    <string name="theme_dark_stone_subtitle">Pierre sombre avec texte gravé</string>
+    <string name="theme_light_stone_title">Pierre claire</string>
+    <string name="theme_light_stone_subtitle">Pierre claire avec texte gravé</string>
+    <string name="theme_hotline_title">Hotline Miami</string>
+    <string name="theme_hotline_subtitle">Rétro néon avec texte lumineux</string>
+    <string name="theme_hotline_light_title">Hotline Miami Clair</string>
+    <string name="theme_hotline_light_subtitle">Rétro néon clair</string>
+
+    <!-- Content Settings Group -->
+    <string name="categories_management_title">Catégories</string>
+    <string name="categories_management_subtitle">Gérez vos catégories d\'activité</string>
+    <string name="categories_visibility_title">Catégories visibles</string>
+    <string name="categories_visibility_subtitle">Choisissez les catégories affichées sur l\'écran principal</string>
+    <string name="comment_management_title">Gérer les modèles de commentaires</string>
+    <string name="comment_management_subtitle">Ajoutez, modifiez ou supprimez les commentaires fréquents pour les saisir plus vite</string>
+
+    <!-- Game Mode -->
+    <string name="gamemode_tumbler_title">Mode jeu</string>
+    <string name="gamemode_tumbler_subtitle">Activer le système de progression avec points d\'expérience</string>
+
+    <!-- Categories Settings Pages -->
+    <string name="categories_visibility_page_title">Gérer les catégories visibles</string>
+    <string name="categories_visibility_annotation_text">Choisissez les catégories affichées sur l\'écran principal. Vous pouvez masquer les catégories système comme les vôtres.</string>
+    <string name="system_category_annotation_text">Catégorie système</string>
+
+    <string name="category_add_screen_title">Ajouter une catégorie</string>
+    <string name="category_name_field_title">Nom de la catégorie</string>
+    <string name="category_name_placeholder_text">Saisissez le nom de la catégorie…</string>
+    <string name="category_add_tips_subtitle">Conseils pour créer des catégories :</string>
+    <string name="category_add_tips_text">• Choisissez des noms clairs et descriptifs\n• Rendez les catégories précises et concrètes\n• Évitez les doublons\n• Gardez des noms courts et faciles à retenir</string>
+    <string name="category_entrance_time_subtitle">La catégorie apparaît à partir de</string>
+    <string name="category_entrance_today_option">Aujourd\'hui</string>
+    <string name="category_entrance_selective_option">Choisir une date :</string>
+    <string name="category_entrance_start_option">Le début</string>
+    <string name="category_edit_page_title">Modifier la catégorie</string>
+
+    <string name="delete_category_title">Supprimer la catégorie</string>
+    <string name="delete_category_message">Voulez-vous vraiment supprimer \"%1$s\" ? Cette action est irréversible.</string>
+    <string name="delete_button">Supprimer</string>
+    <string name="cancel_button">Annuler</string>
+
+    <!-- Comment Template Pages -->
+    <string name="comment_templates_page_title">Modèles de commentaires</string>
+    <string name="comment_template_annotation_text">Définissez jusqu\'à 5 commentaires rapides pour cette catégorie</string>
+    <string name="template">Modèle</string>
+    <string name="empty">Vide</string>
+    <string name="comment_template_text_placeholder">Saisissez le texte du modèle :</string>
+    <string name="empty_tip">Astuce : laissez le champ vide pour effacer cet emplacement</string>
+
+    <!-- Reminders Section-->
+    <string name="notification_settings_section_title">Rappels</string>
+    <string name="notification_settings_card_title">Rappels quotidiens</string>
+    <string name="notification_settings_card_subtitle">Configurez des notifications quotidiennes pour ancrer vos habitudes</string>
+    <string name="cd_notification_settings">Paramètres de notification</string>
+
+    <string name="notification_settings_title">Paramètres de notification</string>
+    <string name="notification_daily_reminders_title">Rappels quotidiens</string>
+    <string name="notification_daily_reminders_desc">Définissez un rappel quotidien pour compléter votre bilan. Nous vous préviendrons chaque jour à l\'heure indiquée pour vous aider à créer une habitude durable.</string>
+
+    <string name="notification_daily_reminders_label">Rappels quotidiens</string>
+    <string name="enabled">Activés</string>
+    <string name="disabled">Désactivés</string>
+
+    <string name="notification_reminder_time_label">Heure du rappel</string>
+
+    <string name="notification_tips_title">Conseils pour des rappels efficaces :</string>
+    <string name="notification_tips_body">• Programmez les rappels aux moments où vous êtes généralement libre\n• Choisissez des horaires réguliers pour ancrer vos habitudes\n• Les rappels du soir aident à faire le bilan de la journée\n• Les rappels du matin aident à planifier</string>
+
+    <string name="notification_test_title">Notification de test</string>
+    <string name="notification_test_desc">Appuyez sur le bouton ci-dessous pour vérifier que les notifications fonctionnent.</string>
+    <string name="notification_test_button">Tester la notification</string>
+
+    <string name="notification_test_notif_title">Notification de test 🧪</string>
+    <string name="notification_test_notif_message">Ceci est une notification de test pour vérifier que tout fonctionne !</string>
+
+    <!-- Auth Section -->
+    <string name="auth_section_title">Compte</string>
+    <string name="auth_register">S\'inscrire</string>
+    <string name="auth_login">Se connecter</string>
+    <string name="auth_logout">Se déconnecter</string>
+    <string name="login_title">Connexion</string>
+    <string name="login_success">Connexion réussie</string>
+    <string name="login_google_button">Se connecter avec Google</string>
+    <string name="login_google_error">Échec de la connexion Google. Veuillez réessayer.</string>
+
+    <string name="change">Modifier</string>
+    <string name="select_time">Sélectionner l\'heure</string>
+    <string name="hour">Heure</string>
+    <string name="minute">Minute</string>
+    <string name="selected_time">Sélectionné : %1$s</string>
+
+    <!-- Cloud Sync -->
+    <string name="cloud_sync_title">Synchronisation cloud</string>
+</resources>

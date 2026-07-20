@@ -64,7 +64,7 @@ fun XpProgressBar(
                     )
 
                     // Класс игрока
-                    if (levelState.playerClassKey != "Новичок") {
+                    if (levelState.playerClassKey != "NOVICE") {
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = stringResource(R.string.level_class_bullet, className),

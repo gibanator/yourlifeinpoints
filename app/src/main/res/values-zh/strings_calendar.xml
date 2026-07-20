@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="streak_current">当前连续：</string>
+    <string name="streak_best">最长连续：</string>
+    <string name="days">天</string>
+    <string name="successful_days">完成天数：</string>
+
+    <string name="month">月</string>
+    <string name="year">年</string>
+    <string name="week">周</string>
+</resources>

@@ -51,9 +51,7 @@
     <string name="category_edit_page_title">Редактирование категории</string>
 
     <string name="delete_category_title">Удалить категорию</string>
-    <string name="delete_category_message">
-    Вы уверены, что хотите удалить «%1$s»? Это действие нельзя отменить.
-    </string>
+    <string name="delete_category_message">Вы уверены, что хотите удалить «%1$s»? Это действие нельзя отменить.</string>
     <string name="delete_button">Удалить</string>
     <string name="cancel_button">Отмена</string>
 
@@ -106,5 +104,8 @@
     <string name="hour">Часы</string>
     <string name="minute">Минуты</string>
     <string name="selected_time">Выбрано: %1$s</string>
+
+    <!-- Cloud Sync -->
+    <string name="cloud_sync_title">Облачная синхронизация</string>
 
 </resources>

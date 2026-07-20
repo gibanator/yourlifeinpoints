@@ -32,9 +32,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.Settings.SettingsViewModel
 import com.example.lifeinpoints.core.navigation.AppNavHost
 import com.example.lifeinpoints.core.ui.AppBottomBar
@@ -146,7 +148,7 @@ fun AppEntryPoint() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Загрузка...",
+                text = stringResource(R.string.loading),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )

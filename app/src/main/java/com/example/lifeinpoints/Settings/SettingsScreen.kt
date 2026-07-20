@@ -73,7 +73,7 @@ fun SettingsScreen(
                 title = { Text(text = stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 }
             )
@@ -463,7 +463,7 @@ fun ThemeOption(
         if (isSelected) {
             Icon(
                 imageVector = Icons.Filled.Check,
-                contentDescription = "Selected",
+                contentDescription = stringResource(R.string.cd_selected),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
@@ -516,7 +516,7 @@ fun GameModeCard(
             if (isEnabled) {
                 Icon(
                     imageVector = Icons.Filled.Check,
-                    contentDescription = "Enabled",
+                    contentDescription = stringResource(R.string.cd_enabled),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -591,7 +591,7 @@ fun SyncStatusCard(
 
             Column {
                 Text(
-                    text = "Cloud Sync",
+                    text = stringResource(R.string.cloud_sync_title),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold
                 )

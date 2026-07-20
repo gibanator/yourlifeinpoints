@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="statistics_page_title">统计</string>
+
+    <string name="day_col_name">日期</string>
+    <string name="total_col_name">合计</string>
+
+    <!-- Summary card -->
+    <plurals name="summary_categories_count">
+        <item quantity="other">%d 个分类</item>
+    </plurals>
+
+    <string name="month_summary_title">%1$s 概览</string>
+    <string name="year_summary_title">%1$d 年概览</string>
+    <string name="summary_day_number">第 %1$d 天</string>
+    <string name="week_summary_title">本周概览</string>
+
+    <string name="summary_days">天数</string>
+    <string name="summary_months">月数</string>
+    <string name="summary_completed">已完成</string>
+    <string name="summary_average">平均</string>
+    <string name="summary_perday">每天</string>
+    <string name="summary_permonth">每月</string>
+    <string name="summary_bestday">最佳日</string>
+    <string name="summary_bestmonth">最佳月</string>
+
+    <!-- Pie Chart -->
+    <string name="piechart_title_month">本月分类</string>
+    <string name="piechart_title_year">本年分类</string>
+    <string name="piechart_title_week">本周分类</string>
+    <string name="piechart_nodata">暂无可显示的数据</string>
+
+    <!-- Chart -->
+    <string name="chart_category_selection_annotation">请选择要显示的分类</string>
+    <string name="chart_no_data_annotation">所选分类暂无数据</string>
+    <string name="chart_selectall_button">全选</string>
+    <string name="chart_deselectall_button">取消全选</string>
+    <string name="chart_selected_count">已选择：%2$d 个中的 %1$d 个</string>
+</resources>

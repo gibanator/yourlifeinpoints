@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="category_networking">Netzwerken</string>
+    <string name="category_education">Bildung</string>
+    <string name="category_work">Arbeit</string>
+    <string name="category_health">Gesundheit</string>
+    <string name="category_personal_life">Privatleben</string>
+
+    <!-- Miscellaneous -->
+    <string name="save">Speichern</string>
+    <string name="set">Festlegen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="delete">Löschen</string>
+    <string name="text_word">Text</string>
+
+    <!-- Menu Items -->
+    <string name="main_page_navbar_item">Start</string>
+    <string name="calendar_page_navbar_item">Kalender</string>
+    <string name="statistics_page_navbar_item">Statistik</string>
+    <string name="settings_page_navbar_item">Einstellungen</string>
+
+    <!-- Languages -->
+    <string name="language_setting_title">Sprache</string>
+    <string name="settings_language_subtitle_system">In den Android-Einstellungen ändern</string>
+
+    <!-- Weekdays -->
+    <string-array name="day_names_short">
+        <item>Mo</item>
+        <item>Di</item>
+        <item>Mi</item>
+        <item>Do</item>
+        <item>Fr</item>
+        <item>Sa</item>
+        <item>So</item>
+    </string-array>
+
+    <!-- Short month names -->
+    <string-array name="month_names_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mär</item>
+        <item>Apr</item>
+        <item>Mai</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Okt</item>
+        <item>Nov</item>
+        <item>Dez</item>
+    </string-array>
+    <string name="notif_daily_title">Zeit für den Tagescheck! ⏰</string>
+    <string name="notif_daily_message">Schließe deine täglichen Kategorien ab, um deinen Fortschritt zu verfolgen. Jeder Tag zählt! 💪</string>
+
+    <!-- System Categories -->
+    <string name="cat_networking">Netzwerken</string>
+    <string name="cat_education">Bildung</string>
+    <string name="cat_work">Arbeit</string>
+    <string name="cat_health">Gesundheit</string>
+    <string name="cat_personal_life">Privatleben</string>
+
+    <!-- Registration -->
+    <string name="registration_title">Registrierung</string>
+    <string name="registration_email_label">E-Mail</string>
+    <string name="registration_username_label">Benutzername</string>
+    <string name="registration_password_label">Passwort</string>
+    <string name="registration_confirm_password_label">Passwort bestätigen</string>
+    <string name="registration_button">Registrieren</string>
+    <string name="registration_success">Registrierung erfolgreich</string>
+    <string name="registration_error_required">E-Mail und Passwort sind erforderlich</string>
+    <string name="registration_error_all_required">Alle Felder sind erforderlich</string>
+    <string name="registration_error_password_mismatch">Die Passwörter stimmen nicht überein</string>
+    <string name="registration_info_card">Nach der Registrierung kannst du deine Daten auf mehreren Geräten synchronisieren.</string>
+    <string name="registration_google_button">Mit Google registrieren</string>
+    <string name="registration_google_error">Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.</string>
+
+    <!-- Success Messages -->
+    <string name="category_added_success">Kategorie hinzugefügt</string>
+    <string name="category_updated_success">Kategorie aktualisiert</string>
+    <string name="category_deleted_success">Kategorie gelöscht</string>
+
+    <!-- Error Messages -->
+    <string name="error_user_not_signed_in">Der Benutzer ist nicht angemeldet</string>
+    <string name="error_firebase_token_missing">Firebase-ID-Token fehlt</string>
+    <string name="error_categories_load_failed">Kategorien konnten nicht geladen werden</string>
+    <string name="error_category_not_found">Kategorie nicht gefunden</string>
+    <string name="error_category_create_failed">Kategorie konnte nicht erstellt werden</string>
+    <string name="error_category_create_failed_http">Kategorie konnte nicht erstellt werden: HTTP %1$d</string>
+    <string name="error_category_update_failed_http">Kategorie konnte nicht aktualisiert werden: HTTP %1$d</string>
+    <string name="error_category_delete_failed_http">Kategorie konnte nicht gelöscht werden: HTTP %1$d</string>
+    <string name="error_progress_load_failed_http">Fortschritt konnte nicht geladen werden: HTTP %1$d</string>
+    <string name="error_progress_save_failed_http">Fortschritt konnte nicht gespeichert werden: HTTP %1$d</string>
+
+    <!-- Learn screen -->
+    <string name="start_sc_title">Willkommen bei Life in Points!</string>
+    <string name="start_sc_text">Verfolge deine täglichen Aktivitäten und bringe deinen Charakter voran.</string>
+
+    <string name="sec_sc_title">Hauptbildschirm</string>
+    <string name="sec_sc_text">Markiere abgeschlossene Kategorien, um Erfahrungspunkte zu sammeln. Vergiss nicht, den Tag abzuschließen!</string>
+
+    <string name="cal_sc_title">Kalender</string>
+    <string name="cal_sc_text">Sieh, welche Tage abgeschlossen sind, und springe schnell zu den Tagen, die dich interessieren.</string>
+
+    <string name="stat_sc_title">Statistik</string>
+    <string name="stat_sc_text">Verfolge deinen Fortschritt mit verschiedenen Diagrammen und Tabellen.</string>
+
+    <string name="set_sc_title">Einstellungen</string>
+    <string name="set_sc_text">Füge benötigte Kategorien hinzu, blende unnötige aus, erstelle Standardantworten für Kommentare, wähle ein Design und richte Benachrichtigungen ein</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_next">Weiter</string>
+    <string name="onboarding_start">Starten</string>
+
+    <!-- Theme selection -->
+    <string name="theme_selection_title">Design wählen</string>
+    <string name="continue_button">Weiter</string>
+    <string name="theme_preview_system_title">System</string>
+    <string name="theme_preview_system_subtitle">Systemdesign folgen</string>
+    <string name="theme_preview_light_title">Hell</string>
+    <string name="theme_preview_light_subtitle">Immer helles Design verwenden</string>
+    <string name="theme_preview_dark_title">Dunkel</string>
+    <string name="theme_preview_dark_subtitle">Immer dunkles Design verwenden</string>
+    <string name="theme_preview_dark_stone_title">Dunkler Stein</string>
+    <string name="theme_preview_dark_stone_subtitle">Immer das Design „Dunkler Stein“ verwenden</string>
+    <string name="theme_preview_light_stone_title">Heller Stein</string>
+    <string name="theme_preview_light_stone_subtitle">Immer das Design „Heller Stein“ verwenden</string>
+    <string name="theme_preview_hotline_title">Hotline Miami</string>
+    <string name="theme_preview_hotline_subtitle">Neon-Retro mit leuchtendem Text</string>
+    <string name="theme_preview_hotline_light_title">Hotline Miami Hell</string>
+    <string name="theme_preview_hotline_light_subtitle">Helles Neon-Retro</string>
+
+    <!-- Daily Checkup Card Titles -->
+    <string name="card_title_productivity_points">Produktivitätspunkte</string>
+    <string name="card_title_goals">Ziele</string>
+
+    <!-- Completed Targets Dialog -->
+    <string name="completed_targets_title">Abgeschlossene Ziele</string>
+    <string name="no_completed_targets">Keine abgeschlossenen Ziele</string>
+    <string name="close_button">Schließen</string>
+
+    <!-- Level Up Dialog -->
+    <string name="level_up_title">🎉 Glückwunsch!</string>
+    <string name="level_up_reached">Du hast Level %1$d erreicht!</string>
+    <string name="level_up_skill_points">Du hast 5 Fertigkeitspunkte erhalten.</string>
+    <string name="level_up_unspent_points">Nicht vergebene Punkte insgesamt: %1$d</string>
+    <string name="later_button">Später</string>
+    <string name="distribute_button">Verteilen</string>
+
+    <!-- Week Bar -->
+    <string name="prev_week_description">Vorherige Woche</string>
+    <string name="next_week_description">Nächste Woche</string>
+
+    <!-- Target List Card -->
+    <string name="add_target_button">+ Ziel hinzufügen</string>
+    <string name="view_completed">Abgeschlossen</string>
+    <string name="view_completed_with_count">Abgeschlossen (%1$d)</string>
+
+    <!-- Add / Edit Target -->
+    <string name="add_target_title">Neues Ziel</string>
+    <string name="edit_target_title">Zieleinstellungen</string>
+    <string name="target_name_label">Name</string>
+    <string name="target_days_label">Anzahl der Tage</string>
+    <string name="target_days_input_label">Anzahl der Tage eingeben</string>
+    <string name="target_deadline_label">Frist (optional)</string>
+    <string name="delete_target_button">Ziel löschen</string>
+    <string name="add_button">Hinzufügen</string>
+    <string name="ok_button">OK</string>
+    <string name="completed_days_count">Abgeschlossene Tage: %1$d</string>
+
+    <!-- AI Mode Screen -->
+    <string name="ai_mode_screen_title">KI-Modus</string>
+    <string name="ai_mode_input_placeholder">Text eingeben…</string>
+    <string name="ai_mode_send_button">Senden</string>
+    <string name="ai_mode_back_content_description">Zurück</string>
+    <string name="ai_mode_mic_content_description">Sprache aufnehmen</string>
+    <string name="ai_mode_model_picker_content_description">Modell wählen</string>
+
+    <!-- AI Errors -->
+    <string name="ai_error_http">KI-Fehler (%1$d)</string>
+    <string name="ai_error_network">Netzwerkfehler</string>
+
+    <!-- Common -->
+    <string name="loading">Wird geladen…</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Zurück</string>
+    <string name="cd_save">Speichern</string>
+    <string name="cd_edit">Bearbeiten</string>
+    <string name="cd_delete">Löschen</string>
+    <string name="cd_clear">Leeren</string>
+    <string name="cd_actions">Aktionen</string>
+    <string name="cd_selected">Ausgewählt</string>
+    <string name="cd_enabled">Aktiviert</string>
+    <string name="cd_locked">Gesperrt</string>
+    <string name="cd_add_category">Kategorie hinzufügen</string>
+    <string name="cd_manage_visibility">Sichtbarkeit verwalten</string>
+    <string name="cd_choose_template">Vorlage wählen</string>
+    <string name="cd_previous_period">Zurück</string>
+    <string name="cd_next_period">Weiter</string>
+    <string name="cd_log_in">Anmelden</string>
+    <string name="cd_register">Registrieren</string>
+
+    <!-- Categories empty state -->
+    <string name="categories_empty_title">Noch keine Kategorien</string>
+    <string name="categories_empty_subtitle">Tippe auf +, um deine erste Kategorie hinzuzufügen</string>
+
+    <!-- System category info -->
+    <string name="system_category_info_text">Dies ist eine Systemkategorie. Du kannst sie in den Sichtbarkeitseinstellungen vom Hauptbildschirm ausblenden, aber ihren Namen weder ändern noch die Kategorie löschen.</string>
+
+    <!-- Goal Reached Dialog -->
+    <string name="target_goal_reached_title">Ziel erreicht!</string>
+    <string name="target_goal_reached_progress">Abgeschlossen: %1$d von %2$d Tagen</string>
+    <plurals name="target_goal_reached_more">
+        <item quantity="one">%d weiteres abgeschlossen</item>
+        <item quantity="other">%d weitere abgeschlossen</item>
+    </plurals>
+    <string name="target_goal_reached_extend_hint">Wenn du das Ziel noch nicht abgeschlossen hast, kannst du weitere Tage hinzufügen.</string>
+    <string name="target_goal_reached_add_days_label">Tage hinzufügen</string>
+    <string name="target_goal_reached_completed_count">Abgeschlossene Ziele: %1$d</string>
+    <string name="target_goal_reached_finish_button">Abschließen</string>
+
+</resources>

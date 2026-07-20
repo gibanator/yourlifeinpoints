@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="class_novice">Novice</string>
+    <string name="class_swordsman">Épéiste</string>
+    <string name="class_paladin">Paladin</string>
+    <string name="class_cyborg">Cyborg</string>
+    <string name="class_berserker">Berserker</string>
+    <string name="class_reaper">Faucheur</string>
+    <string name="class_herbalist">Herboriste</string>
+    <string name="class_bard">Barde</string>
+    <string name="class_monk">Moine</string>
+    <string name="class_engineer">Ingénieur</string>
+    <string name="class_netrunner">Netrunner</string>
+    <string name="class_marksman">Tireur d\'élite</string>
+    <string name="class_general">Général</string>
+</resources>

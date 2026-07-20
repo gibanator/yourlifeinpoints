@@ -336,7 +336,7 @@ fun AdaptivePeriodSelector(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous",
+                contentDescription = stringResource(R.string.cd_previous_period),
                 modifier = Modifier.size(screenHeight * 0.03f)
             )
         }
@@ -385,7 +385,7 @@ fun AdaptivePeriodSelector(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next",
+                contentDescription = stringResource(R.string.cd_next_period),
                 modifier = Modifier.size(screenHeight * 0.03f)
             )
         }

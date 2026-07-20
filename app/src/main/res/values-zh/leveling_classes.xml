@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="class_novice">新手</string>
+    <string name="class_swordsman">剑士</string>
+    <string name="class_paladin">圣骑士</string>
+    <string name="class_cyborg">改造人</string>
+    <string name="class_berserker">狂战士</string>
+    <string name="class_reaper">死神</string>
+    <string name="class_herbalist">草药师</string>
+    <string name="class_bard">吟游诗人</string>
+    <string name="class_monk">武僧</string>
+    <string name="class_engineer">工程师</string>
+    <string name="class_netrunner">网络行者</string>
+    <string name="class_marksman">神射手</string>
+    <string name="class_general">将军</string>
+</resources>

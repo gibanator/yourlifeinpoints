@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Leveling Popup -->
+    <string name="skill_distribution_title">Répartition des compétences</string>
+    <string name="skill_distribution_subtitle">Niveau %1$d • %2$s</string>
+
+    <string name="unspent_points_label">Points non attribués : </string>
+    <string name="reset_all_points">Réinitialiser tous les points</string>
+
+    <string name="current_value">Valeur actuelle : %1$d</string>
+
+    <string name="skill_strength">Force</string>
+    <string name="skill_agility">Agilité</string>
+    <string name="skill_charisma">Charisme</string>
+    <string name="skill_will">Volonté</string>
+    <string name="skill_intelligence">Intelligence</string>
+    <string name="skill_survival">Survie</string>
+
+    <string name="cd_close">Fermer</string>
+    <string name="cd_increase">Augmenter</string>
+    <string name="cd_decrease">Diminuer</string>
+
+    <!-- XP BAR -->
+    <string name="level_label">Niveau %1$d</string>
+    <string name="level_class_bullet">• %1$s</string>
+
+    <plurals name="unspent_points_badge">
+        <item quantity="one">%d point disponible</item>
+        <item quantity="other">%d points disponibles</item>
+    </plurals>
+
+    <string name="xp_progress_label">XP : %1$d/%2$d</string>
+    <string name="percent_label">%1$d%%</string>
+
+    <string name="total_xp_label">XP total : %1$d</string>
+    <string name="consecutive_days_label">%1$d jours d\'affilée</string>
+</resources>

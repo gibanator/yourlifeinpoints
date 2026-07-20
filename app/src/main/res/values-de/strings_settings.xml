@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Groups -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="theme_setting_title">Design</string>
+    <string name="content_section_title">Inhalte</string>
+    <string name="leveling_section_title">Levelsystem</string>
+
+    <!-- Theming -->
+    <string name="theme_system_title">Systemstandard</string>
+    <string name="theme_system_subtitle">Systemdesign folgen</string>
+    <string name="theme_light_title">Hell</string>
+    <string name="theme_light_subtitle">Immer helles Design verwenden</string>
+    <string name="theme_dark_title">Dunkel</string>
+    <string name="theme_dark_subtitle">Immer dunkles Design verwenden</string>
+    <string name="theme_dark_stone_title">Dunkler Stein</string>
+    <string name="theme_dark_stone_subtitle">Dunkler Stein mit eingraviertem Text</string>
+    <string name="theme_light_stone_title">Heller Stein</string>
+    <string name="theme_light_stone_subtitle">Heller Stein mit eingraviertem Text</string>
+    <string name="theme_hotline_title">Hotline Miami</string>
+    <string name="theme_hotline_subtitle">Neon-Retro mit leuchtendem Text</string>
+    <string name="theme_hotline_light_title">Hotline Miami Hell</string>
+    <string name="theme_hotline_light_subtitle">Helles Neon-Retro</string>
+
+    <!-- Content Settings Group -->
+    <string name="categories_management_title">Kategorien</string>
+    <string name="categories_management_subtitle">Verwalte deine Aktivitätskategorien</string>
+    <string name="categories_visibility_title">Sichtbare Kategorien</string>
+    <string name="categories_visibility_subtitle">Wähle, welche Kategorien auf dem Hauptbildschirm erscheinen</string>
+    <string name="comment_management_title">Kommentarvorlagen verwalten</string>
+    <string name="comment_management_subtitle">Häufig genutzte Kommentare hinzufügen, bearbeiten oder löschen, um sie schneller einzutragen</string>
+
+    <!-- Game Mode -->
+    <string name="gamemode_tumbler_title">Spielmodus</string>
+    <string name="gamemode_tumbler_subtitle">Levelsystem mit Erfahrungspunkten aktivieren</string>
+
+    <!-- Categories Settings Pages -->
+    <string name="categories_visibility_page_title">Sichtbare Kategorien verwalten</string>
+    <string name="categories_visibility_annotation_text">Lege fest, welche Kategorien auf dem Hauptbildschirm erscheinen. Du kannst sowohl System- als auch eigene Kategorien ausblenden.</string>
+    <string name="system_category_annotation_text">Systemkategorie</string>
+
+    <string name="category_add_screen_title">Neue Kategorie hinzufügen</string>
+    <string name="category_name_field_title">Kategoriename</string>
+    <string name="category_name_placeholder_text">Kategorienamen eingeben…</string>
+    <string name="category_add_tips_subtitle">Tipps zum Erstellen von Kategorien:</string>
+    <string name="category_add_tips_text">• Wähle klare, aussagekräftige Namen\n• Mache Kategorien konkret und umsetzbar\n• Vermeide doppelte Kategorien\n• Halte Namen kurz und einprägsam</string>
+    <string name="category_entrance_time_subtitle">Kategorie erscheint ab</string>
+    <string name="category_entrance_today_option">Heute</string>
+    <string name="category_entrance_selective_option">Datum wählen:</string>
+    <string name="category_entrance_start_option">Beginn</string>
+    <string name="category_edit_page_title">Kategorie bearbeiten</string>
+
+    <string name="delete_category_title">Kategorie löschen</string>
+    <string name="delete_category_message">Möchtest du \"%1$s\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_button">Löschen</string>
+    <string name="cancel_button">Abbrechen</string>
+
+    <!-- Comment Template Pages -->
+    <string name="comment_templates_page_title">Kommentarvorlagen</string>
+    <string name="comment_template_annotation_text">Lege bis zu 5 Schnellkommentare für diese Kategorie fest</string>
+    <string name="template">Vorlage</string>
+    <string name="empty">Leer</string>
+    <string name="comment_template_text_placeholder">Vorlagentext eingeben:</string>
+    <string name="empty_tip">Tipp: Lass das Feld leer, um diesen Platz zu leeren</string>
+
+    <!-- Reminders Section-->
+    <string name="notification_settings_section_title">Erinnerungen</string>
+    <string name="notification_settings_card_title">Tägliche Erinnerungen</string>
+    <string name="notification_settings_card_subtitle">Richte tägliche Benachrichtigungen ein, um feste Gewohnheiten aufzubauen</string>
+    <string name="cd_notification_settings">Benachrichtigungseinstellungen</string>
+
+    <string name="notification_settings_title">Benachrichtigungseinstellungen</string>
+    <string name="notification_daily_reminders_title">Tägliche Erinnerungen</string>
+    <string name="notification_daily_reminders_desc">Richte eine tägliche Erinnerung für deinen Check-up ein. Wir benachrichtigen dich jeden Tag zur angegebenen Zeit, damit du eine feste Gewohnheit aufbaust.</string>
+
+    <string name="notification_daily_reminders_label">Tägliche Erinnerungen</string>
+    <string name="enabled">Aktiviert</string>
+    <string name="disabled">Deaktiviert</string>
+
+    <string name="notification_reminder_time_label">Erinnerungszeit</string>
+
+    <string name="notification_tips_title">Tipps für wirksame Erinnerungen:</string>
+    <string name="notification_tips_body">• Wähle Zeiten, zu denen du normalerweise frei bist\n• Nutze feste Uhrzeiten, um Gewohnheiten aufzubauen\n• Erinnerungen am Abend helfen beim Rückblick auf den Tag\n• Erinnerungen am Morgen helfen bei der Planung</string>
+
+    <string name="notification_test_title">Testbenachrichtigung</string>
+    <string name="notification_test_desc">Tippe auf die Schaltfläche unten, um zu prüfen, ob Benachrichtigungen funktionieren.</string>
+    <string name="notification_test_button">Benachrichtigung jetzt testen</string>
+
+    <string name="notification_test_notif_title">Testbenachrichtigung 🧪</string>
+    <string name="notification_test_notif_message">Dies ist eine Testbenachrichtigung, um zu prüfen, ob alles funktioniert!</string>
+
+    <!-- Auth Section -->
+    <string name="auth_section_title">Konto</string>
+    <string name="auth_register">Registrieren</string>
+    <string name="auth_login">Anmelden</string>
+    <string name="auth_logout">Abmelden</string>
+    <string name="login_title">Anmelden</string>
+    <string name="login_success">Erfolgreich angemeldet</string>
+    <string name="login_google_button">Mit Google anmelden</string>
+    <string name="login_google_error">Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.</string>
+
+    <string name="change">Ändern</string>
+    <string name="select_time">Uhrzeit wählen</string>
+    <string name="hour">Stunde</string>
+    <string name="minute">Minute</string>
+    <string name="selected_time">Ausgewählt: %1$s</string>
+
+    <!-- Cloud Sync -->
+    <string name="cloud_sync_title">Cloud-Synchronisierung</string>
+</resources>

@@ -1,6 +1,7 @@
 // com.example.lifeinpoints.daily_checkup.ui/DailyCheckupViewModel.kt
 package com.example.lifeinpoints.daily_checkup.ui
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -20,7 +21,9 @@ import com.example.lifeinpoints.data.target.TargetEntity
 import com.example.lifeinpoints.data.target.TargetRepository
 import com.example.lifeinpoints.util.toEpochMilliAtEndOfDay
 import com.example.lifeinpoints.util.weekDatesOf
+import com.example.lifeinpoints.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,6 +41,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DailyCheckupViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val categoryRepository: CategoryRepositoryNew,
     private val dailyProgressRepo: DailyCategoryProgressRepositoryNew,
     private val dayCompletionRepo: DayCompletionRepository,
@@ -490,7 +494,10 @@ class DailyCheckupViewModel @Inject constructor(
 
                 if (!response.isSuccessful || body == null) {
                     _uiState.update {
-                        it.copy(isAiLoading = false, aiError = "Ошибка ИИ (${response.code()})")
+                        it.copy(
+                            isAiLoading = false,
+                            aiError = appContext.getString(R.string.ai_error_http, response.code())
+                        )
                     }
                     return@launch
                 }
@@ -526,7 +533,10 @@ class DailyCheckupViewModel @Inject constructor(
                 hideAiMode()
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isAiLoading = false, aiError = e.message ?: "Сетевая ошибка")
+                    it.copy(
+                        isAiLoading = false,
+                        aiError = e.message ?: appContext.getString(R.string.ai_error_network)
+                    )
                 }
             }
         }

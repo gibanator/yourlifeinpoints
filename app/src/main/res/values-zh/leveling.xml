@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Leveling Popup -->
+    <string name="skill_distribution_title">技能分配</string>
+    <string name="skill_distribution_subtitle">%1$d 级 • %2$s</string>
+
+    <string name="unspent_points_label">未分配点数：</string>
+    <string name="reset_all_points">重置所有点数</string>
+
+    <string name="current_value">当前数值：%1$d</string>
+
+    <string name="skill_strength">力量</string>
+    <string name="skill_agility">敏捷</string>
+    <string name="skill_charisma">魅力</string>
+    <string name="skill_will">意志</string>
+    <string name="skill_intelligence">智力</string>
+    <string name="skill_survival">生存</string>
+
+    <string name="cd_close">关闭</string>
+    <string name="cd_increase">增加</string>
+    <string name="cd_decrease">减少</string>
+
+    <!-- XP BAR -->
+    <string name="level_label">%1$d 级</string>
+    <string name="level_class_bullet">• %1$s</string>
+
+    <plurals name="unspent_points_badge">
+        <item quantity="other">可用 %d 点</item>
+    </plurals>
+
+    <string name="xp_progress_label">经验：%1$d/%2$d</string>
+    <string name="percent_label">%1$d%%</string>
+
+    <string name="total_xp_label">总经验：%1$d</string>
+    <string name="consecutive_days_label">连续 %1$d 天</string>
+</resources>

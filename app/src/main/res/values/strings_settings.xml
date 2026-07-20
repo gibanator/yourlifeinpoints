@@ -51,9 +51,7 @@
     <string name="category_edit_page_title">Edit Category</string>
 
     <string name="delete_category_title">Delete category</string>
-    <string name="delete_category_message">
-    Are you sure you want to delete "%1$s"? This action cannot be undone.
-    </string>
+    <string name="delete_category_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
     <string name="delete_button">Delete</string>
     <string name="cancel_button">Cancel</string>
 
@@ -106,4 +104,7 @@
     <string name="hour">Hour</string>
     <string name="minute">Minute</string>
     <string name="selected_time">Selected: %1$s</string>
+
+    <!-- Cloud Sync -->
+    <string name="cloud_sync_title">Cloud Sync</string>
 </resources>

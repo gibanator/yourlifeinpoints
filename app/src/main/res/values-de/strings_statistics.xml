@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="statistics_page_title">Statistik</string>
+
+    <string name="day_col_name">Tag</string>
+    <string name="total_col_name">Gesamt</string>
+
+    <!-- Summary card -->
+    <plurals name="summary_categories_count">
+        <item quantity="one">%d Kategorie</item>
+        <item quantity="other">%d Kategorien</item>
+    </plurals>
+
+    <string name="month_summary_title">Zusammenfassung %1$s</string>
+    <string name="year_summary_title">Zusammenfassung %1$d</string>
+    <string name="summary_day_number">#%1$d</string>
+    <string name="week_summary_title">Wochenübersicht</string>
+
+    <string name="summary_days">Tage</string>
+    <string name="summary_months">Monate</string>
+    <string name="summary_completed">abgeschlossen</string>
+    <string name="summary_average">Durchschnitt</string>
+    <string name="summary_perday">pro Tag</string>
+    <string name="summary_permonth">pro Monat</string>
+    <string name="summary_bestday">Bester Tag</string>
+    <string name="summary_bestmonth">Bester Monat</string>
+
+    <!-- Pie Chart -->
+    <string name="piechart_title_month">Kategorien des Monats</string>
+    <string name="piechart_title_year">Kategorien des Jahres</string>
+    <string name="piechart_title_week">Kategorien der Woche</string>
+    <string name="piechart_nodata">Keine Daten zum Anzeigen</string>
+
+    <!-- Chart -->
+    <string name="chart_category_selection_annotation">Wähle Kategorien aus, um das Diagramm anzuzeigen</string>
+    <string name="chart_no_data_annotation">Keine Daten für die ausgewählten Kategorien</string>
+    <string name="chart_selectall_button">Alle auswählen</string>
+    <string name="chart_deselectall_button">Auswahl aufheben</string>
+    <string name="chart_selected_count">Ausgewählt: %1$d von %2$d</string>
+</resources>

@@ -37,12 +37,14 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.example.lifeinpoints.R
 import com.example.lifeinpoints.core.ui.category.categoryDisplayName
 import com.example.lifeinpoints.core.ui.theme.LocalStatsPalette
 //import com.example.lifeinpoints.util.pastelIfNeeded
@@ -128,7 +130,7 @@ fun PieChartWithLegend(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Нет данных для отображения",
+                    text = stringResource(R.string.piechart_nodata),
                     style = TextStyle(
                         fontSize = calculateResponsiveFontSize(screenHeight, 0.02f),
                         color = Color.Gray

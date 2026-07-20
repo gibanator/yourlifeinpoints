@@ -99,7 +99,11 @@ fun CategoryFilter(
 
             // Selected count information
             Text(
-                text = "Selected: ${selectedCategoryIds.size} of ${categories.size}",
+                text = stringResource(
+                    R.string.chart_selected_count,
+                    selectedCategoryIds.size,
+                    categories.size
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier

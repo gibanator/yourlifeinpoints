@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="streak_current">Racha actual:</string>
+    <string name="streak_best">Mejor racha:</string>
+    <string name="days">días</string>
+    <string name="successful_days">Días completados:</string>
+
+    <string name="month">Mes</string>
+    <string name="year">Año</string>
+    <string name="week">Semana</string>
+</resources>

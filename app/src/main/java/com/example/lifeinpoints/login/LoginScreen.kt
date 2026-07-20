@@ -83,7 +83,7 @@ fun LoginScreen(
                 title = { Text(stringResource(R.string.login_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -94,7 +94,7 @@ fun LoginScreen(
                         if (uiState.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         } else {
-                            Icon(Icons.Default.Check, contentDescription = "Log in")
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_log_in))
                         }
                     }
                 }
