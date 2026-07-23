@@ -62,7 +62,7 @@ fun CommentScreen(
                 title = { Text(uiState.selectedDate.format(formatter)) },
                 navigationIcon = {
                     IconButton(onClick = { vm.commitCommentsAndLeave(onBack) }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 }
             )
@@ -152,7 +152,7 @@ fun OneComment(
                             IconButton(onClick = { menuOpen = true }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "Choose template",
+                                    contentDescription = stringResource(R.string.cd_choose_template),
                                     tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                                 )
                             }

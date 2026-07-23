@@ -50,7 +50,7 @@ fun AddCategoryScreen(
                 title = { Text(stringResource(R.string.category_add_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -85,7 +85,7 @@ fun AddCategoryScreen(
                         if (isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         } else {
-                            Icon(Icons.Filled.Check, contentDescription = "Save")
+                            Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.cd_save))
                         }
                     }
                 }

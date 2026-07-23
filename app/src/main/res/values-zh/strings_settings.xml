@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Groups -->
+    <string name="settings_title">设置</string>
+    <string name="theme_setting_title">主题</string>
+    <string name="content_section_title">内容</string>
+    <string name="leveling_section_title">等级系统</string>
+
+    <!-- Theming -->
+    <string name="theme_system_title">跟随系统</string>
+    <string name="theme_system_subtitle">跟随系统主题</string>
+    <string name="theme_light_title">浅色</string>
+    <string name="theme_light_subtitle">始终使用浅色主题</string>
+    <string name="theme_dark_title">深色</string>
+    <string name="theme_dark_subtitle">始终使用深色主题</string>
+    <string name="theme_dark_stone_title">深色石纹</string>
+    <string name="theme_dark_stone_subtitle">深色石纹，文字如雕刻</string>
+    <string name="theme_light_stone_title">浅色石纹</string>
+    <string name="theme_light_stone_subtitle">浅色石纹，文字如雕刻</string>
+    <string name="theme_hotline_title">Hotline Miami</string>
+    <string name="theme_hotline_subtitle">霓虹复古风格，文字带发光效果</string>
+    <string name="theme_hotline_light_title">Hotline Miami 浅色</string>
+    <string name="theme_hotline_light_subtitle">浅色霓虹复古风格</string>
+
+    <!-- Content Settings Group -->
+    <string name="categories_management_title">分类</string>
+    <string name="categories_management_subtitle">管理你的活动分类</string>
+    <string name="categories_visibility_title">显示的分类</string>
+    <string name="categories_visibility_subtitle">选择在主界面显示哪些分类</string>
+    <string name="comment_management_title">管理评论模板</string>
+    <string name="comment_management_subtitle">添加、编辑或删除常用评论，方便快速填写</string>
+
+    <!-- Game Mode -->
+    <string name="gamemode_tumbler_title">游戏模式</string>
+    <string name="gamemode_tumbler_subtitle">启用带经验值的等级系统</string>
+
+    <!-- Categories Settings Pages -->
+    <string name="categories_visibility_page_title">管理显示的分类</string>
+    <string name="categories_visibility_annotation_text">选择在主界面显示哪些分类。系统分类和自定义分类都可以隐藏。</string>
+    <string name="system_category_annotation_text">系统分类</string>
+
+    <string name="category_add_screen_title">添加新分类</string>
+    <string name="category_name_field_title">分类名称</string>
+    <string name="category_name_placeholder_text">请输入分类名称…</string>
+    <string name="category_add_tips_subtitle">创建分类的小建议：</string>
+    <string name="category_add_tips_text">• 使用清晰、易懂的名称\n• 让分类具体且可执行\n• 避免重复的分类\n• 名称尽量简短好记</string>
+    <string name="category_entrance_time_subtitle">分类开始显示的时间</string>
+    <string name="category_entrance_today_option">今天</string>
+    <string name="category_entrance_selective_option">选择日期：</string>
+    <string name="category_entrance_start_option">从最初开始</string>
+    <string name="category_edit_page_title">编辑分类</string>
+
+    <string name="delete_category_title">删除分类</string>
+    <string name="delete_category_message">确定要删除\"%1$s\"吗？此操作无法撤销。</string>
+    <string name="delete_button">删除</string>
+    <string name="cancel_button">取消</string>
+
+    <!-- Comment Template Pages -->
+    <string name="comment_templates_page_title">评论模板</string>
+    <string name="comment_template_annotation_text">最多可为此分类设置 5 条快捷评论</string>
+    <string name="template">模板</string>
+    <string name="empty">空</string>
+    <string name="comment_template_text_placeholder">请输入模板文本：</string>
+    <string name="empty_tip">提示：留空即可清除该模板位</string>
+
+    <!-- Reminders Section-->
+    <string name="notification_settings_section_title">提醒</string>
+    <string name="notification_settings_card_title">每日提醒</string>
+    <string name="notification_settings_card_subtitle">设置每日通知，帮助你养成习惯</string>
+    <string name="cd_notification_settings">通知设置</string>
+
+    <string name="notification_settings_title">通知设置</string>
+    <string name="notification_daily_reminders_desc">设置每日提醒来完成打卡。我们会在你指定的时间每天提醒你，帮助你养成稳定的习惯。</string>
+    <string name="notification_daily_reminders_title">每日提醒</string>
+
+    <string name="notification_daily_reminders_label">每日提醒</string>
+    <string name="enabled">已开启</string>
+    <string name="disabled">已关闭</string>
+
+    <string name="notification_reminder_time_label">提醒时间</string>
+
+    <string name="notification_tips_title">有效提醒的小建议：</string>
+    <string name="notification_tips_body">• 把提醒设在你通常空闲的时间\n• 选择固定的时间有助于养成习惯\n• 晚间提醒方便你回顾一天\n• 早间提醒方便你提前规划</string>
+
+    <string name="notification_test_title">测试通知</string>
+    <string name="notification_test_desc">点击下方按钮，检查通知是否正常工作。</string>
+    <string name="notification_test_button">立即测试通知</string>
+
+    <string name="notification_test_notif_title">测试通知 🧪</string>
+    <string name="notification_test_notif_message">这是一条测试通知，用于确认一切正常！</string>
+
+    <!-- Auth Section -->
+    <string name="auth_section_title">账户</string>
+    <string name="auth_register">注册</string>
+    <string name="auth_login">登录</string>
+    <string name="auth_logout">退出登录</string>
+    <string name="login_title">登录</string>
+    <string name="login_success">登录成功</string>
+    <string name="login_google_button">使用 Google 登录</string>
+    <string name="login_google_error">Google 登录失败，请重试。</string>
+
+    <string name="change">更改</string>
+    <string name="select_time">选择时间</string>
+    <string name="hour">小时</string>
+    <string name="minute">分钟</string>
+    <string name="selected_time">已选择：%1$s</string>
+
+    <!-- Cloud Sync -->
+    <string name="cloud_sync_title">云同步</string>
+</resources>

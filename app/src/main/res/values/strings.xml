@@ -186,4 +186,48 @@
     <string name="ai_mode_stop_recording_button">Stop and transcribe</string>
     <string name="ai_mode_close_button">Close</string>
 
+    <!-- AI Errors -->
+    <string name="ai_error_http">AI error (%1$d)</string>
+    <string name="ai_error_network">Network error</string>
+
+    <!-- Common -->
+    <string name="loading">Loading…</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_save">Save</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_delete">Delete</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_actions">Actions</string>
+    <string name="cd_selected">Selected</string>
+    <string name="cd_enabled">Enabled</string>
+    <string name="cd_locked">Locked</string>
+    <string name="cd_add_category">Add category</string>
+    <string name="cd_manage_visibility">Manage visibility</string>
+    <string name="cd_choose_template">Choose template</string>
+    <string name="cd_previous_period">Previous</string>
+    <string name="cd_next_period">Next</string>
+    <string name="cd_log_in">Log in</string>
+    <string name="cd_register">Register</string>
+
+    <!-- Categories empty state -->
+    <string name="categories_empty_title">No categories yet</string>
+    <string name="categories_empty_subtitle">Tap the + button to add your first category</string>
+
+    <!-- System category info -->
+    <string name="system_category_info_text">This is a system category. You can hide it from the main screen in the visibility settings, but you cannot edit its name or delete it.</string>
+
+    <!-- Goal Reached Dialog -->
+    <string name="target_goal_reached_title">Goal completed!</string>
+    <string name="target_goal_reached_progress">Completed: %1$d of %2$d days</string>
+    <plurals name="target_goal_reached_more">
+        <item quantity="one">%d more completed</item>
+        <item quantity="other">%d more completed</item>
+    </plurals>
+    <string name="target_goal_reached_extend_hint">If you haven\'t finished the goal yet, you can add more days.</string>
+    <string name="target_goal_reached_add_days_label">Add days</string>
+    <string name="target_goal_reached_completed_count">Completed goals: %1$d</string>
+    <string name="target_goal_reached_finish_button">Finish</string>
+
 </resources>

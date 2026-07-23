@@ -52,7 +52,7 @@ fun NotificationSettingsScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 }

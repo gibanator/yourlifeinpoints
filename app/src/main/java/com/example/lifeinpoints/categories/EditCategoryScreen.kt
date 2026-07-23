@@ -87,7 +87,7 @@ fun EditCategoryScreen(
                 title = { Text(stringResource(R.string.category_edit_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -97,7 +97,7 @@ fun EditCategoryScreen(
                             onClick = { showDeleteDialog = true },
                             enabled = !isLoading
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cd_delete))
                         }
                     }
 
@@ -126,7 +126,7 @@ fun EditCategoryScreen(
                             if (isLoading) {
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             } else {
-                                Icon(Icons.Default.Check, contentDescription = "Save")
+                                Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_save))
                             }
                         }
                     }
@@ -157,17 +157,17 @@ fun EditCategoryScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Locked",
+                                contentDescription = stringResource(R.string.cd_locked),
                                 modifier = Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "System Category",
+                                text = stringResource(R.string.system_category_annotation_text),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "This is a system category. You can hide it from the main screen in the visibility settings, but you cannot edit its name or delete it.",
+                                text = stringResource(R.string.system_category_info_text),
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center
                             )
@@ -203,8 +203,10 @@ fun EditCategoryScreen(
             if (showDeleteDialog && !isStaticCategory) {
                 AlertDialog(
                     onDismissRequest = { showDeleteDialog = false },
-                    title = { Text("Delete Category") },
-                    text = { Text("Are you sure you want to delete \"$categoryName\"? This action cannot be undone.") },
+                    title = { Text(stringResource(R.string.delete_category_title)) },
+                    text = {
+                        Text(stringResource(R.string.delete_category_message, categoryName))
+                    },
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -227,12 +229,12 @@ fun EditCategoryScreen(
                                 contentColor = MaterialTheme.colorScheme.error
                             )
                         ) {
-                            Text("Delete")
+                            Text(stringResource(R.string.delete_button))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showDeleteDialog = false }) {
-                            Text("Cancel")
+                            Text(stringResource(R.string.cancel_button))
                         }
                     }
                 )

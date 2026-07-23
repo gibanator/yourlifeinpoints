@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="to_today_button_text">Aujourd\'hui</string>
+
+    <string name="comments_button_text">Ajouter/modifier des commentaires</string>
+    <string name="voice_button_text">Note vocale</string>
+    <string name="end_day_button_text">Clôturer la journée</string>
+    <string name="day_ended_button_text">Journée terminée !</string>
+
+    <string name="comment_placeholder_text">Ajoutez votre commentaire…</string>
+
+    <string name="voice_recognition_title">Reconnaissance vocale</string>
+    <string name="voice_recognition_permission_text">L\'autorisation du microphone est nécessaire pour reconnaître votre voix.</string>
+    <string name="voice_recognition_request_permission">Autoriser le microphone</string>
+    <string name="voice_recognition_unavailable">La reconnaissance vocale n\'est pas disponible sur cet appareil.</string>
+    <string name="voice_recognition_listening">Écoute…</string>
+    <string name="voice_recognition_ready">Appuyez sur Démarrer et parlez.</string>
+    <string name="voice_recognition_start">Démarrer</string>
+    <string name="voice_recognition_stop">Arrêter</string>
+    <string name="voice_recognition_clear">Effacer</string>
+    <string name="voice_recognition_transcript_placeholder">Le texte reconnu apparaîtra ici.</string>
+    <string name="voice_recognition_error_no_match">Je n\'ai pas pu reconnaître la voix. Réessayez.</string>
+    <string name="voice_recognition_error_audio">Erreur d\'enregistrement audio. Réessayez.</string>
+    <string name="voice_recognition_error_network">Erreur réseau pendant la reconnaissance vocale.</string>
+    <string name="voice_recognition_error_permission">L\'autorisation du microphone a été refusée.</string>
+    <string name="voice_recognition_error_busy">Le module de reconnaissance vocale est occupé. Réessayez.</string>
+    <string name="voice_recognition_error_generic">Échec de la reconnaissance vocale. Réessayez.</string>
+</resources>

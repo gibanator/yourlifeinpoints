@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="to_today_button_text">回到今天</string>
+
+    <string name="comments_button_text">添加/编辑评论</string>
+    <string name="voice_button_text">语音备注</string>
+    <string name="end_day_button_text">结束今天</string>
+    <string name="day_ended_button_text">今天已完成！</string>
+
+    <string name="comment_placeholder_text">添加你的评论…</string>
+
+    <string name="voice_recognition_title">语音识别</string>
+    <string name="voice_recognition_permission_text">需要麦克风权限才能识别你的语音。</string>
+    <string name="voice_recognition_request_permission">允许使用麦克风</string>
+    <string name="voice_recognition_unavailable">此设备不支持语音识别。</string>
+    <string name="voice_recognition_listening">正在聆听…</string>
+    <string name="voice_recognition_ready">点击“开始”后开始说话。</string>
+    <string name="voice_recognition_start">开始</string>
+    <string name="voice_recognition_stop">停止</string>
+    <string name="voice_recognition_clear">清除</string>
+    <string name="voice_recognition_transcript_placeholder">识别出的文本会显示在这里。</string>
+    <string name="voice_recognition_error_no_match">未能识别语音，请重试。</string>
+    <string name="voice_recognition_error_audio">录音出错，请重试。</string>
+    <string name="voice_recognition_error_network">语音识别过程中出现网络错误。</string>
+    <string name="voice_recognition_error_permission">麦克风权限已被拒绝。</string>
+    <string name="voice_recognition_error_busy">语音识别服务正忙，请重试。</string>
+    <string name="voice_recognition_error_generic">语音识别失败，请重试。</string>
+</resources>

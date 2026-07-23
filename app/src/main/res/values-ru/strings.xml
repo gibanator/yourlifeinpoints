@@ -186,4 +186,50 @@
     <string name="ai_mode_stop_recording_button">Остановить и расшифровать</string>
     <string name="ai_mode_close_button">Закрыть</string>
 
+    <!-- AI Errors -->
+    <string name="ai_error_http">Ошибка ИИ (%1$d)</string>
+    <string name="ai_error_network">Сетевая ошибка</string>
+
+    <!-- Common -->
+    <string name="loading">Загрузка…</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Назад</string>
+    <string name="cd_save">Сохранить</string>
+    <string name="cd_edit">Редактировать</string>
+    <string name="cd_delete">Удалить</string>
+    <string name="cd_clear">Очистить</string>
+    <string name="cd_actions">Действия</string>
+    <string name="cd_selected">Выбрано</string>
+    <string name="cd_enabled">Включено</string>
+    <string name="cd_locked">Заблокировано</string>
+    <string name="cd_add_category">Добавить категорию</string>
+    <string name="cd_manage_visibility">Управление видимостью</string>
+    <string name="cd_choose_template">Выбрать шаблон</string>
+    <string name="cd_previous_period">Назад</string>
+    <string name="cd_next_period">Вперёд</string>
+    <string name="cd_log_in">Войти</string>
+    <string name="cd_register">Зарегистрироваться</string>
+
+    <!-- Categories empty state -->
+    <string name="categories_empty_title">Категорий пока нет</string>
+    <string name="categories_empty_subtitle">Нажмите кнопку +, чтобы добавить первую категорию</string>
+
+    <!-- System category info -->
+    <string name="system_category_info_text">Это системная категория. Вы можете скрыть её с главного экрана в настройках видимости, но не можете изменить название или удалить её.</string>
+
+    <!-- Goal Reached Dialog -->
+    <string name="target_goal_reached_title">Цель выполнена!</string>
+    <string name="target_goal_reached_progress">Выполнено: %1$d из %2$d дней</string>
+    <plurals name="target_goal_reached_more">
+        <item quantity="one">Ещё %d выполненная</item>
+        <item quantity="few">Ещё %d выполненных</item>
+        <item quantity="many">Ещё %d выполненных</item>
+        <item quantity="other">Ещё %d выполненных</item>
+    </plurals>
+    <string name="target_goal_reached_extend_hint">Если вы ещё не закончили с целью, можете добавить себе дней.</string>
+    <string name="target_goal_reached_add_days_label">Добавить дней</string>
+    <string name="target_goal_reached_completed_count">Завершённых целей: %1$d</string>
+    <string name="target_goal_reached_finish_button">Завершить</string>
+
 </resources>

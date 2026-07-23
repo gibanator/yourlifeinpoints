@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="to_today_button_text">A hoy</string>
+
+    <string name="comments_button_text">Añadir/editar comentarios</string>
+    <string name="voice_button_text">Nota de voz</string>
+    <string name="end_day_button_text">Terminar el día</string>
+    <string name="day_ended_button_text">¡Día completado!</string>
+
+    <string name="comment_placeholder_text">Añade tu comentario…</string>
+
+    <string name="voice_recognition_title">Reconocimiento de voz</string>
+    <string name="voice_recognition_permission_text">Se necesita permiso para el micrófono para reconocer tu voz.</string>
+    <string name="voice_recognition_request_permission">Permitir micrófono</string>
+    <string name="voice_recognition_unavailable">El reconocimiento de voz no está disponible en este dispositivo.</string>
+    <string name="voice_recognition_listening">Escuchando…</string>
+    <string name="voice_recognition_ready">Toca Iniciar y habla.</string>
+    <string name="voice_recognition_start">Iniciar</string>
+    <string name="voice_recognition_stop">Detener</string>
+    <string name="voice_recognition_clear">Borrar</string>
+    <string name="voice_recognition_transcript_placeholder">El texto reconocido aparecerá aquí.</string>
+    <string name="voice_recognition_error_no_match">No he podido reconocer la voz. Inténtalo de nuevo.</string>
+    <string name="voice_recognition_error_audio">Error al grabar el audio. Inténtalo de nuevo.</string>
+    <string name="voice_recognition_error_network">Error de red durante el reconocimiento de voz.</string>
+    <string name="voice_recognition_error_permission">Se ha denegado el permiso del micrófono.</string>
+    <string name="voice_recognition_error_busy">El reconocedor de voz está ocupado. Inténtalo de nuevo.</string>
+    <string name="voice_recognition_error_generic">Error en el reconocimiento de voz. Inténtalo de nuevo.</string>
+</resources>

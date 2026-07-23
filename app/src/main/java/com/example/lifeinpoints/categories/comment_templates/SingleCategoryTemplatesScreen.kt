@@ -57,7 +57,7 @@ fun EditCommentTemplatesScreen(
                         },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 }
             )
@@ -128,10 +128,10 @@ fun EditCommentTemplatesScreen(
                             vm.saveSlot(categoryId, pos, editorText)
                             editingPosition = null
                         }
-                    ) { Text("Save") }
+                    ) { Text(stringResource(R.string.save)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { editingPosition = null }) { Text("Cancel") }
+                    TextButton(onClick = { editingPosition = null }) { Text(stringResource(R.string.cancel)) }
                 }
             )
         }
@@ -171,14 +171,14 @@ private fun TemplateSlotCard(
             }
 
             IconButton(onClick = onEdit) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.cd_edit))
             }
 
             IconButton(
                 onClick = onClear,
                 enabled = text.isNotBlank()
             ) {
-                Icon(Icons.Default.Clear, contentDescription = "Clear")
+                Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cd_clear))
             }
         }
     }

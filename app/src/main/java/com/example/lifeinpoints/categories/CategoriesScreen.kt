@@ -73,13 +73,13 @@ fun CategoriesScreen(
                 title = { Text(stringResource(R.string.categories_management_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
                     // Кнопка управления видимостью
                     IconButton(onClick = onManageVisibility) {
-                        Icon(Icons.Default.Visibility, contentDescription = "Manage Visibility")
+                        Icon(Icons.Default.Visibility, contentDescription = stringResource(R.string.cd_manage_visibility))
                     }
                 }
             )
@@ -88,7 +88,7 @@ fun CategoriesScreen(
             AppFloatingActionButton(
                 onClick = onAddCategory
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Category")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_category))
             }
         }
     ) { paddingValues ->
@@ -115,13 +115,13 @@ fun CategoriesScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "No categories yet",
+                        text = stringResource(R.string.categories_empty_title),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "Tap the + button to add your first category",
+                        text = stringResource(R.string.categories_empty_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline,
                         textAlign = TextAlign.Center,
@@ -229,7 +229,7 @@ fun CategoryCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Actions"
+                            contentDescription = stringResource(R.string.cd_actions)
                         )
                     }
 

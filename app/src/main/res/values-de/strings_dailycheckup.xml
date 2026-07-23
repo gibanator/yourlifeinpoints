@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="to_today_button_text">Zu heute</string>
+
+    <string name="comments_button_text">Kommentare hinzufügen/bearbeiten</string>
+    <string name="voice_button_text">Sprachnotiz</string>
+    <string name="end_day_button_text">Tag abschließen</string>
+    <string name="day_ended_button_text">Tag abgeschlossen!</string>
+
+    <string name="comment_placeholder_text">Kommentar hinzufügen…</string>
+
+    <string name="voice_recognition_title">Spracherkennung</string>
+    <string name="voice_recognition_permission_text">Für die Spracherkennung wird die Mikrofonberechtigung benötigt.</string>
+    <string name="voice_recognition_request_permission">Mikrofon erlauben</string>
+    <string name="voice_recognition_unavailable">Spracherkennung ist auf diesem Gerät nicht verfügbar.</string>
+    <string name="voice_recognition_listening">Höre zu…</string>
+    <string name="voice_recognition_ready">Tippe auf Start und sprich.</string>
+    <string name="voice_recognition_start">Start</string>
+    <string name="voice_recognition_stop">Stopp</string>
+    <string name="voice_recognition_clear">Leeren</string>
+    <string name="voice_recognition_transcript_placeholder">Der erkannte Text erscheint hier.</string>
+    <string name="voice_recognition_error_no_match">Ich konnte die Sprache nicht erkennen. Versuche es erneut.</string>
+    <string name="voice_recognition_error_audio">Fehler bei der Audioaufnahme. Versuche es erneut.</string>
+    <string name="voice_recognition_error_network">Netzwerkfehler bei der Spracherkennung.</string>
+    <string name="voice_recognition_error_permission">Die Mikrofonberechtigung wurde verweigert.</string>
+    <string name="voice_recognition_error_busy">Die Spracherkennung ist gerade beschäftigt. Versuche es erneut.</string>
+    <string name="voice_recognition_error_generic">Spracherkennung fehlgeschlagen. Versuche es erneut.</string>
+</resources>

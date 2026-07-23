@@ -162,7 +162,7 @@ fun ThemeOptionCard(
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(R.string.cd_selected),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }

@@ -197,8 +197,8 @@ try {
 
     val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_notification)
-        .setContentTitle("Test Notification 🧪")
-        .setContentText("This is a test notification to check if everything is working!")
+        .setContentTitle(context.getString(R.string.notification_test_notif_title))
+        .setContentText(context.getString(R.string.notification_test_notif_message))
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_REMINDER)
         .setAutoCancel(true)

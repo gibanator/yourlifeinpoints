@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="category_networking">人脉</string>
+    <string name="category_education">学习</string>
+    <string name="category_work">工作</string>
+    <string name="category_health">健康</string>
+    <string name="category_personal_life">个人生活</string>
+
+    <!-- Miscellaneous -->
+    <string name="save">保存</string>
+    <string name="set">设置</string>
+    <string name="cancel">取消</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="text_word">文本</string>
+
+    <!-- Menu Items -->
+    <string name="main_page_navbar_item">主页</string>
+    <string name="calendar_page_navbar_item">日历</string>
+    <string name="statistics_page_navbar_item">统计</string>
+    <string name="settings_page_navbar_item">设置</string>
+
+    <!-- Languages -->
+    <string name="language_setting_title">语言</string>
+    <string name="settings_language_subtitle_system">在 Android 设置中更改</string>
+
+    <!-- Weekdays -->
+    <string-array name="day_names_short">
+        <item>周一</item>
+        <item>周二</item>
+        <item>周三</item>
+        <item>周四</item>
+        <item>周五</item>
+        <item>周六</item>
+        <item>周日</item>
+    </string-array>
+
+    <!-- Short month names -->
+    <string-array name="month_names_short">
+        <item>1月</item>
+        <item>2月</item>
+        <item>3月</item>
+        <item>4月</item>
+        <item>5月</item>
+        <item>6月</item>
+        <item>7月</item>
+        <item>8月</item>
+        <item>9月</item>
+        <item>10月</item>
+        <item>11月</item>
+        <item>12月</item>
+    </string-array>
+    <string name="notif_daily_title">该做每日打卡了！⏰</string>
+    <string name="notif_daily_message">完成今天的分类来记录你的进度。每一天都很重要！💪</string>
+
+    <!-- System Categories -->
+    <string name="cat_networking">人脉</string>
+    <string name="cat_education">学习</string>
+    <string name="cat_work">工作</string>
+    <string name="cat_health">健康</string>
+    <string name="cat_personal_life">个人生活</string>
+
+    <!-- Registration -->
+    <string name="registration_title">注册</string>
+    <string name="registration_email_label">电子邮箱</string>
+    <string name="registration_username_label">用户名</string>
+    <string name="registration_password_label">密码</string>
+    <string name="registration_confirm_password_label">确认密码</string>
+    <string name="registration_button">注册</string>
+    <string name="registration_success">注册成功</string>
+    <string name="registration_error_required">请填写电子邮箱和密码</string>
+    <string name="registration_error_all_required">请填写所有字段</string>
+    <string name="registration_error_password_mismatch">两次输入的密码不一致</string>
+    <string name="registration_info_card">注册后，你可以在多台设备之间同步数据。</string>
+    <string name="registration_google_button">使用 Google 注册</string>
+    <string name="registration_google_error">Google 登录失败，请重试。</string>
+
+    <!-- Success Messages -->
+    <string name="category_added_success">分类已添加</string>
+    <string name="category_updated_success">分类已更新</string>
+    <string name="category_deleted_success">分类已删除</string>
+
+    <!-- Error Messages -->
+    <string name="error_user_not_signed_in">用户未登录</string>
+    <string name="error_firebase_token_missing">缺少 Firebase ID 令牌</string>
+    <string name="error_categories_load_failed">加载分类失败</string>
+    <string name="error_category_not_found">未找到该分类</string>
+    <string name="error_category_create_failed">创建分类失败</string>
+    <string name="error_category_create_failed_http">创建分类失败：HTTP %1$d</string>
+    <string name="error_category_update_failed_http">更新分类失败：HTTP %1$d</string>
+    <string name="error_category_delete_failed_http">删除分类失败：HTTP %1$d</string>
+    <string name="error_progress_load_failed_http">加载进度失败：HTTP %1$d</string>
+    <string name="error_progress_save_failed_http">保存进度失败：HTTP %1$d</string>
+
+    <!-- Learn screen -->
+    <string name="start_sc_title">欢迎使用 Life in Points！</string>
+    <string name="start_sc_text">记录你的日常活动，让你的角色不断升级。</string>
+
+    <string name="sec_sc_title">主界面</string>
+    <string name="sec_sc_text">勾选已完成的分类来获得经验值。别忘了结束这一天！</string>
+
+    <string name="cal_sc_title">日历</string>
+    <string name="cal_sc_text">查看哪些日期已完成，并快速跳转到你关心的日期。</string>
+
+    <string name="stat_sc_title">统计</string>
+    <string name="stat_sc_text">通过各种图表和表格跟踪你的进度。</string>
+
+    <string name="set_sc_title">设置</string>
+    <string name="set_sc_text">添加你需要的分类、隐藏不需要的分类、创建常用评论模板、选择主题并设置通知</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_next">下一步</string>
+    <string name="onboarding_start">开始</string>
+
+    <!-- Theme selection -->
+    <string name="theme_selection_title">选择主题</string>
+    <string name="continue_button">继续</string>
+    <string name="theme_preview_system_title">跟随系统</string>
+    <string name="theme_preview_system_subtitle">跟随系统主题</string>
+    <string name="theme_preview_light_title">浅色</string>
+    <string name="theme_preview_light_subtitle">始终使用浅色主题</string>
+    <string name="theme_preview_dark_title">深色</string>
+    <string name="theme_preview_dark_subtitle">始终使用深色主题</string>
+    <string name="theme_preview_dark_stone_title">深色石纹</string>
+    <string name="theme_preview_dark_stone_subtitle">始终使用深色石纹主题</string>
+    <string name="theme_preview_light_stone_title">浅色石纹</string>
+    <string name="theme_preview_light_stone_subtitle">始终使用浅色石纹主题</string>
+    <string name="theme_preview_hotline_title">Hotline Miami</string>
+    <string name="theme_preview_hotline_subtitle">霓虹复古风格，文字带发光效果</string>
+    <string name="theme_preview_hotline_light_title">Hotline Miami 浅色</string>
+    <string name="theme_preview_hotline_light_subtitle">浅色霓虹复古风格</string>
+
+    <!-- Daily Checkup Card Titles -->
+    <string name="card_title_productivity_points">效率点数</string>
+    <string name="card_title_goals">目标</string>
+
+    <!-- Completed Targets Dialog -->
+    <string name="completed_targets_title">已完成的目标</string>
+    <string name="no_completed_targets">暂无已完成的目标</string>
+    <string name="close_button">关闭</string>
+
+    <!-- Level Up Dialog -->
+    <string name="level_up_title">🎉 恭喜！</string>
+    <string name="level_up_reached">你已达到 %1$d 级！</string>
+    <string name="level_up_skill_points">你获得了 5 点技能点。</string>
+    <string name="level_up_unspent_points">未分配点数共计：%1$d</string>
+    <string name="later_button">稍后</string>
+    <string name="distribute_button">分配</string>
+
+    <!-- Week Bar -->
+    <string name="prev_week_description">上一周</string>
+    <string name="next_week_description">下一周</string>
+
+    <!-- Target List Card -->
+    <string name="add_target_button">+ 添加目标</string>
+    <string name="view_completed">已完成</string>
+    <string name="view_completed_with_count">已完成（%1$d）</string>
+
+    <!-- Add / Edit Target -->
+    <string name="add_target_title">新目标</string>
+    <string name="edit_target_title">目标设置</string>
+    <string name="target_name_label">名称</string>
+    <string name="target_days_label">天数</string>
+    <string name="target_days_input_label">请输入天数</string>
+    <string name="target_deadline_label">截止日期（可选）</string>
+    <string name="delete_target_button">删除目标</string>
+    <string name="add_button">添加</string>
+    <string name="ok_button">确定</string>
+    <string name="completed_days_count">已完成天数：%1$d</string>
+
+    <!-- AI Mode Screen -->
+    <string name="ai_mode_screen_title">AI 模式</string>
+    <string name="ai_mode_input_placeholder">请输入文本…</string>
+    <string name="ai_mode_send_button">发送</string>
+    <string name="ai_mode_back_content_description">返回</string>
+    <string name="ai_mode_mic_content_description">录音</string>
+    <string name="ai_mode_model_picker_content_description">选择模型</string>
+
+    <!-- AI Errors -->
+    <string name="ai_error_http">AI 错误（%1$d）</string>
+    <string name="ai_error_network">网络错误</string>
+
+    <!-- Common -->
+    <string name="loading">加载中…</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">返回</string>
+    <string name="cd_save">保存</string>
+    <string name="cd_edit">编辑</string>
+    <string name="cd_delete">删除</string>
+    <string name="cd_clear">清除</string>
+    <string name="cd_actions">操作</string>
+    <string name="cd_selected">已选择</string>
+    <string name="cd_enabled">已启用</string>
+    <string name="cd_locked">已锁定</string>
+    <string name="cd_add_category">添加分类</string>
+    <string name="cd_manage_visibility">管理显示</string>
+    <string name="cd_choose_template">选择模板</string>
+    <string name="cd_previous_period">上一个</string>
+    <string name="cd_next_period">下一个</string>
+    <string name="cd_log_in">登录</string>
+    <string name="cd_register">注册</string>
+
+    <!-- Categories empty state -->
+    <string name="categories_empty_title">暂无分类</string>
+    <string name="categories_empty_subtitle">点击 + 按钮添加你的第一个分类</string>
+
+    <!-- System category info -->
+    <string name="system_category_info_text">这是系统分类。你可以在显示设置中把它从主界面隐藏，但无法修改名称或删除它。</string>
+
+    <!-- Goal Reached Dialog -->
+    <string name="target_goal_reached_title">目标已完成！</string>
+    <string name="target_goal_reached_progress">已完成：%2$d 天中的 %1$d 天</string>
+    <plurals name="target_goal_reached_more">
+        <item quantity="other">另有 %d 个已完成</item>
+    </plurals>
+    <string name="target_goal_reached_extend_hint">如果这个目标还没有结束，你可以给自己增加天数。</string>
+    <string name="target_goal_reached_add_days_label">增加天数</string>
+    <string name="target_goal_reached_completed_count">已完成的目标：%1$d</string>
+    <string name="target_goal_reached_finish_button">完成</string>
+
+</resources>

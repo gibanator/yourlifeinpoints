@@ -55,7 +55,7 @@ fun CommentTemplatesCategoriesScreen(
                 title = { Text(stringResource(R.string.comment_templates_page_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 }
             )
@@ -82,7 +82,7 @@ fun CommentTemplatesCategoriesScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "No categories yet",
+                        text = stringResource(R.string.categories_empty_title),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center

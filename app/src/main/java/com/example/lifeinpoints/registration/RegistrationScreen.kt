@@ -88,7 +88,7 @@ fun RegistrationScreen(
                 title = { Text(stringResource(R.string.registration_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -99,7 +99,7 @@ fun RegistrationScreen(
                         if (uiState.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         } else {
-                            Icon(Icons.Default.Check, contentDescription = "Register")
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_register))
                         }
                     }
                 }
